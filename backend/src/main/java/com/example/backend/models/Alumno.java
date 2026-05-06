@@ -2,10 +2,7 @@ package com.example.backend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,9 +13,9 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="alumnos", schema = "")
+@Table(name="alumnos")
 
-public class Alumnos {
+public class Alumno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

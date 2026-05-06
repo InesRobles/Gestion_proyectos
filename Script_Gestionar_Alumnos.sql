@@ -2,29 +2,29 @@
 -- 1. TABLA USUARIOS
 -- =========================================
 CREATE TABLE usuarios (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nombre_usuario VARCHAR2(50) NOT NULL UNIQUE,
-    contrasena_hash VARCHAR2(255) NOT NULL,
-    rol VARCHAR2(20) NOT NULL
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
+    contrasena_hash VARCHAR(255) NOT NULL,
+    rol VARCHAR(20) NOT NULL 
         CHECK (rol IN ('alumno', 'administrador')),
-    nombre_real VARCHAR2(100) NOT NULL
+    nombre_real VARCHAR(100) NOT NULL
 );
 
 -- =========================================
 -- 2. TABLA MODALIDADES
 -- =========================================
 CREATE TABLE modalidades (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nombre VARCHAR2(50) NOT NULL UNIQUE
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE
 );
 
 -- =========================================
 -- 3. TABLA ALUMNOS
 -- =========================================
 CREATE TABLE alumnos (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    usuario_id NUMBER UNIQUE,
-    modalidad_id NUMBER,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT UNIQUE,
+    modalidad_id INT,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
     FOREIGN KEY (modalidad_id) REFERENCES modalidades(id)
 );
@@ -33,11 +33,11 @@ CREATE TABLE alumnos (
 -- 4. TABLA PROYECTOS
 -- =========================================
 CREATE TABLE proyectos (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    titulo VARCHAR2(100) NOT NULL,
-    descripcion VARCHAR2(500),
-    cupo_maximo NUMBER DEFAULT 5 NOT NULL,
-    estado VARCHAR2(20) DEFAULT 'en curso'
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(500),
+    cupo_maximo INT DEFAULT 5 NOT NULL,
+    estado VARCHAR(20) DEFAULT 'en curso'
         CHECK (estado IN ('en curso', 'finalizado', 'pausado'))
 );
 
@@ -45,8 +45,8 @@ CREATE TABLE proyectos (
 -- 5. TABLA ASIGNACIONES
 -- =========================================
 CREATE TABLE asignaciones (
-    alumno_id NUMBER,
-    proyecto_id NUMBER,
+    alumno_id INT,
+    proyecto_id INT,
     PRIMARY KEY (alumno_id, proyecto_id),
     FOREIGN KEY (alumno_id) REFERENCES alumnos(id),
     FOREIGN KEY (proyecto_id) REFERENCES proyectos(id)
@@ -55,37 +55,39 @@ CREATE TABLE asignaciones (
 -- =========================================
 -- 6. TRIGGER CUPOS PROYECTOS
 -- =========================================
-CREATE OR REPLACE TRIGGER evitar_exceso_cupo
+DELIMITER //
+
+CREATE TRIGGER evitar_exceso_cupo
 BEFORE INSERT ON asignaciones
 FOR EACH ROW
-DECLARE
-    v_total NUMBER;
-    v_cupo NUMBER;
 BEGIN
+    DECLARE v_total INT;
+    DECLARE v_cupo INT;
+
     SELECT COUNT(*) INTO v_total
     FROM asignaciones
-    WHERE proyecto_id = :NEW.proyecto_id;
+    WHERE proyecto_id = NEW.proyecto_id;
 
     SELECT cupo_maximo INTO v_cupo
     FROM proyectos
-    WHERE id = :NEW.proyecto_id;
+    WHERE id = NEW.proyecto_id;
 
     IF v_total >= v_cupo THEN
-        RAISE_APPLICATION_ERROR(-20001,
-        'Error: El proyecto ha alcanzado su límite de alumnos');
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Error: El proyecto ha alcanzado su límite de alumnos';
     END IF;
-END;
-/
--- IMPORTANTE: la barra "/" es obligatoria en Oracle
+END//
+
+DELIMITER ;
 
 -- =========================================
 -- 7. TABLA COMENTARIOS
 -- =========================================
 CREATE TABLE comentarios (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    proyecto_id NUMBER,
-    usuario_id NUMBER,
-    texto VARCHAR2(500) NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    proyecto_id INT,
+    usuario_id INT,
+    texto VARCHAR(500) NOT NULL,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (proyecto_id) REFERENCES proyectos(id),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
@@ -95,11 +97,11 @@ CREATE TABLE comentarios (
 -- 8. TABLA HORARIOS
 -- =========================================
 CREATE TABLE horarios (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    alumno_id NUMBER,
-    dia_semana VARCHAR2(20) NOT NULL,
-    hora_inicio VARCHAR2(10) NOT NULL,
-    hora_fin VARCHAR2(10) NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    alumno_id INT,
+    dia_semana VARCHAR(20) NOT NULL,
+    hora_inicio VARCHAR(10) NOT NULL,
+    hora_fin VARCHAR(10) NOT NULL,
     FOREIGN KEY (alumno_id) REFERENCES alumnos(id)
 );
 
@@ -107,86 +109,56 @@ CREATE TABLE horarios (
 -- 9. TABLA ASISTENCIA
 -- =========================================
 CREATE TABLE asistencia (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    alumno_id NUMBER,
-    fecha DATE DEFAULT SYSDATE,
-    presente NUMBER(1) DEFAULT 0,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    alumno_id INT,
+    fecha DATE DEFAULT (CURRENT_DATE),
+    presente TINYINT(1) DEFAULT 0,
     FOREIGN KEY (alumno_id) REFERENCES alumnos(id)
 );
 
 -- =========================================
--- INSERCIÓN DE DATOS DE PRUEBA (ORACLE)
+-- INSERCIÓN DE DATOS DE PRUEBA
 -- =========================================
 
 -- 1. MODALIDADES
-INSERT INTO modalidades (nombre) VALUES ('Presencial');
-INSERT INTO modalidades (nombre) VALUES ('Online');
-INSERT INTO modalidades (nombre) VALUES ('Semipresencial');
+INSERT INTO modalidades (nombre) VALUES ('Presencial'), ('Online'), ('Semipresencial');
 
 -- 2. USUARIOS 
--- (Contraseñas de ejemplo en texto plano para fines ilustrativos, en real sería el hash)
-INSERT INTO usuarios (nombre_usuario, contrasena_hash, rol, nombre_real) 
-VALUES ('admin_jose', 'hash_secure_123', 'administrador', 'José Rodríguez');
-
-INSERT INTO usuarios (nombre_usuario, contrasena_hash, rol, nombre_real) 
-VALUES ('maria_garcia', 'hash_student_99', 'alumno', 'María García');
-
-INSERT INTO usuarios (nombre_usuario, contrasena_hash, rol, nombre_real) 
-VALUES ('carlos_ruiz', 'hash_student_88', 'alumno', 'Carlos Ruiz');
-
-INSERT INTO usuarios (nombre_usuario, contrasena_hash, rol, nombre_real) 
-VALUES ('ana_perez', 'hash_student_77', 'alumno', 'Ana Pérez');
-
-INSERT INTO usuarios (nombre_usuario, contrasena_hash, rol, nombre_real) 
-VALUES ('luis_mendoza', 'hash_student_66', 'alumno', 'Luis Mendoza');
+INSERT INTO usuarios (nombre_usuario, contrasena_hash, rol, nombre_real) VALUES 
+('admin_jose', 'hash_secure_123', 'administrador', 'José Rodríguez'),
+('maria_garcia', 'hash_student_99', 'alumno', 'María García'),
+('carlos_ruiz', 'hash_student_88', 'alumno', 'Carlos Ruiz'),
+('ana_perez', 'hash_student_77', 'alumno', 'Ana Pérez'),
+('luis_mendoza', 'hash_student_66', 'alumno', 'Luis Mendoza');
 
 -- 3. ALUMNOS 
--- Relacionamos los usuarios con rol 'alumno' (IDs 2, 3, 4, 5) y modalidades
-INSERT INTO alumnos (usuario_id, modalidad_id) VALUES (2, 1); -- María en Presencial
-INSERT INTO alumnos (usuario_id, modalidad_id) VALUES (3, 2); -- Carlos en Online
-INSERT INTO alumnos (usuario_id, modalidad_id) VALUES (4, 1); -- Ana en Presencial
-INSERT INTO alumnos (usuario_id, modalidad_id) VALUES (5, 3); -- Luis en Semipresencial
+INSERT INTO alumnos (usuario_id, modalidad_id) VALUES 
+(2, 1), (3, 2), (4, 1), (5, 3);
 
 -- 4. PROYECTOS
-INSERT INTO proyectos (titulo, descripcion, cupo_maximo, estado) 
-VALUES ('Sistema de Gestión IA', 'Desarrollo de un core basado en redes neuronales', 3, 'en curso');
-
-INSERT INTO proyectos (titulo, descripcion, cupo_maximo, estado) 
-VALUES ('App Móvil Reciclaje', 'Aplicación para incentivar el reciclaje urbano', 5, 'en curso');
-
-INSERT INTO proyectos (titulo, descripcion, cupo_maximo, estado) 
-VALUES ('Portal E-learning', 'Plataforma educativa para zonas rurales', 10, 'finalizado');
+INSERT INTO proyectos (titulo, descripcion, cupo_maximo, estado) VALUES 
+('Sistema de Gestión IA', 'Desarrollo de un core basado en redes neuronales', 3, 'en curso'),
+('App Móvil Reciclaje', 'Aplicación para incentivar el reciclaje urbano', 5, 'en curso'),
+('Portal E-learning', 'Plataforma educativa para zonas rurales', 10, 'finalizado');
 
 -- 5. ASIGNACIONES
--- Proyecto 1 (IA): María y Carlos
-INSERT INTO asignaciones (alumno_id, proyecto_id) VALUES (1, 1);
-INSERT INTO asignaciones (alumno_id, proyecto_id) VALUES (2, 1);
-
--- Proyecto 2 (App): Ana y Luis
-INSERT INTO asignaciones (alumno_id, proyecto_id) VALUES (3, 2);
-INSERT INTO asignaciones (alumno_id, proyecto_id) VALUES (4, 2);
+INSERT INTO asignaciones (alumno_id, proyecto_id) VALUES 
+(1, 1), (2, 1), (3, 2), (4, 2);
 
 -- 6. COMENTARIOS
-INSERT INTO comentarios (proyecto_id, usuario_id, texto) 
-VALUES (1, 1, 'He subido el primer bosquejo del modelo a la nube.');
-
-INSERT INTO comentarios (proyecto_id, usuario_id, texto) 
-VALUES (1, 1, '¿Alguien puede revisar la API de conexión?');
-
-INSERT INTO comentarios (proyecto_id, usuario_id, texto) 
-VALUES (2, 1, 'Excelente progreso con el diseño de la interfaz.');
+INSERT INTO comentarios (proyecto_id, usuario_id, texto) VALUES 
+(1, 1, 'He subido el primer bosquejo del modelo a la nube.'),
+(1, 1, '¿Alguien puede revisar la API de conexión?'),
+(2, 1, 'Excelente progreso con el diseño de la interfaz.');
 
 -- 7. HORARIOS
--- Horario de María
-INSERT INTO horarios (alumno_id, dia_semana, hora_inicio, hora_fin) 
-VALUES (1, 'Lunes', '09:00', '13:00');
-
--- Horario de Carlos
-INSERT INTO horarios (alumno_id, dia_semana, hora_inicio, hora_fin) 
-VALUES (2, 'Martes', '15:00', '19:00');
+INSERT INTO horarios (alumno_id, dia_semana, hora_inicio, hora_fin) VALUES 
+(1, 'Lunes', '09:00', '13:00'),
+(2, 'Martes', '15:00', '19:00');
 
 -- 8. ASISTENCIA
-INSERT INTO asistencia (alumno_id, fecha, presente) VALUES (1, SYSDATE, 1);
-INSERT INTO asistencia (alumno_id, fecha, presente) VALUES (2, SYSDATE, 1);
-INSERT INTO asistencia (alumno_id, fecha, presente) VALUES (3, SYSDATE, 0); -- Ausente
-INSERT INTO asistencia (alumno_id, fecha, presente) VALUES (4, SYSDATE, 1);
+INSERT INTO asistencia (alumno_id, fecha, presente) VALUES 
+(1, CURDATE(), 1),
+(2, CURDATE(), 1),
+(3, CURDATE(), 0),
+(4, CURDATE(), 1);

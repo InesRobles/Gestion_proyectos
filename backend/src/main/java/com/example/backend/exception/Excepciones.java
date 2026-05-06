@@ -1,4 +1,4 @@
 package com.example.backend.exception;
 
-public class Excepciones {
+public class Excepciones extends RuntimeException{
 }

@@ -1,7 +1,9 @@
 package com.example.backend.models;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -10,16 +12,15 @@ import lombok.*;
 @Table(name = "asignaciones")
 public class Asignaciones {
 
-    @EmbeddedId
-    private AsignacionesId id = new AsignacionesId();
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("alumnoId")
     @JoinColumn(name = "alumno_id")
-    private Alumnos alumno;
+    private Alumno alumno;
 
     @ManyToOne
-    @MapsId("proyectoId")
     @JoinColumn(name = "proyecto_id")
     private Proyectos proyecto;
 }
