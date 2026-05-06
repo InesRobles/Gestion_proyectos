@@ -2,32 +2,29 @@ package com.example.backend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name="usuarios", schema = "")
-
+@Table(name="usuarios")
 public class Usuarios {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "contrasena_hash")
+    @Column(name = "nombre_usuario", nullable = false, unique = true, length = 50)
+    private String nombreUsuario;
+
+    @Column(name = "contrasena_hash", nullable = false, length = 255)
     private String contrasenaHash;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private Rol rol;
 
-    @Column(name = "nombre_real")
+    @Column(name = "nombre_real", nullable = false, length = 100)
     private String nombreReal;
 }

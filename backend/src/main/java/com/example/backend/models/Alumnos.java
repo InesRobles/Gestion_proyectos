@@ -30,4 +30,7 @@ public class Alumnos {
     @ManyToOne
     @JoinColumn(name = "modalidad_id")
     private Modalidades modalidades;
+
+    @OneToMany(mappedBy = "alumno")
+    private Set<Asignaciones> asignaciones = new HashSet<>();
 }

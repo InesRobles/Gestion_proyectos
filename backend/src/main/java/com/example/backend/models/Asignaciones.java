@@ -1,9 +1,7 @@
 package com.example.backend.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -13,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class Asignaciones {
 
     @EmbeddedId
-    private Long id;
+    private AsignacionesId id = new AsignacionesId();
 
     @ManyToOne
     @MapsId("alumnoId")

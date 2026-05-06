@@ -35,6 +35,6 @@ public class Proyectos {
     @Column
     private EstadoProyecto estado;
 
-    @ManyToMany(mappedBy = "proyectos")
-    private Set<Alumnos> alumnos = new HashSet<>();
+    @OneToMany(mappedBy = "proyecto")
+    private Set<Asignaciones> asignaciones = new HashSet<>();
 }
