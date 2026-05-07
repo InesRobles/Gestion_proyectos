@@ -1,8 +1,8 @@
 package com.example.backend.services;
 
-import com.example.backend.dto.AsignacionesDTO;
-import com.example.backend.mapper.AsignacionesMapper;
-import com.example.backend.models.AsignacionesId;
+import com.example.backend.dto.AsignacionDTO;
+import com.example.backend.mapper.AsignacionMapper;
+import com.example.backend.models.AsignacionId;
 import com.example.backend.repositories.AsignacionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +20,17 @@ public class AsignacionService {
     private AsignacionRepository asignacionRepository;
 
     @Autowired
-    private AsignacionesMapper asignacionesMapper;
+    private AsignacionMapper asignacionMapper;
 
-    public List<AsignacionesDTO> findAll() {
+    public List<AsignacionDTO> findAll() {
         return asignacionRepository.findAll()
                 .stream()
-                .map(asignacionesMapper::toDTO)
+                .map(asignacionMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<AsignacionesDTO> findById(AsignacionesId id) {
+    public Optional<AsignacionDTO> findById(AsignacionId id) {
         return asignacionRepository.findById(id)
-                .map(asignacionesMapper::toDTO);
+                .map(asignacionMapper::toDTO);
     }
 }

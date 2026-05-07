@@ -1,8 +1,7 @@
 package com.example.backend.services;
 
-import com.example.backend.dto.ProyectosDTO;
-import com.example.backend.mapper.ProyectosMapper;
-import com.example.backend.models.Proyectos;
+import com.example.backend.dto.ProyectoDTO;
+import com.example.backend.mapper.ProyectoMapper;
 import com.example.backend.repositories.ProyectoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +19,13 @@ public class ProyectoService {
     private ProyectoRepository proyectoRepository;
 
     @Autowired
-    private ProyectosMapper proyectosMapper;
+    private ProyectoMapper proyectoMapper;
 
-    public List<ProyectosDTO> findAll() {
-        return proyectoRepository.findAll().stream().map(proyectosMapper::toDTO).collect(Collectors.toList());
+    public List<ProyectoDTO> findAll() {
+        return proyectoRepository.findAll().stream().map(proyectoMapper::toDTO).collect(Collectors.toList());
     }
 
-    public Optional<ProyectosDTO> findById(Long id) {
-        return proyectoRepository.findById(id).map(proyectosMapper::toDTO);
+    public Optional<ProyectoDTO> findById(Long id) {
+        return proyectoRepository.findById(id).map(proyectoMapper::toDTO);
     }
 }

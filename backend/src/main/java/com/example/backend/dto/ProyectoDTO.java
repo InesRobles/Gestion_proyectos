@@ -5,10 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class ProyectosDTO {
+public class ProyectoDTO {
 
     private Long id;
 

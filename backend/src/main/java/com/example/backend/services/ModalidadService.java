@@ -1,7 +1,7 @@
 package com.example.backend.services;
 
-import com.example.backend.dto.ModalidadesDTO;
-import com.example.backend.mapper.ModalidadesMapper;
+import com.example.backend.dto.ModalidadDTO;
+import com.example.backend.mapper.ModalidadMapper;
 import com.example.backend.repositories.ModalidadRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,20 +16,20 @@ import java.util.stream.Collectors;
 public class ModalidadService {
 
     @Autowired
-    private ModalidadRepository modalidadesRepository;
+    private ModalidadRepository modalidadRepository;
 
     @Autowired
-    private ModalidadesMapper modalidadesMapper;
+    private ModalidadMapper modalidadMapper;
 
-    public List<ModalidadesDTO> findAll() {
-        return modalidadesRepository.findAll()
+    public List<ModalidadDTO> findAll() {
+        return modalidadRepository.findAll()
                 .stream()
-                .map(modalidadesMapper::toDTO)
+                .map(modalidadMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public Optional<ModalidadesDTO> findById(Long id) {
-        return modalidadesRepository.findById(id)
-                .map(modalidadesMapper::toDTO);
+    public Optional<ModalidadDTO> findById(Long id) {
+        return modalidadRepository.findById(id)
+                .map(modalidadMapper::toDTO);
     }
 }

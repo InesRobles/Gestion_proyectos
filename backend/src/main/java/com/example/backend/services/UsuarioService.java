@@ -2,7 +2,7 @@ package com.example.backend.services;
 
 import com.example.backend.dto.UsuarioDTO;
 import com.example.backend.mapper.UsuarioMapper;
-import com.example.backend.models.Usuarios;
+import com.example.backend.models.Usuario;
 import com.example.backend.repositories.UsuarioRepository;
 import com.example.backend.exception.ElementoNoEncontradoException;
 import com.example.backend.exception.ResourceAlreadyExistsException;
@@ -29,37 +29,37 @@ public class UsuarioService {
 
 
     public UsuarioDTO crearUsuario(UsuarioDTO usuarioDTO) {
-        Optional<Usuarios> existingByNombre = usuarioRepository.findByNombreReal(usuarioDTO.getNombreReal());
+        Optional<Usuario> existingByNombre = usuarioRepository.findByNombreReal(usuarioDTO.getNombreReal());
         if (existingByNombre.isPresent()) {
             throw new ResourceAlreadyExistsException("Ya existe un usuario con el nombre: " + usuarioDTO.getNombreReal());
         }
 
-        Usuarios usuario = usuarioMapper.toEntity(usuarioDTO);
+        Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
         usuario.setContrasenaHash(passwordEncoder.encode(usuarioDTO.getContrasenaHash()));
 
-        Usuarios usuarioGuardado = usuarioRepository.save(usuario);
+        Usuario usuarioGuardado = usuarioRepository.save(usuario);
         return usuarioMapper.toDTO(usuarioGuardado);
     }
 
     public UsuarioDTO buscarUsuarioPorId(Long id) {
-        Usuarios usuario = usuarioRepository.findById(id)
+        Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con id: " + id));
         return usuarioMapper.toDTO(usuario);
     }
 
     public UsuarioDTO buscarUsuarioPorNombre(String nombreReal) {
-        Usuarios usuario = usuarioRepository.findByNombreReal(nombreReal)
+        Usuario usuario = usuarioRepository.findByNombreReal(nombreReal)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con nombre: " + nombreReal));
         return usuarioMapper.toDTO(usuario);
     }
 
     public List<UsuarioDTO> obtenerTodosLosUsuarios() {
-        List<Usuarios> usuarios = usuarioRepository.findAll();
+        List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarioMapper.toDTO(usuarios);
     }
 
     public UsuarioDTO actualizarUsuario(Long id, UsuarioDTO usuarioDTO) {
-        Usuarios usuario = usuarioRepository.findById(id)
+        Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con id: " + id));
 
         if (!usuario.getNombreReal().equals(usuarioDTO.getNombreReal())) {
@@ -75,7 +75,7 @@ public class UsuarioService {
             usuario.setContrasenaHash(passwordEncoder.encode(usuarioDTO.getContrasenaHash()));
         }
 
-        Usuarios usuarioActualizado = usuarioRepository.save(usuario);
+        Usuario usuarioActualizado = usuarioRepository.save(usuario);
         return usuarioMapper.toDTO(usuarioActualizado);
     }
 

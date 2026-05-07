@@ -13,7 +13,7 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="alumnos")
+@Table(name="alumno")
 
 public class Alumno {
     @Id
@@ -22,12 +22,12 @@ public class Alumno {
 
     @OneToOne
     @JoinColumn(name = "usuario_id", unique = true)
-    private Usuarios usuario;
+    private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "modalidad_id")
-    private Modalidades modalidades;
+    private Modalidad modalidad;
 
     @OneToMany(mappedBy = "alumno")
-    private Set<Asignaciones> asignaciones = new HashSet<>();
+    private Set<Asignacion> asignacion = new HashSet<>();
 }

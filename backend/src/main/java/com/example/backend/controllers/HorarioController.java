@@ -1,6 +1,6 @@
 package com.example.backend.controllers;
 
-import com.example.backend.dto.HorariosDTO;
+import com.example.backend.dto.HorarioDTO;
 import com.example.backend.services.HorarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,33 +13,33 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HorarioController {
 
-    private final HorarioService horariosService;
+    private final HorarioService horarioService;
 
     @GetMapping
-    public List<HorariosDTO> findAll() {
-        return horariosService.findAll();
+    public List<HorarioDTO> findAll() {
+        return horarioService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HorariosDTO> findById(@PathVariable Long id) {
-        return horariosService.findById(id)
+    public ResponseEntity<HorarioDTO> findById(@PathVariable Long id) {
+        return horarioService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/alumno/{alumnoId}")
-    public List<HorariosDTO> findByAlumno(@PathVariable Long alumnoId) {
-        return horariosService.findByAlumnoId(alumnoId);
+    public List<HorarioDTO> findByAlumno(@PathVariable Long alumnoId) {
+        return horarioService.findByAlumnoId(alumnoId);
     }
 
     @PostMapping
-    public HorariosDTO create(@RequestBody HorariosDTO horariosDTO) {
-        return horariosService.save(horariosDTO);
+    public HorarioDTO create(@RequestBody HorarioDTO horarioDTO) {
+        return horarioService.save(horarioDTO);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        horariosService.deleteById(id);
+        horarioService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

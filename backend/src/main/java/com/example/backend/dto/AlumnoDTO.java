@@ -14,5 +14,5 @@ public class AlumnoDTO {
 
     private Long usuarioId;
 
-    private Long modalidades;
+    private Long modalidad;
 }

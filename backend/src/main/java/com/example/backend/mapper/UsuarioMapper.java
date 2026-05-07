@@ -1,7 +1,7 @@
 package com.example.backend.mapper;
 
 import com.example.backend.dto.UsuarioDTO;
-import com.example.backend.models.Usuarios;
+import com.example.backend.models.Usuario;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -9,11 +9,11 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
 
-    Usuarios toEntity (UsuarioDTO usuarioDTO);
+    Usuario toEntity (UsuarioDTO usuarioDTO);
 
-    UsuarioDTO toDTO (Usuarios usuario);
+    UsuarioDTO toDTO (Usuario usuario);
 
-    List<UsuarioDTO> toDTO (List<Usuarios> usuarios);
+    List<UsuarioDTO> toDTO (List<Usuario> usuario);
 
-    List<Usuarios> toEntity (List<UsuarioDTO> usuarioDTOS);
+    List<Usuario> toEntity (List<UsuarioDTO> usuarioDTO);
 }

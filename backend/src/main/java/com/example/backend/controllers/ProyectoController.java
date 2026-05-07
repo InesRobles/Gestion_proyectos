@@ -1,6 +1,6 @@
 package com.example.backend.controllers;
 
-import com.example.backend.dto.ProyectosDTO;
+import com.example.backend.dto.ProyectoDTO;
 import com.example.backend.services.ProyectoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +19,12 @@ public class ProyectoController {
     private ProyectoService proyectoService;
 
     @GetMapping
-    public List<ProyectosDTO> findAll() {
+    public List<ProyectoDTO> findAll() {
         return proyectoService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Optional<ProyectosDTO> findById(@PathVariable Long id) {
+    public Optional<ProyectoDTO> findById(@PathVariable Long id) {
         return proyectoService.findById(id);
     }
 }

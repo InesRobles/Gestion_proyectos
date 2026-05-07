@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AsignacionesDTO {
+public class AsignacionDTO {
 
     private Integer alumnoId;
     private Integer proyectoId;

@@ -1,8 +1,8 @@
 package com.example.backend.services;
 
-import com.example.backend.dto.ComentariosDTO;
-import com.example.backend.mapper.ComentariosMapper;
-import com.example.backend.models.Comentarios;
+import com.example.backend.dto.ComentarioDTO;
+import com.example.backend.mapper.ComentarioMapper;
+import com.example.backend.models.Comentario;
 import com.example.backend.repositories.ComentarioRepository;
 import com.example.backend.repositories.ProyectoRepository; // Asumiendo que existen
 import com.example.backend.repositories.UsuarioRepository;
@@ -21,7 +21,7 @@ public class ComentarioService {
     private ComentarioRepository comentarioRepository;
 
     @Autowired
-    private ComentariosMapper comentarioMapper;
+    private ComentarioMapper comentarioMapper;
 
     @Autowired
     private ProyectoRepository proyectoRepository;
@@ -30,8 +30,8 @@ public class ComentarioService {
     private UsuarioRepository usuarioRepository;
 
 
-    public ComentariosDTO crearComentario(ComentariosDTO dto) {
-        Comentarios comentario = comentarioMapper.toEntity(dto);
+    public ComentarioDTO crearComentario(ComentarioDTO dto) {
+        Comentario comentario = comentarioMapper.toEntity(dto);
 
         comentario.setProyecto(proyectoRepository.findById(dto.getProyectoId())
                 .orElseThrow(() -> new ElementoNoEncontradoException("Proyecto no encontrado")));
@@ -41,12 +41,12 @@ public class ComentarioService {
         return comentarioMapper.toDTO(comentarioRepository.save(comentario));
     }
 
-    public List<ComentariosDTO> obtenerTodos() {
+    public List<ComentarioDTO> obtenerTodos() {
         return comentarioMapper.toDTO(comentarioRepository.findAll());
     }
 
-    public ComentariosDTO obtenerPorId(Long id) {
-        Comentarios comentario = comentarioRepository.findById(id)
+    public ComentarioDTO obtenerPorId(Long id) {
+        Comentario comentario = comentarioRepository.findById(id)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Comentario no encontrado"));
         return comentarioMapper.toDTO(comentario);
     }

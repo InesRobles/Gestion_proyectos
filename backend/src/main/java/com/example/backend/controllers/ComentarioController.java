@@ -1,6 +1,6 @@
 package com.example.backend.controllers;
 
-import com.example.backend.dto.ComentariosDTO;
+import com.example.backend.dto.ComentarioDTO;
 import com.example.backend.services.ComentarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,17 +17,17 @@ public class ComentarioController {
     private final ComentarioService comentarioService;
 
     @PostMapping
-    public ResponseEntity<ComentariosDTO> guardar(@RequestBody ComentariosDTO dto) {
+    public ResponseEntity<ComentarioDTO> guardar(@RequestBody ComentarioDTO dto) {
         return new ResponseEntity<>(comentarioService.crearComentario(dto), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<ComentariosDTO> listar() {
+    public List<ComentarioDTO> listar() {
         return comentarioService.obtenerTodos();
     }
 
     @GetMapping("/{id}")
-    public ComentariosDTO buscar(@PathVariable Long id) {
+    public ComentarioDTO buscar(@PathVariable Long id) {
         return comentarioService.obtenerPorId(id);
     }
 

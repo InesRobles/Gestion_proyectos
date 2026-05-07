@@ -9,10 +9,10 @@ import org.mapstruct.Mapping;
 public interface AlumnoMapper {
 
     @Mapping(source = "usuario.id", target = "usuarioId")
-    @Mapping(source = "modalidades.id", target = "modalidades")
+    @Mapping(source = "modalidad.id", target = "modalidad")
     AlumnoDTO toDTO(Alumno alumno);
 
     @Mapping(source = "usuarioId", target = "usuario.id")
-    @Mapping(source = "modalidades", target = "modalidades.id")
+    @Mapping(source = "modalidad", target = "modalidad.id")
     Alumno toEntity(AlumnoDTO alumnoDTO);
 }

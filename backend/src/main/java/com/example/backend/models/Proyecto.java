@@ -12,9 +12,9 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="proyectos", schema = "")
+@Table(name="proyecto", schema = "")
 
-public class Proyectos {
+public class Proyecto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,5 +32,5 @@ public class Proyectos {
     private EstadoProyecto estado;
 
     @OneToMany(mappedBy = "proyecto")
-    private Set<Asignaciones> asignaciones = new HashSet<>();
+    private Set<Asignacion> asignaciones = new HashSet<>();
 }

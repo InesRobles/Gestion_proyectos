@@ -10,9 +10,9 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="horarios", schema = "")
+@Table(name="horario", schema = "")
 
-public class Horarios {
+public class Horario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

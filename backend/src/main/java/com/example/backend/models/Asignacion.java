@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "asignaciones")
-public class Asignaciones {
+@Table(name = "asignacion")
+public class Asignacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private AsignacionesId id;
+    private AsignacionId id;
 
     @ManyToOne
     @MapsId("alumnoId")
@@ -24,5 +24,5 @@ public class Asignaciones {
     @ManyToOne
     @MapsId("proyectoId")
     @JoinColumn(name = "proyecto_id", insertable = false, updatable = false)
-    private Proyectos proyecto;
+    private Proyecto proyecto;
 }

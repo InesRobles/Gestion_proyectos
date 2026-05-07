@@ -1,6 +1,6 @@
 package com.example.backend.controllers;
 
-import com.example.backend.dto.ModalidadesDTO;
+import com.example.backend.dto.ModalidadDTO;
 import com.example.backend.services.ModalidadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +16,16 @@ import java.util.List;
 public class ModalidadController {
 
     @Autowired
-    private ModalidadService modalidadesService;
+    private ModalidadService modalidadService;
 
     @GetMapping
-    public List<ModalidadesDTO> findAll() {
-        return modalidadesService.findAll();
+    public List<ModalidadDTO> findAll() {
+        return modalidadService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ModalidadesDTO> findById(@PathVariable Long id) {
-        return modalidadesService.findById(id)
+    public ResponseEntity<ModalidadDTO> findById(@PathVariable Long id) {
+        return modalidadService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

@@ -1,7 +1,7 @@
 package com.example.backend.controllers;
 
-import com.example.backend.dto.AsignacionesDTO;
-import com.example.backend.models.AsignacionesId;
+import com.example.backend.dto.AsignacionDTO;
+import com.example.backend.models.AsignacionId;
 import com.example.backend.services.AsignacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +17,16 @@ import java.util.List;
 public class AsignacionController {
 
     @Autowired
-    private AsignacionService asignacionesService;
+    private AsignacionService asignacionService;
 
     @GetMapping
-    public List<AsignacionesDTO> findAll() {
-        return asignacionesService.findAll();
+    public List<AsignacionDTO> findAll() {
+        return asignacionService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AsignacionesDTO> findById(@PathVariable AsignacionesId id) {
-        return asignacionesService.findById(id)
+    public ResponseEntity<AsignacionDTO> findById(@PathVariable AsignacionId id) {
+        return asignacionService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

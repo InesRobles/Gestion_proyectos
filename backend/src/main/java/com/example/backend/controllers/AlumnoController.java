@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/alumnos")
+@RequestMapping("/api/alumno")
 public class AlumnoController {
 
     @Autowired
     private AlumnoService alumnoService;
 
     @GetMapping
-    public List<AlumnoDTO> listarAlumnos() {
+    public List<AlumnoDTO> listarAlumno() {
         return alumnoService.obtenerTodos();
     }
 

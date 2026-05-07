@@ -6,7 +6,7 @@ import lombok.*;
 
 @Embeddable
 @Data @NoArgsConstructor @AllArgsConstructor
-public class AsignacionesId implements Serializable {
+public class AsignacionId implements Serializable {
     private Long alumnoId;
     private Long proyectoId;
 }
