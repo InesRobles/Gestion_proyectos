@@ -14,13 +14,15 @@ public class Asignaciones {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private AsignacionesId id;
 
     @ManyToOne
-    @JoinColumn(name = "alumno_id")
+    @MapsId("alumnoId")
+    @JoinColumn(name = "alumno_id", insertable = false, updatable = false)
     private Alumno alumno;
 
     @ManyToOne
-    @JoinColumn(name = "proyecto_id")
+    @MapsId("proyectoId")
+    @JoinColumn(name = "proyecto_id", insertable = false, updatable = false)
     private Proyectos proyecto;
 }
