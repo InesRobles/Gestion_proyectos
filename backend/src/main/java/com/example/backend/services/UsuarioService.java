@@ -3,7 +3,7 @@ package com.example.backend.services;
 import com.example.backend.dto.UsuarioDTO;
 import com.example.backend.mapper.UsuarioMapper;
 import com.example.backend.models.Usuarios;
-import com.example.backend.repositories.IUsuarioRepository;
+import com.example.backend.repositories.UsuarioRepository;
 import com.example.backend.exception.ElementoNoEncontradoException;
 import com.example.backend.exception.ResourceAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    private final IUsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder passwordEncoder;
 
