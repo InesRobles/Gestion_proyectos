@@ -2,10 +2,7 @@ package com.example.backend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,9 +13,9 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="proyectos", schema = "")
+@Table(name="proyecto", schema = "")
 
-public class Proyectos {
+public class Proyecto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,8 +30,8 @@ public class Proyectos {
     private Integer cupoMaximo;
 
     @Column
-    private String estado;
+    private EstadoProyecto estado;
 
-    @ManyToMany(mappedBy = "proyectos")
-    private Set<Alumnos> alumnos = new HashSet<>();
+    @OneToMany(mappedBy = "proyecto")
+    private Set<Asignacion> asignaciones = new HashSet<>();
 }

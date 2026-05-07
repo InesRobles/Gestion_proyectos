@@ -2,12 +2,7 @@ package com.example.backend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 import java.time.LocalDateTime;
 
 @Getter
@@ -17,20 +12,20 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="comentarios", schema = "")
+@Table(name="comentario", schema = "")
 
-public class Comentarios {
+public class Comentario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "proyecto_id")
-    private Proyectos proyecto;
+    private Proyecto proyecto;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    private Usuarios usuario;
+    private Usuario usuario;
 
     @Column(nullable = false, length = 500)
     private String texto;

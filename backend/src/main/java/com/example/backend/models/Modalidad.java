@@ -2,12 +2,6 @@ package com.example.backend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -16,11 +10,12 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @Entity
-@Table(name="modalidades", schema = "")
+@Table(name="modalidad", schema = "")
 
-public class Modalidades {
+public class Modalidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nombre;
 }

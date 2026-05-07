@@ -9,17 +9,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class UsuarioDTO {
+public class AsistenciaDTO {
 
     private Long id;
 
-    private String contrasenaHash;
+    private Long alumnoId;
 
-    private Rol rol;
+    private LocalDate fecha = LocalDate.now();
 
-    private String nombreReal;
+    private Boolean presente = false;
 }

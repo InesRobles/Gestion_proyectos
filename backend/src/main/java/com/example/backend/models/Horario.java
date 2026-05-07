@@ -2,12 +2,6 @@ package com.example.backend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -18,14 +12,14 @@ import java.util.Set;
 @Entity
 @Table(name="horarios", schema = "")
 
-public class Horarios {
+public class Horario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "alumno_id")
-    private Alumnos alumno;
+    private Alumno alumnoId;
 
     @Column(name = "dia_semana", nullable = false, length = 20)
     private String diaSemana;

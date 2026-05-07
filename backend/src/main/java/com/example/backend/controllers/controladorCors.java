@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "http://localhost:8100")
 @RestController
 @RequestMapping("/api")
-public class MiControlador {
+public class controladorCors {
 
     @GetMapping("/datos")
     public String obtenerDatos() {
