@@ -1,0 +1,35 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="main-header">
+    <div class="header-content">
+      <div class="brand-section">
+        @if (mostrarFlecha) {
+          <ion-icon name="arrow-back-outline" class="back-icon" [routerLink]="['/']"></ion-icon>
+        }
+        <h1 class="logo-text">Proyectos<span>Hub</span></h1>
+      </div>
+
+      <div class="search-bar-container">
+        <ion-searchbar
+          placeholder="Buscar proyectos..."
+          class="custom-search"
+          [debounce]="300"
+          (ionInput)="onSearch($event)">
+        </ion-searchbar>
+      </div>
+
+      <ion-buttons slot="end">
+        <div class="user-card-trigger" [routerLink]="['/profile']">
+          <div class="user-info-text">
+            <span class="welcome-msg">Bienvenido,</span>
+            <span class="user-name">{{ nombreUsuario }}</span>
+          </div>
+          <div class="avatar-wrapper">
+            <img *ngIf="fotoUrl" [src]="fotoUrl" class="header-avatar-img" />
+            <ion-icon *ngIf="!fotoUrl" name="person-circle"></ion-icon>
+            <div class="online-indicator"></div>
+          </div>
+        </div>
+      </ion-buttons>
+    </div>
+  </ion-toolbar>
+</ion-header>

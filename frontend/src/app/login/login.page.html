@@ -1,0 +1,43 @@
+<ion-content [fullscreen]="true">
+  <div class="login-wrapper">
+    <ion-card class="interactive-card">
+      <ion-grid>
+        <ion-row class="ion-align-items-center">
+
+          <ion-col size="12" size-md="7">
+            <div class="form-section">
+              <ion-card-title>BIENVENIDO</ion-card-title>
+              <div class="inputs-wrapper">
+                <div class="custom-input">
+                  <label class="input-label">Email</label>
+                  <ion-input type="email" placeholder="ejemplo@correo.com" class="styled-input"></ion-input>
+                </div>
+                <div class="custom-input">
+                  <label class="input-label">Password</label>
+                  <ion-input type="password" placeholder="********" class="styled-input"></ion-input>
+                </div>
+              </div>
+              <ion-button expand="block" class="login-button" [routerLink]="['/home']">
+                Iniciar Sesión
+              </ion-button>
+
+              <div class="ion-text-center">
+                <ion-note>
+                  ¿No tienes cuenta?
+                  <b [routerLink]="['/register']" class="link-register">Regístrate aquí</b>
+                </ion-note>
+              </div>
+            </div>
+          </ion-col>
+
+          <ion-col size="12" size-md="5" class="ion-text-center">
+            <div class="logo-section">
+              <ion-icon class="img-login-large" name="person-sharp"></ion-icon>
+            </div>
+          </ion-col>
+
+        </ion-row>
+      </ion-grid>
+    </ion-card>
+  </div>
+</ion-content>

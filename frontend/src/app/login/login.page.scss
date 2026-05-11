@@ -1,0 +1,128 @@
+// Variables de color personalizadas
+$bg-app: #f0f2f5;
+$bg-card: #ffffff;
+$primary-color: #3880ff;
+
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); // Fondo de la app interactivo
+  padding: 20px;
+}
+
+.interactive-card {
+  width: 100%;
+  max-width: 800px;
+  background: $bg-card;
+  border-radius: 20px;
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  // Efecto interactivo al pasar el mouse
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+}
+
+.form-section {
+  padding: 20px;
+
+  ion-card-title {
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #444;
+  }
+}
+
+.inputs-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 5px;
+}
+
+.custom-input {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  .input-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #764ba2;
+    letter-spacing: 0.3px;
+    padding-left: 4px;
+  }
+
+  ion-input.styled-input {
+    --background: #f4f0fa;
+    --color: #2d1f3d;
+    --placeholder-color: #b09cc8;
+    --padding-start: 14px;
+    --padding-end: 14px;
+    --border-radius: 10px;
+    border: 1.5px solid #e0d6f0;
+    border-radius: 10px;
+    font-size: 0.97rem;
+    height: 46px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus-within {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.12);
+    }
+  }
+}
+
+.login-button {
+  --border-radius: 10px;
+  margin-top: 20px;
+  height: 50px;
+  font-weight: bold;
+}
+
+.logo-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f4f5f8;
+  border-radius: 20px;
+  padding: 40px;
+}
+
+.img-login-large {
+  font-size: 150px; // Logo grande a la derecha
+  color: $primary-color;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+// Ajuste para móviles: el logo pasa arriba y el formulario abajo
+@media (max-width: 768px) {
+  .logo-section {
+    margin-bottom: 20px;
+  }
+  .img-login-large {
+    font-size: 100px;
+  }
+}
+
+
+.link-register {
+  color: #3880ff;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    color: #764ba2;
+    filter: brightness(1.2);
+  }
+}
+
+// Asegúrate de que el ion-note tenga un margen superior para separarlo del botón
+ion-note {
+  display: block;
+  margin-top: 20px;
+}
