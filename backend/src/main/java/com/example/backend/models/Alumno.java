@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -30,4 +31,10 @@ public class Alumno {
 
     @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Asignacion> asignacion = new HashSet<>();
+
+    @OneToMany(mappedBy = "alumno", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Asistencia> asistencias = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "alumnoId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Horario> horarios = new java.util.ArrayList<>();
 }

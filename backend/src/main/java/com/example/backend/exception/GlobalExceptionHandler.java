@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     // 500 - Cualquier otro error inesperado
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage() != null ? ex.getMessage() : ex.getClass().getName());
     }
 
     // ── Helper ───────────────────────────────────────────────

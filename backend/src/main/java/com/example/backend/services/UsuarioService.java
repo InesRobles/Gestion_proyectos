@@ -4,6 +4,7 @@ import com.example.backend.dto.UsuarioDTO;
 import com.example.backend.mapper.UsuarioMapper;
 import com.example.backend.models.Usuario;
 import com.example.backend.repositories.AlumnoRepository;
+import com.example.backend.repositories.ComentarioRepository;
 import com.example.backend.repositories.UsuarioRepository;
 import com.example.backend.exception.ElementoNoEncontradoException;
 import com.example.backend.exception.ResourceAlreadyExistsException;
@@ -25,6 +26,9 @@ public class UsuarioService {
 
     @Autowired
     private AlumnoRepository alumnoRepository;
+
+    @Autowired
+    private ComentarioRepository comentarioRepository;
 
     @Autowired
     private UsuarioMapper usuarioMapper;
@@ -102,6 +106,9 @@ public class UsuarioService {
         if (!usuarioRepository.existsById(id)) {
             throw new ElementoNoEncontradoException("Usuario no encontrado con id: " + id);
         }
+
+        // Eliminar comentarios del usuario para evitar fallo de foreign key
+        comentarioRepository.deleteAll(comentarioRepository.findByUsuarioId(id));
 
         // Eliminar el alumno asociado si existe, para evitar el fallo de foreign key
         alumnoRepository.findByUsuarioId(id).ifPresent(alumnoRepository::delete);
