@@ -596,3 +596,49 @@ $bg-app: #f4f7fe;
     }
   }
 }
+
+// ── ESTADO CHIP (reemplaza badge/progress-chip) ────────────────
+.estado-chip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(6px);
+
+  &.estado-en-curso   { background: rgba(34,197,94,0.85);  color: #fff; }
+  &.estado-pausado    { background: rgba(251,191,36,0.85); color: #1a1a1a; }
+  &.estado-finalizado { background: rgba(148,163,184,0.85);color: #fff; }
+}
+
+// ── META ROW (cupo) ────────────────────────────────────────────
+.meta-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  color: var(--ion-color-medium, #888);
+
+  ion-icon { font-size: 0.95rem; }
+}
+
+// ── LISTA VACÍA ────────────────────────────────────────────────
+.lista-vacia {
+  width: 100%;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ion-color-medium, #888);
+
+  ion-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+  p { margin: 0; font-size: 0.9rem; }
+}

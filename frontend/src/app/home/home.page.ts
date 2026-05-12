@@ -16,6 +16,8 @@ import {
 } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from "../components/header/header.component";
+import {proyecto} from "../modelos/proyecto";
+import {ProyectoService} from "../services/proyecto-service";
 
 @Component({
   selector: 'app-home',
@@ -31,7 +33,7 @@ import { HeaderComponent } from "../components/header/header.component";
   ]
 })
 export class HomePage implements OnInit {
-  // Estado del Modal y Selección
+
   isModalOpen = false;
   proyectoSeleccionado: any = null;
   esProyectoInscrito = false;
@@ -42,63 +44,23 @@ export class HomePage implements OnInit {
   isExiting = false;
   nombreUsuario = "Usuario Pro";
 
-  // Listas de Proyectos (Base de datos local)
-  misProyectos = [
-    {
-      titulo: 'Sistema de Gestión',
-      categoria: 'Frontend',
-      imagen: 'https://picsum.photos/id/10/600/400',
-      descripcion: 'Un panel administrativo avanzado para gestionar usuarios y recursos en tiempo real.',
-      progreso: 65,
-      caracteristicas: ['Dashboard interactivo', 'Gestión de roles', 'Exportación a PDF'],
-      comentarios: ['Maquetación terminada', 'Falta conectar API de usuarios']
-    },
-    {
-      titulo: 'Pasarela de Pagos',
-      categoria: 'Backend',
-      imagen: 'https://picsum.photos/id/20/600/400',
-      descripcion: 'Integración de seguridad de alto nivel para transacciones monetarias internacionales.',
-      progreso: 40,
-      caracteristicas: ['Certificación PCI-DSS', 'Soporte multi-moneda', 'Webhooks de respuesta'],
-      comentarios: ['Iniciando pruebas de cifrado']
-    }
-  ];
+  // Listas de proyectos desde BD
+  misProyectos: proyecto[] = [];
+  nuevosProyectos: proyecto[] = [];
 
-  nuevosProyectos = [
-    {
-      titulo: 'AI Image Gen',
-      categoria: 'Innovación',
-      imagen: 'https://picsum.photos/id/30/600/400',
-      descripcion: 'Generador de imágenes mediante inteligencia artificial basado en prompts.',
-      progreso: 0,
-      caracteristicas: ['Modelo Stable Diffusion', 'Interfaz optimizada', 'Cloud Storage'],
-      comentarios: []
-    },
-    {
-      titulo: 'Crypto Wallet',
-      categoria: 'Web3',
-      imagen: 'https://picsum.photos/id/50/600/400',
-      descripcion: 'Billetera digital segura para el manejo de activos en la blockchain.',
-      progreso: 0,
-      caracteristicas: ['Seguridad biométrica', 'Soporte multichain', 'Swap integrado'],
-      comentarios: []
-    },
-    {
-      titulo: 'Medical Tracker',
-      categoria: 'Salud',
-      imagen: 'https://picsum.photos/id/60/600/400',
-      descripcion: 'Diseño de interfaz para monitorización médica.',
-      progreso: 0,
-      caracteristicas: ['Gráficos en tiempo real', 'Alertas críticas', 'Historial médico'],
-      comentarios: []
-    }
-  ];
+  // Listas filtradas (las que se muestran)
+  misProyectosFiltrados: proyecto[] = [];
+  nuevosProyectosFiltrados: proyecto[] = [];
 
-  // Listas que se muestran (las que filtramos)
-  misProyectosFiltrados: any[] = [];
-  nuevosProyectosFiltrados: any[] = [];
+  loadingProyectos = true;
 
-  constructor(private toastController: ToastController) {
+  // Imagen placeholder para cards sin imagen en BD
+  readonly PLACEHOLDER_IMG = 'https://picsum.photos/seed/proyecto/600/400';
+
+  constructor(
+    private toastController: ToastController,
+    private proyectoService: ProyectoService,
+  ) {
     addIcons({
       personCircle, closeOutline, exitOutline, timeOutline,
       logInOutline, addCircleOutline, chatbubblesOutline,
@@ -108,22 +70,41 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit() {
-    // Inicializar listas filtradas
-    this.misProyectosFiltrados = [...this.misProyectos];
-    this.nuevosProyectosFiltrados = [...this.nuevosProyectos];
-
-    // Verificar si ya fichó hoy
     const ultimoFichaje = localStorage.getItem('fechaFichaje');
     const hoy = new Date().toDateString();
     if (ultimoFichaje === hoy) {
       this.mostrarTarjetaAsistencia = false;
     }
+
+    this.cargarProyectos();
   }
 
-  // --- LÓGICA DE BÚSQUEDA CORREGIDA ---
-  // Ahora recibe directamente el 'string' que le envía el header
+  cargarProyectos() {
+    this.loadingProyectos = true;
+    this.proyectoService.getProyectos().subscribe({
+      next: (res) => {
+        // Proyectos "en curso" son los del alumno activo
+        this.misProyectos = res.filter(p => p.estado === 'en curso');
+        // El resto (pausado, finalizado) van a "Explorar"
+        this.nuevosProyectos = res.filter(p => p.estado !== 'en curso');
+        this.misProyectosFiltrados = [...this.misProyectos];
+        this.nuevosProyectosFiltrados = [...this.nuevosProyectos];
+        this.loadingProyectos = false;
+      },
+      error: async () => {
+        const toast = await this.toastController.create({
+          message: 'Error al cargar los proyectos',
+          duration: 2000,
+          color: 'danger',
+          position: 'top'
+        });
+        await toast.present();
+        this.loadingProyectos = false;
+      }
+    });
+  }
+
   buscarProyectos(textoBusqueda: string) {
-    // Aseguramos de que tengamos texto y lo pasamos a minúsculas
     const texto = textoBusqueda ? textoBusqueda.toLowerCase().trim() : '';
 
     if (!texto) {
@@ -134,13 +115,43 @@ export class HomePage implements OnInit {
 
     this.misProyectosFiltrados = this.misProyectos.filter(p =>
       p.titulo.toLowerCase().includes(texto) ||
-      p.categoria.toLowerCase().includes(texto)
+      p.descripcion?.toLowerCase().includes(texto)
     );
 
     this.nuevosProyectosFiltrados = this.nuevosProyectos.filter(p =>
       p.titulo.toLowerCase().includes(texto) ||
-      p.categoria.toLowerCase().includes(texto)
+      p.descripcion?.toLowerCase().includes(texto)
     );
+  }
+
+  // Devuelve la clase CSS para el chip de estado (sin espacios)
+  getClaseEstado(estado: string): string {
+    return 'estado-' + (estado ?? '').replace(/ /g, '-');
+  }
+
+  // Devuelve la imagen placeholder con seed único por proyecto para que cada card tenga una distinta
+  getImagenProyecto(p: proyecto): string {
+    return `https://picsum.photos/seed/${p.id}/600/400`;
+  }
+
+  // Traduce el estado del enum a una etiqueta legible
+  getEtiquetaEstado(estado: string): string {
+    switch (estado) {
+      case 'en curso':   return 'En Curso';
+      case 'finalizado': return 'Finalizado';
+      case 'pausado':    return 'Pausado';
+      default:           return estado;
+    }
+  }
+
+  // Color del badge según estado
+  getColorEstado(estado: string): string {
+    switch (estado) {
+      case 'en curso':   return 'success';
+      case 'finalizado': return 'medium';
+      case 'pausado':    return 'warning';
+      default:           return 'primary';
+    }
   }
 
   // --- ACCIONES ---
@@ -160,7 +171,7 @@ export class HomePage implements OnInit {
     setTimeout(() => this.mostrarTarjetaAsistencia = false, 500);
   }
 
-  async inscribirse(proyecto: any) {
+  async inscribirse(proyecto: proyecto) {
     const toast = await this.toastController.create({
       message: `🚀 Inscripción enviada para: ${proyecto.titulo}`,
       duration: 2500,
@@ -170,9 +181,9 @@ export class HomePage implements OnInit {
     await toast.present();
   }
 
-  verDetalles(p: any, i: boolean) {
+  verDetalles(p: proyecto, inscrito: boolean) {
     this.proyectoSeleccionado = p;
-    this.esProyectoInscrito = i;
+    this.esProyectoInscrito = inscrito;
     this.isModalOpen = true;
   }
 

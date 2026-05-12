@@ -27,4 +27,22 @@ public class ProyectoController {
     public Optional<ProyectoDTO> findById(@PathVariable Long id) {
         return proyectoService.findById(id);
     }
+
+    // Proyectos en curso o pausados donde el alumno está inscrito
+    @GetMapping("/alumno/{alumnoId}/activos")
+    public List<ProyectoDTO> findActivosByAlumno(@PathVariable Long alumnoId) {
+        return proyectoService.findActivosByAlumno(alumnoId);
+    }
+
+    // Proyectos finalizados donde el alumno está inscrito
+    @GetMapping("/alumno/{alumnoId}/finalizados")
+    public List<ProyectoDTO> findFinalizadosByAlumno(@PathVariable Long alumnoId) {
+        return proyectoService.findFinalizadosByAlumno(alumnoId);
+    }
+
+    // Proyectos donde el alumno NO está inscrito
+    @GetMapping("/alumno/{alumnoId}/explorar")
+    public List<ProyectoDTO> findNoInscritosByAlumno(@PathVariable Long alumnoId) {
+        return proyectoService.findNoInscritosByAlumno(alumnoId);
+    }
 }

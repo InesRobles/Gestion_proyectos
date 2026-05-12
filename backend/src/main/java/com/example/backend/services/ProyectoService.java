@@ -22,10 +22,33 @@ public class ProyectoService {
     private ProyectoMapper proyectoMapper;
 
     public List<ProyectoDTO> findAll() {
-        return proyectoRepository.findAll().stream().map(proyectoMapper::toDTO).collect(Collectors.toList());
+        return proyectoRepository.findAll().stream()
+                .map(proyectoMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public Optional<ProyectoDTO> findById(Long id) {
         return proyectoRepository.findById(id).map(proyectoMapper::toDTO);
+    }
+
+    // Proyectos 'en curso' o 'pausado' donde el alumno está inscrito
+    public List<ProyectoDTO> findActivosByAlumno(Long alumnoId) {
+        return proyectoRepository
+                .findByAsignaciones_AlumnoIdAndEstadoIn(alumnoId, List.of("en curso", "pausado"))
+                .stream().map(proyectoMapper::toDTO).collect(Collectors.toList());
+    }
+
+    // Proyectos 'finalizado' donde el alumno está inscrito
+    public List<ProyectoDTO> findFinalizadosByAlumno(Long alumnoId) {
+        return proyectoRepository
+                .findByAsignaciones_AlumnoIdAndEstadoIn(alumnoId, List.of("finalizado"))
+                .stream().map(proyectoMapper::toDTO).collect(Collectors.toList());
+    }
+
+    // Proyectos donde el alumno NO está inscrito
+    public List<ProyectoDTO> findNoInscritosByAlumno(Long alumnoId) {
+        return proyectoRepository
+                .findByAsignaciones_AlumnoIdNotContaining(alumnoId)
+                .stream().map(proyectoMapper::toDTO).collect(Collectors.toList());
     }
 }

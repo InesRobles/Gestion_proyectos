@@ -46,30 +46,44 @@
 
       <hr class="divider">
 
+      <!-- PROYECTOS EN CURSO -->
       <section>
         <h2 class="section-title">Tus Proyectos Activos</h2>
-        <ion-grid>
+
+        <!-- Skeleton loading -->
+        <ion-grid *ngIf="loadingProyectos">
           <ion-row>
-            <!-- CAMBIO AQUÍ: misProyectos -> misProyectosFiltrados -->
+            <ion-col size="12" size-sm="6" size-lg="4" size-xl="3" *ngFor="let i of [1,2,3]">
+              <ion-card class="interactive-card project-card">
+                <div class="image-container skeleton-box" style="height: 180px;"></div>
+                <ion-card-header class="card-header-content">
+                  <div class="skeleton-line wide" style="height: 18px; margin-bottom: 8px;"></div>
+                  <div class="skeleton-line short" style="height: 14px;"></div>
+                </ion-card-header>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <ion-grid *ngIf="!loadingProyectos">
+          <ion-row>
             <ion-col size="12" size-sm="6" size-lg="4" size-xl="3" *ngFor="let p of misProyectosFiltrados">
               <ion-card class="interactive-card project-card">
                 <div class="image-container">
-                  <img [src]="p.imagen" alt="Proyecto"/>
+                  <img [src]="getImagenProyecto(p)" alt="Proyecto"/>
                   <div class="card-overlay"></div>
-                  <div class="badge">{{ p.categoria }}</div>
-                  <div class="progress-chip">{{ p.progreso }}%</div>
+                  <div class="estado-chip estado-en-curso">En Curso</div>
                 </div>
                 <ion-card-header class="card-header-content">
                   <ion-card-title class="project-title">{{ p.titulo }}</ion-card-title>
                   <p class="project-description">{{ p.descripcion }}</p>
                 </ion-card-header>
                 <ion-card-content class="card-body">
-                  <div class="progress-row">
-                    <span class="progress-label">Avance</span>
-                    <span class="progress-value">{{ p.progreso }}%</span>
-                  </div>
-                  <div class="progress-track">
-                    <div class="progress-fill" [style.width.%]="p.progreso"></div>
+                  <div class="meta-row">
+                    <span class="meta-item">
+                      <ion-icon name="people-outline"></ion-icon>
+                      Cupo: {{ p.cupoMaximo }}
+                    </span>
                   </div>
                 </ion-card-content>
                 <div class="card-footer">
@@ -80,48 +94,68 @@
                 </div>
               </ion-card>
             </ion-col>
+
+            <div class="lista-vacia" *ngIf="misProyectosFiltrados.length === 0">
+              <ion-icon name="folder-open-outline"></ion-icon>
+              <p>No tienes proyectos activos en este momento.</p>
+            </div>
           </ion-row>
         </ion-grid>
       </section>
 
       <hr class="divider">
 
+      <!-- OTROS PROYECTOS (pausados / finalizados) -->
       <section class="project-section new-projects">
         <div class="section-header">
-          <h2 class="section-title">Explorar Nuevos Proyectos</h2>
-          <p class="section-subtitle">Únete a nuevos desafíos y amplía tu portafolio.</p>
+          <h2 class="section-title">Explorar Proyectos</h2>
+          <p class="section-subtitle">Consulta el estado de todos los proyectos disponibles.</p>
         </div>
 
-        <ion-grid>
+        <ion-grid *ngIf="!loadingProyectos">
           <ion-row>
-            <!-- CAMBIO AQUÍ: nuevosProyectos -> nuevosProyectosFiltrados -->
             <ion-col size="12" size-sm="6" size-lg="4" *ngFor="let p of nuevosProyectosFiltrados">
-              <ion-card class="interactive-card new-project-card">
+              <ion-card class="interactive-card project-card">
                 <div class="image-container">
-                  <img [src]="p.imagen" alt="Nuevo Proyecto"/>
-                  <div class="new-badge">NUEVO</div>
+                  <img [src]="getImagenProyecto(p)" alt="Proyecto"/>
+                  <div class="card-overlay"></div>
+                  <div class="estado-chip" [ngClass]="getClaseEstado(p.estado)">
+                    {{ getEtiquetaEstado(p.estado) }}
+                  </div>
                 </div>
-                <ion-card-header>
-                  <div class="cat-label">{{ p.categoria }}</div>
-                  <ion-card-title>{{ p.titulo }}</ion-card-title>
+                <ion-card-header class="card-header-content">
+                  <ion-card-title class="project-title">{{ p.titulo }}</ion-card-title>
+                  <p class="project-description">{{ p.descripcion }}</p>
                 </ion-card-header>
-                <ion-card-content>
-                  <p>{{ p.descripcion }}</p>
+                <ion-card-content class="card-body">
+                  <div class="meta-row">
+                    <span class="meta-item">
+                      <ion-icon name="people-outline"></ion-icon>
+                      Cupo: {{ p.cupoMaximo }}
+                    </span>
+                  </div>
                 </ion-card-content>
                 <div class="card-footer">
-                  <ion-button expand="block" class="inscribir-btn" (click)="inscribirse(p)">
+                  <ion-button fill="solid" class="inscribir-btn" (click)="inscribirse(p)">
                     <ion-icon name="add-circle-outline" slot="start"></ion-icon>
                     Inscribirse
                   </ion-button>
                 </div>
               </ion-card>
             </ion-col>
+
+            <div class="lista-vacia" *ngIf="nuevosProyectosFiltrados.length === 0">
+              <ion-icon name="search-outline"></ion-icon>
+              <p>No hay otros proyectos disponibles.</p>
+            </div>
           </ion-row>
         </ion-grid>
       </section>
 
     </div>
   </div>
+
+  <!-- MODAL DETALLES -->
   <ion-modal
     [isOpen]="isModalOpen"
     (didDismiss)="isModalOpen = false"
@@ -143,7 +177,7 @@
         <div class="modal-container" *ngIf="proyectoSeleccionado">
 
           <div class="modal-image-wrapper">
-            <img [src]="proyectoSeleccionado.imagen" class="modal-project-img" />
+            <img [src]="getImagenProyecto(proyectoSeleccionado)" class="modal-project-img" />
           </div>
 
           <div class="modal-info-content">
@@ -153,33 +187,17 @@
             <div class="status-section">
               <ion-label class="section-label">
                 <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
-                Estado de avance
+                Estado del proyecto
               </ion-label>
-
               <div class="progress-header">
-                <span class="progress-percent">{{ proyectoSeleccionado.progreso }}% Completado</span>
-                <ion-badge color="success" mode="ios" class="progress-badge">ACTIVO</ion-badge>
+                <ion-badge [color]="getColorEstado(proyectoSeleccionado.estado)" mode="ios" class="progress-badge">
+                  {{ getEtiquetaEstado(proyectoSeleccionado.estado) | uppercase }}
+                </ion-badge>
+                <span class="meta-item">
+                  <ion-icon name="people-outline"></ion-icon>
+                  Cupo máximo: {{ proyectoSeleccionado.cupoMaximo }}
+                </span>
               </div>
-
-              <ion-progress-bar [value]="proyectoSeleccionado.progreso / 100" color="success" class="custom-progress-bar"></ion-progress-bar>
-
-              <p class="progress-remaining">
-                Quedan aproximadamente {{ 100 - proyectoSeleccionado.progreso }}% para finalizar.
-              </p>
-            </div>
-
-            <div class="features-section">
-              <ion-label class="section-label">
-                <ion-icon name="list-outline" class="section-icon"></ion-icon>
-                Características del Proyecto
-              </ion-label>
-
-              <ion-list lines="none" class="features-list">
-                <ion-item *ngFor="let car of proyectoSeleccionado.caracteristicas" class="feature-item">
-                  <ion-icon name="checkmark-done-circle" color="primary" slot="start" class="feature-icon"></ion-icon>
-                  <ion-label class="feature-text">{{ car }}</ion-label>
-                </ion-item>
-              </ion-list>
             </div>
 
             <div class="chat-section">
@@ -192,7 +210,6 @@
                 <div *ngFor="let c of proyectoSeleccionado.comentarios" class="comment-bubble">
                   <p class="comment-text">{{ c }}</p>
                 </div>
-
                 <div *ngIf="!proyectoSeleccionado.comentarios || proyectoSeleccionado.comentarios.length === 0" class="empty-chat">
                   <ion-icon name="chatbubble-ellipses-outline" class="empty-chat-icon"></ion-icon>
                   <p class="empty-chat-text">No hay notas registradas para este proyecto.</p>
