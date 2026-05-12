@@ -1,6 +1,19 @@
-$primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$primary: #764ba2;
+$primary-light: #f0e8f8;
+$primary-dark: #5a3480;
+$accent-admin: #eb445a;
+$accent-alumno: #3880ff;
+$accent-profesor: #2dd36f;
 $bg-app: #f4f7fe;
+$surface: #ffffff;
+$border: rgba(0, 0, 0, 0.07);
+$text-main: #1a1a2e;
+$text-muted: #8892a4;
+$radius-card: 20px;
+$radius-modal: 24px;
+$radius-input: 12px;
 
+// ── BASE ──────────────────────────────────────────────────────────────────────
 .home-wrapper {
   background-color: $bg-app;
   min-height: 100%;
@@ -13,22 +26,14 @@ $bg-app: #f4f7fe;
   padding: 0 20px;
 }
 
-// LÓGICA DE ANIMACIÓN FICHAJE
+// ── HERO CARD ─────────────────────────────────────────────────────────────────
 .attendance-section {
   margin-bottom: 30px;
   animation: fadeInDown 0.6s ease-out forwards;
-  transition: all 0.5s ease-in-out;
-
-  &.exit-animation {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-    pointer-events: none;
-  }
 
   .attendance-hero-card {
     border-radius: 30px;
-    background: #fff;
-    position: relative;
+    background: $surface;
     overflow: hidden;
     box-shadow: 0 20px 50px rgba(118, 75, 162, 0.15);
 
@@ -40,139 +45,61 @@ $bg-app: #f4f7fe;
       flex-wrap: wrap;
       gap: 30px;
 
-      .user-name { color: #333; font-size: 3rem; font-weight: 900; }
+      .user-name { color: $text-main; font-size: 3rem; font-weight: 900; }
 
       .fichar-button {
-        --background: #764ba2;
+        --background: #{$primary};
+        --background-hover: #{$primary-dark};
         --border-radius: 18px;
         height: 65px;
-        width: 180px;
-        font-size: 1.3rem;
+        width: 200px;
+        font-size: 1.1rem;
         font-weight: 800;
+        letter-spacing: 0.04em;
+        transition: transform 0.15s ease;
+
+        &:active { transform: scale(0.97); }
       }
     }
   }
 }
 
-// ==========================================
-// ESTILOS NUEVA SECCIÓN PROYECTOS
-// ==========================================
+// ── PROYECTOS ─────────────────────────────────────────────────────────────────
 .new-projects {
   padding-bottom: 50px;
 
   .section-header {
     margin-bottom: 25px;
-    .section-subtitle {
-      color: #666;
-      margin-top: -15px;
-      font-size: 1rem;
-    }
+    .section-subtitle { color: #666; margin-top: -15px; font-size: 1rem; }
   }
 
   .new-project-card {
-    border-radius: 20px;
-    border: 1px solid rgba(0,0,0,0.05);
-    background: white;
-
-    .new-badge {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background: #2dd36f;
-      color: white;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 0.7rem;
-      font-weight: bold;
-    }
+    border-radius: $radius-card;
+    border: 1px solid $border;
+    background: $surface;
 
     .cat-label {
-      color: #764ba2;
+      color: $primary;
       font-size: 0.8rem;
       font-weight: bold;
       text-transform: uppercase;
       margin-bottom: 5px;
     }
-
-    .inscribir-btn {
-      --background: #3880ff;
-      --border-radius: 12px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
   }
 }
 
-// GENERALES
-.section-title { font-size: 1.8rem; font-weight: 800; color: #333; margin-bottom: 20px; }
-.divider { border: 0; height: 1px; background: rgba(0,0,0,0.1); margin: 40px 0; }
-.interactive-card { transition: all 0.3s ease; &:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); } border-radius: 15px; }
-.image-container { position: relative; height: 200px; overflow: hidden; img { width: 100%; height: 100%; object-fit: cover; } }
-.badge { position: absolute; top: 10px; right: 10px; background: #764ba2; color: white; padding: 5px 12px; border-radius: 10px; font-weight: bold; }
-
-
-// ==========================================
-// ESTILOS DEL MODAL DE DETALLES
-// ==========================================
-.project-modal {
-  --height: 85%;
-  --max-height: 85%;
-  --width: 650px;
+// ── GENERALES ─────────────────────────────────────────────────────────────────
+.section-title { font-size: 1.8rem; font-weight: 800; color: $text-main; margin-bottom: 20px; }
+.divider { border: 0; height: 1px; background: $border; margin: 40px 0; }
+.interactive-card {
+  transition: all 0.3s ease;
+  border-radius: 15px;
+  &:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
 }
 
-.modal-header-title {
-  font-weight: 800;
-  font-size: 1.1rem;
-}
-
-.modal-image-wrapper {
-  margin-bottom: 25px;
-
-  .modal-project-img {
-    border-radius: 18px;
-    width: 100%;
-    object-fit: cover;
-    height: 240px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  }
-}
-
-.modal-info-content {
-  .modal-title {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: #1a1a1a;
-  }
-
-  .modal-description-text {
-    color: #555;
-    line-height: 1.6;
-    margin: 12px 0 25px 0;
-    font-size: 1.05rem;
-  }
-}
-
-// Etiquetas de sección genéricas
-.section-label {
-  display: block;
-  margin-bottom: 10px;
-  font-weight: bold;
-  color: #333;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  font-size: 0.8rem;
-
-  .section-icon {
-    vertical-align: middle;
-    margin-right: 6px;
-    font-size: 1rem;
-  }
-}
-
-// 1. Estado de Avance
+// ── STATUS ────────────────────────────────────────────────────────────────────
 .status-section {
-  background: #f4f7fe;
+  background: $bg-app;
   padding: 18px;
   border-radius: 15px;
   margin-bottom: 20px;
@@ -184,141 +111,11 @@ $bg-app: #f4f7fe;
     align-items: center;
     margin-bottom: 10px;
 
-    .progress-percent {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #444;
-    }
-
-    .progress-badge {
-      padding: 5px 12px;
-      font-weight: bold;
-    }
-  }
-
-  .custom-progress-bar {
-    height: 10px;
-    border-radius: 5px;
-  }
-
-  .progress-remaining {
-    font-size: 0.8rem;
-    color: #777;
-    text-align: right;
-    margin-top: 8px;
+    .progress-percent { font-size: 1rem; font-weight: 600; color: #444; }
   }
 }
 
-// 2. Características
-.features-section {
-  margin-bottom: 25px;
-
-  .section-label { margin-bottom: 12px; }
-
-  .features-list {
-    background: transparent;
-
-    .feature-item {
-      --background: transparent;
-      --padding-start: 0;
-      min-height: 35px;
-
-      .feature-icon {
-        font-size: 1.3rem;
-        margin-right: 12px;
-      }
-
-      .feature-text {
-        font-size: 1rem;
-        color: #333;
-      }
-    }
-  }
-}
-
-// 3. Bitácora / Chat
-.chat-section {
-  border-top: 2px solid #f0f0f0;
-  padding-top: 20px;
-  margin-top: 10px;
-
-  .section-label { margin-bottom: 15px; }
-
-  .comments-feed {
-    max-height: 250px;
-    overflow-y: auto;
-    margin-bottom: 20px;
-    padding-right: 5px;
-
-    .comment-bubble {
-      background: #eef2ff;
-      padding: 12px 16px;
-      border-radius: 14px;
-      margin-bottom: 10px;
-      align-self: flex-start;
-      width: fit-content;
-      max-width: 90%;
-      border-left: 4px solid #3880ff;
-
-      .comment-text {
-        margin: 0;
-        font-size: 0.95rem;
-        color: #222;
-        line-height: 1.4;
-      }
-    }
-
-    .empty-chat {
-      text-align: center;
-      padding: 30px;
-      color: #999;
-      border: 2px dashed #eee;
-      border-radius: 15px;
-
-      .empty-chat-icon {
-        font-size: 2rem;
-        margin-bottom: 10px;
-        opacity: 0.5;
-      }
-
-      .empty-chat-text {
-        font-size: 0.9rem;
-        margin: 0;
-      }
-    }
-  }
-
-  .chat-input-container {
-    display: flex;
-    align-items: center;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 30px;
-    padding: 5px 10px 5px 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-
-    .chat-input {
-      --padding-start: 0;
-      font-size: 0.95rem;
-    }
-
-    .send-button {
-      --border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      --padding-start: 0;
-      --padding-end: 0;
-
-      .send-icon {
-        font-size: 1.1rem;
-      }
-    }
-  }
-}
-
-// ==========================================
-// SECCIÓN LISTA DE USUARIOS
-// ==========================================
+// ── USUARIOS LISTA ────────────────────────────────────────────────────────────
 .usuarios-header {
   display: flex;
   justify-content: space-between;
@@ -332,11 +129,7 @@ $bg-app: #f4f7fe;
     align-items: baseline;
     gap: 12px;
 
-    .usuarios-count {
-      font-size: 0.9rem;
-      color: #888;
-      font-weight: 500;
-    }
+    .usuarios-count { font-size: 0.9rem; color: $text-muted; font-weight: 500; }
   }
 
   .usuarios-controles {
@@ -356,24 +149,17 @@ $bg-app: #f4f7fe;
     padding: 6px 16px;
     border-radius: 20px;
     border: 1.5px solid #ddd;
-    background: white;
+    background: $surface;
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
     color: #555;
     transition: all 0.2s ease;
 
-    &:hover { border-color: #764ba2; color: #764ba2; }
-
-    &.active {
-      background: #764ba2;
-      border-color: #764ba2;
-      color: white;
-    }
-
-    &.filtro-admin.active    { background: #eb445a; border-color: #eb445a; }
-    &.filtro-alumno.active   { background: #3880ff; border-color: #3880ff; }
-    &.filtro-profesor.active { background: #2dd36f; border-color: #2dd36f; }
+    &:hover { border-color: $primary; color: $primary; }
+    &.active { background: $primary; border-color: $primary; color: white; }
+    &.filtro-admin.active  { background: $accent-admin;   border-color: $accent-admin; }
+    &.filtro-alumno.active { background: $accent-alumno;  border-color: $accent-alumno; }
   }
 }
 
@@ -387,11 +173,11 @@ $bg-app: #f4f7fe;
   display: flex;
   align-items: center;
   gap: 16px;
-  background: white;
+  background: $surface;
   border-radius: 14px;
   padding: 14px 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  border: 1px solid rgba(0,0,0,0.04);
+  border: 1px solid $border;
   transition: box-shadow 0.2s ease;
 
   &:hover { box-shadow: 0 6px 18px rgba(118,75,162,0.1); }
@@ -405,12 +191,11 @@ $bg-app: #f4f7fe;
     justify-content: center;
     flex-shrink: 0;
     font-size: 1.3rem;
-    background: #f0e8f8;
-    color: #764ba2;
+    background: $primary-light;
+    color: $primary;
 
-    &.avatar-admin    { background: #fdecea; color: #eb445a; }
-    &.avatar-alumno   { background: #e8f0fe; color: #3880ff; }
-    &.avatar-profesor { background: #e8f8ef; color: #2dd36f; }
+    &.avatar-administrador { background: rgba($accent-admin, 0.12); color: $accent-admin; }
+    &.avatar-alumno        { background: rgba($accent-alumno, 0.12); color: $accent-alumno; }
   }
 
   .usuario-info {
@@ -423,16 +208,13 @@ $bg-app: #f4f7fe;
     .usuario-nombre {
       font-weight: 700;
       font-size: 0.97rem;
-      color: #222;
+      color: $text-main;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .usuario-id {
-      font-size: 0.78rem;
-      color: #aaa;
-    }
+    .usuario-id { font-size: 0.78rem; color: $text-muted; }
   }
 
   .usuario-rol-badge {
@@ -443,12 +225,11 @@ $bg-app: #f4f7fe;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
-    background: #f0e8f8;
-    color: #764ba2;
+    background: $primary-light;
+    color: $primary;
 
-    &.rol-admin    { background: #fdecea; color: #eb445a; }
-    &.rol-alumno   { background: #e8f0fe; color: #3880ff; }
-    &.rol-profesor { background: #e8f8ef; color: #2dd36f; }
+    &.rol-administrador { background: rgba($accent-admin, 0.12);   color: darken($accent-admin, 5%); }
+    &.rol-alumno        { background: rgba($accent-alumno, 0.12);  color: darken($accent-alumno, 5%); }
   }
 
   .usuario-acciones {
@@ -457,9 +238,8 @@ $bg-app: #f4f7fe;
     flex-shrink: 0;
 
     .accion-btn { --border-radius: 8px; }
-
-    .edit-btn   { --color: #3880ff; }
-    .delete-btn { --color: #eb445a; }
+    .edit-btn   { --color: #{$accent-alumno}; }
+    .delete-btn { --color: #{$accent-admin}; }
   }
 }
 
@@ -472,24 +252,22 @@ $bg-app: #f4f7fe;
   p { font-size: 1rem; margin: 0; }
 }
 
-// Skeleton loading
+// Skeleton
 .usuario-item.skeleton {
   pointer-events: none;
 
-  .skeleton-box {
+  @mixin shimmer-bg {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
     animation: shimmer 1.2s infinite;
-    border-radius: 50%;
   }
 
+  .skeleton-box { @include shimmer-bg; border-radius: 50%; }
   .skeleton-line {
     height: 12px;
     border-radius: 6px;
     display: block;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.2s infinite;
+    @include shimmer-bg;
 
     &.wide   { width: 160px; }
     &.short  { width: 70px; margin-top: 6px; }
@@ -502,40 +280,62 @@ $bg-app: #f4f7fe;
   100% { background-position: -200% 0; }
 }
 
-// ── MODAL EDICIÓN ──────────────────────────────────────────────
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODALES — sistema compartido
+// ═══════════════════════════════════════════════════════════════════════════════
+
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
+  background: rgba(15, 10, 30, 0.6);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
   padding: 16px;
+  animation: overlayIn 0.2s ease;
 }
 
-.modal-card {
-  background: var(--ion-card-background, #1e1e2e);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 480px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.4);
-  overflow: hidden;
-  animation: modalIn 0.22s ease;
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+.modal-card {
+  background: #16112a;
+  border-radius: $radius-modal;
+  width: 100%;
+  max-width: 480px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 32px 80px rgba(0,0,0,0.55);
+  overflow: hidden;
+  animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  // Modal masivo más ancho
+  &.modal-masivo {
+    max-width: 560px;
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 
   .modal-header-info {
     display: flex;
@@ -544,66 +344,74 @@ $bg-app: #f4f7fe;
   }
 
   .modal-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.3rem;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.07);
+    flex-shrink: 0;
 
-    &.avatar-administrador { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
-    &.avatar-alumno        { background: rgba(34, 197, 94, 0.2);  color: #4ade80; }
-    &.avatar-profesor      { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+    &.avatar-administrador { background: rgba(139, 92, 246, 0.2); color: #b89dfa; }
+    &.avatar-alumno        { background: rgba(56, 128, 255, 0.2); color: #7fb3ff; }
+    &.avatar-profesor      { background: rgba(45, 211, 111, 0.2); color: #6ae89a; }
   }
 
   .modal-title {
-    margin: 0;
-    font-size: 1.1rem;
+    margin: 0 0 2px;
+    font-size: 1.05rem;
     font-weight: 700;
-    color: var(--ion-text-color, #fff);
+    color: #f0ecff;
+    letter-spacing: -0.01em;
   }
 
   .modal-subtitle {
+    display: block;
     font-size: 0.78rem;
-    color: var(--ion-color-medium, #888);
+    color: rgba(255,255,255,0.38);
+    font-weight: 400;
   }
 
   .modal-close-btn {
-    --color: var(--ion-color-medium, #888);
+    --color: rgba(255,255,255,0.35);
     --padding-start: 6px;
     --padding-end: 6px;
+    transition: color 0.15s;
+
+    &:hover { --color: rgba(255,255,255,0.7); }
   }
 }
 
+// ── Body ──────────────────────────────────────────────────────────────────────
 .modal-body {
-  padding: 20px;
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
 
 .form-label {
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--ion-color-medium, #888);
+  color: rgba(255,255,255,0.4);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.07em;
 }
 
 .form-hint {
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
-  color: var(--ion-color-medium, #666);
-  font-size: 0.78rem;
+  color: rgba(255,255,255,0.28);
+  font-size: 0.75rem;
   margin-left: 4px;
 }
 
@@ -611,52 +419,59 @@ $bg-app: #f4f7fe;
 .form-select {
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 11px 14px;
-  color: var(--ion-text-color, #fff);
+  border-radius: $radius-input;
+  padding: 12px 15px;
+  color: #f0ecff;
   font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
   width: 100%;
   box-sizing: border-box;
 
+  &::placeholder { color: rgba(255,255,255,0.2); }
+
   &:focus {
-    border-color: var(--ion-color-primary, #6366f1);
+    border-color: rgba(139, 92, 246, 0.6);
     background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
   }
 }
 
-.form-select option {
-  background: #1e1e2e;
-  color: #fff;
+.form-select {
+  cursor: pointer;
+  option { background: #1e1530; color: #f0ecff; }
 }
 
+// ── Footer ────────────────────────────────────────────────────────────────────
 .modal-footer {
   display: flex;
   gap: 10px;
-  padding: 16px 20px 20px;
-  border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 16px 24px 22px;
+  border-top: 1px solid rgba(255,255,255,0.06);
 
   .btn-cancelar {
     flex: 1;
-    padding: 11px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.12);
+    padding: 12px;
+    border-radius: $radius-input;
+    border: 1px solid rgba(255,255,255,0.1);
     background: transparent;
-    color: var(--ion-color-medium, #888);
+    color: rgba(255,255,255,0.45);
     font-size: 0.9rem;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, color 0.2s;
 
-    &:hover { background: rgba(255,255,255,0.06); }
+    &:hover {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.7);
+    }
   }
 
   .btn-guardar {
     flex: 2;
-    padding: 11px;
-    border-radius: 10px;
+    padding: 12px;
+    border-radius: $radius-input;
     border: none;
-    background: var(--ion-color-primary, #6366f1);
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d3fcf 100%);
     color: #fff;
     font-size: 0.9rem;
     font-weight: 600;
@@ -664,10 +479,325 @@ $bg-app: #f4f7fe;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    transition: opacity 0.2s;
+    gap: 7px;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 16px rgba(109, 63, 207, 0.35);
 
-    &:disabled { opacity: 0.6; cursor: not-allowed; }
-    &:not(:disabled):hover { opacity: 0.88; }
+    ion-icon { font-size: 1rem; }
+
+    &:not(:disabled):hover { opacity: 0.92; transform: translateY(-1px); }
+    &:not(:disabled):active { transform: scale(0.98); }
+    &:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODAL MASIVO — componentes específicos
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── PROYECTOS ─────────────────────────────────────────────────────────────────
+
+.proyectos-section {
+  padding-bottom: 50px;
+}
+
+.btn-nuevo-proyecto {
+  --background: #{$primary};
+  --background-hover: #{$primary-dark};
+  --border-radius: 12px;
+  height: 40px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.proyecto-item {
+  .proyecto-desc {
+    max-width: 400px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .proyecto-meta {
+    display: flex;
+    align-items: center;
+
+    .proyecto-cupo {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: $text-muted;
+      white-space: nowrap;
+
+      ion-icon { font-size: 0.95rem; }
+    }
+  }
+}
+
+// Avatares de estado proyecto
+.estado-avatar-en-curso   { background: rgba($accent-alumno, 0.12); color: $accent-alumno; }
+.estado-avatar-pausado    { background: rgba(255, 165, 0, 0.12);    color: #e6920a; }
+.estado-avatar-finalizado { background: rgba(45, 211, 111, 0.12);   color: #2dd36f; }
+
+// Badges de estado
+.usuario-rol-badge {
+  &.estado-en-curso   { background: rgba($accent-alumno, 0.12); color: darken($accent-alumno, 5%); }
+  &.estado-pausado    { background: rgba(255, 165, 0, 0.12);    color: #c47a00; }
+  &.estado-finalizado { background: rgba(45, 211, 111, 0.12);   color: darken(#2dd36f, 15%); }
+}
+
+// Filtros estado
+.filtro-btn {
+  &.filtro-encurso.active   { background: $accent-alumno; border-color: $accent-alumno; }
+  &.filtro-pausado.active   { background: #e6920a;        border-color: #e6920a; }
+  &.filtro-finalizado.active{ background: #2dd36f;        border-color: #2dd36f; }
+}
+
+// Avatar modal proyecto
+.modal-avatar {
+  &.avatar-proyecto { background: rgba(45, 211, 111, 0.2); color: #5ee88a; }
+}
+
+// Textarea del modal
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+// Fila de dos columnas en el modal
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+// Buscador del modal masivo
+.masivo-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .masivo-search-icon {
+    position: absolute;
+    left: 13px;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.3);
+    pointer-events: none;
+  }
+
+  .masivo-search-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: $radius-input;
+    padding: 11px 40px 11px 38px;
+    color: #f0ecff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    box-sizing: border-box;
+
+    &::placeholder { color: rgba(255,255,255,0.22); }
+
+    &:focus {
+      border-color: rgba(139, 92, 246, 0.55);
+      background: rgba(255,255,255,0.07);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+  }
+
+  .masivo-search-clear {
+    position: absolute;
+    right: 10px;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    border-radius: 6px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255,255,255,0.4);
+    font-size: 0.85rem;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.75); }
+  }
+}
+
+.masivo-vacio {
+  text-align: center;
+  padding: 24px 16px;
+  color: rgba(255,255,255,0.25);
+
+  ion-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+  p { font-size: 0.85rem; margin: 0; }
+}
+
+.masivo-acciones-rapidas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .filtro-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: rgba(255,255,255,0.5);
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: rgba(139, 92, 246, 0.5);
+      color: #b89dfa;
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    &.filtro-admin:hover  { border-color: rgba($accent-admin, 0.5); color: lighten($accent-admin, 20%); background: rgba($accent-admin, 0.1); }
+    &.filtro-alumno:hover { border-color: rgba($accent-alumno, 0.5); color: lighten($accent-alumno, 20%); background: rgba($accent-alumno, 0.1); }
+  }
+}
+
+.masivo-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+}
+
+.masivo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+  background: rgba(255,255,255,0.03);
+
+  &:hover {
+    background: rgba(139, 92, 246, 0.07);
+    border-color: rgba(139, 92, 246, 0.2);
+  }
+
+  &.masivo-item-selected {
+    background: rgba(139, 92, 246, 0.13);
+    border-color: rgba(139, 92, 246, 0.35);
+
+    .masivo-check ion-icon { color: #b89dfa; }
+    .usuario-nombre { color: #f0ecff; }
+  }
+
+  .masivo-check {
+    flex-shrink: 0;
+    width: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.2);
+      transition: color 0.15s;
+    }
+  }
+
+  .usuario-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+
+    &.avatar-administrador { background: rgba($accent-admin, 0.18); color: lighten($accent-admin, 15%); }
+    &.avatar-alumno        { background: rgba($accent-alumno, 0.18); color: lighten($accent-alumno, 15%); }
+  }
+
+  .usuario-info {
+    flex: 1;
+    min-width: 0;
+
+    .usuario-nombre {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.15s;
+    }
+
+    .usuario-id {
+      display: block;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+    }
+  }
+
+  .usuario-rol-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.3);
+
+    &.rol-administrador { background: rgba($accent-admin, 0.18); color: lighten($accent-admin, 20%); }
+    &.rol-alumno        { background: rgba($accent-alumno, 0.18); color: lighten($accent-alumno, 20%); }
+  }
+}
+
+// Vista previa de imagen en el modal
+.foto-preview-wrapper {
+  margin-top: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(118, 75, 162, 0.2);
+  max-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f4fd;
+
+  .foto-preview {
+    width: 100%;
+    max-height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+// Foto miniatura en la lista de proyectos
+.proyecto-avatar {
+  overflow: hidden;
+
+  .proyecto-foto-mini {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+}
+

@@ -7,7 +7,7 @@ export interface Usuario {
   id: number;
   nombreReal: string;
   contrasenaHash?: string;
-  rol: 'ADMIN' | 'ALUMNO' | 'PROFESOR' | string;
+  rol: 'administrador' | 'alumno' | string;
 }
 
 @Injectable({
