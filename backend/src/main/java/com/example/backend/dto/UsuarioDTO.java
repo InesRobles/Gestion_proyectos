@@ -19,4 +19,6 @@ public class UsuarioDTO {
     private Rol rol;
 
     private String nombreReal;
+
+    private String fotoUsuario;
 }

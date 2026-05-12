@@ -27,4 +27,7 @@ public class Usuario {
 
     @Column(name = "nombre_real", nullable = false, length = 100)
     private String nombreReal;
+
+    @Column(name = "foto_usuario", columnDefinition = "LONGTEXT")
+    private String fotoUsuario;
 }

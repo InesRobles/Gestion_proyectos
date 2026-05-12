@@ -1,5 +1,7 @@
 package com.example.backend.controllers;
 
+import com.example.backend.dto.CambioFotoDTO;
+import com.example.backend.dto.CambioPasswordDTO;
 import com.example.backend.dto.UsuarioDTO;
 import com.example.backend.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +48,21 @@ public class UsuarioController {
     public ResponseEntity<UsuarioDTO> login(@RequestBody LoginRequest loginRequest) {
         UsuarioDTO usuario = usuarioService.login(loginRequest);
         return ResponseEntity.ok(usuario);
+    }
+
+    @PutMapping("/cambiar-password/{id}")
+    public ResponseEntity<Void> cambiarPassword(@PathVariable Long id, @RequestBody CambioPasswordDTO dto) {
+        try {
+            usuarioService.cambiarPassword(id, dto);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/foto/{id}")
+    public ResponseEntity<Void> actualizarFoto(@PathVariable Long id, @RequestBody CambioFotoDTO dto) {
+        usuarioService.actualizarFoto(id, dto.getFotoBase64());
+        return ResponseEntity.noContent().build();
     }
 }

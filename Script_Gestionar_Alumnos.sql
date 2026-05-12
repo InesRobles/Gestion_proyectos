@@ -232,3 +232,6 @@ INSERT INTO asistencia (alumno_id, fecha, presente) VALUES
 (7,  CURDATE() - INTERVAL 2 DAY, 1), (8,  CURDATE() - INTERVAL 2 DAY, 0),
 (9,  CURDATE() - INTERVAL 2 DAY, 1), (10, CURDATE() - INTERVAL 2 DAY, 1),
 (11, CURDATE() - INTERVAL 2 DAY, 1);
+
+
+ALTER TABLE usuario MODIFY COLUMN foto_usuario LONGTEXT;

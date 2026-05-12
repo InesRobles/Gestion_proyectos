@@ -3,7 +3,7 @@
     <div class="header-content">
       <div class="brand-section">
         @if (mostrarFlecha) {
-          <ion-icon name="arrow-back-outline" class="back-icon" [routerLink]="['/']"></ion-icon>
+          <ion-icon name="arrow-back-outline" class="back-icon" (click)="goBack()"></ion-icon>
         }
         <h1 class="logo-text">Proyectos<span>Hub</span></h1>
       </div>

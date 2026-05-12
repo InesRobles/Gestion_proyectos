@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { ApiService } from './api.sevice';
 
 export interface LoginRequest {
@@ -28,6 +28,9 @@ export class AuthService {
   private http = inject(HttpClient);
   private apiService = inject(ApiService);
 
+  private sesionSubject = new BehaviorSubject<LoginResponse | null>(this.obtenerSesion());
+  sesion$ = this.sesionSubject.asObservable();
+
   login(datos: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiService.apiUrl}/usuario/login`, datos);
   }
@@ -38,6 +41,7 @@ export class AuthService {
 
   guardarSesion(usuario: LoginResponse): void {
     localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
+    this.sesionSubject.next(usuario);
   }
 
   obtenerSesion(): LoginResponse | null {
@@ -47,6 +51,7 @@ export class AuthService {
 
   cerrarSesion(): void {
     localStorage.removeItem('usuarioLogado');
+    this.sesionSubject.next(null);
   }
 
   estaLogado(): boolean {

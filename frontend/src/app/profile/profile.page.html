@@ -1,7 +1,5 @@
 <app-header [mostrarFlecha]="true"></app-header>
 
-
-
 <ion-content [fullscreen]="true">
   <ion-button (click)="navegarAdmin()" color="danger" expand="block">
     ENTRAR PANEL ADMIN
@@ -100,13 +98,13 @@
   </div>
 </ion-content>
 
-<ion-modal [isOpen]="isPasswordModalOpen" (didDismiss)="isPasswordModalOpen = false" class="project-modal">
+<ion-modal [isOpen]="isPasswordModalOpen" (didDismiss)="cerrarModalPassword()" class="project-modal">
   <ng-template>
     <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-title>Seguridad de la Cuenta</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="isPasswordModalOpen = false">
+          <ion-button (click)="cerrarModalPassword()">
             <ion-icon name="close-outline"></ion-icon>
           </ion-button>
         </ion-buttons>
@@ -130,7 +128,7 @@
               <h2 style="font-weight: bold;">Autenticación en 2 pasos</h2>
               <p>Capa extra de seguridad</p>
             </ion-label>
-            <ion-toggle slot="end" [(ngModel)]="securityData.dosPasosActivo"></ion-toggle>
+            <ion-toggle slot="end" [checked]="securityData.dosPasosActivo" (ionChange)="securityData.dosPasosActivo = $event.detail.checked"></ion-toggle>
           </ion-item>
 
           <ion-item>
@@ -146,15 +144,36 @@
 
         <ion-list lines="none">
           <ion-item class="custom-input">
-            <ion-input label="Contraseña Actual" labelPlacement="stacked" type="password" [(ngModel)]="passwordData.actual" placeholder="••••••••"></ion-input>
+            <ion-input
+              label="Contraseña Actual"
+              labelPlacement="stacked"
+              type="password"
+              [value]="passwordData.actual"
+              (ionInput)="passwordData.actual = $event.detail.value ?? ''"
+              placeholder="••••••••">
+            </ion-input>
           </ion-item>
 
           <ion-item class="custom-input">
-            <ion-input label="Nueva Contraseña" labelPlacement="stacked" type="password" [(ngModel)]="passwordData.nueva" placeholder="Mínimo 6 caracteres"></ion-input>
+            <ion-input
+              label="Nueva Contraseña"
+              labelPlacement="stacked"
+              type="password"
+              [value]="passwordData.nueva"
+              (ionInput)="passwordData.nueva = $event.detail.value ?? ''"
+              placeholder="Mínimo 6 caracteres">
+            </ion-input>
           </ion-item>
 
           <ion-item class="custom-input">
-            <ion-input label="Confirmar Nueva Contraseña" labelPlacement="stacked" type="password" [(ngModel)]="passwordData.confirmar" placeholder="Repite la nueva contraseña"></ion-input>
+            <ion-input
+              label="Confirmar Nueva Contraseña"
+              labelPlacement="stacked"
+              type="password"
+              [value]="passwordData.confirmar"
+              (ionInput)="passwordData.confirmar = $event.detail.value ?? ''"
+              placeholder="Repite la nueva contraseña">
+            </ion-input>
           </ion-item>
         </ion-list>
 

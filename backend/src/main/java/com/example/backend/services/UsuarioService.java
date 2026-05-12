@@ -1,5 +1,6 @@
 package com.example.backend.services;
 
+import com.example.backend.dto.CambioPasswordDTO;
 import com.example.backend.dto.UsuarioDTO;
 import com.example.backend.mapper.UsuarioMapper;
 import com.example.backend.models.Usuario;
@@ -74,7 +75,6 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con id: " + id));
 
-        // Solo actualizar nombreUsuario si viene informado y es distinto al actual
         if (usuarioDTO.getNombreUsuario() != null
                 && !usuarioDTO.getNombreUsuario().isBlank()
                 && !usuarioDTO.getNombreUsuario().equals(usuario.getNombreUsuario())) {
@@ -86,7 +86,6 @@ public class UsuarioService {
             usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
         }
 
-        // Solo actualizar nombreReal si viene informado y es distinto al actual
         if (usuarioDTO.getNombreReal() != null
                 && !usuarioDTO.getNombreReal().isBlank()
                 && !usuarioDTO.getNombreReal().equals(usuario.getNombreReal())) {
@@ -98,12 +97,10 @@ public class UsuarioService {
             usuario.setNombreReal(usuarioDTO.getNombreReal());
         }
 
-        // Solo actualizar rol si viene informado
         if (usuarioDTO.getRol() != null) {
             usuario.setRol(usuarioDTO.getRol());
         }
 
-        // Solo actualizar contraseña si viene informada
         if (usuarioDTO.getContrasenaHash() != null && !usuarioDTO.getContrasenaHash().isBlank()) {
             usuario.setContrasenaHash(passwordEncoder.encode(usuarioDTO.getContrasenaHash()));
         }
@@ -121,6 +118,7 @@ public class UsuarioService {
         alumnoRepository.findByUsuarioId(id).ifPresent(alumnoRepository::delete);
         usuarioRepository.deleteById(id);
     }
+
     public UsuarioDTO login(LoginRequest request) {
         Usuario usuario = usuarioRepository.findByNombreUsuario(request.getNombreUsuario())
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado"));
@@ -130,5 +128,24 @@ public class UsuarioService {
         }
 
         return usuarioMapper.toDTO(usuario);
+    }
+
+    public void cambiarPassword(Long id, CambioPasswordDTO dto) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con id: " + id));
+
+        if (!passwordEncoder.matches(dto.getContrasenaActual(), usuario.getContrasenaHash())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta");
+        }
+
+        usuario.setContrasenaHash(passwordEncoder.encode(dto.getContrasenaNueva()));
+        usuarioRepository.save(usuario);
+    }
+
+    public void actualizarFoto(Long id, String fotoBase64) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado con id: " + id));
+        usuario.setFotoUsuario(fotoBase64);
+        usuarioRepository.save(usuario);
     }
 }

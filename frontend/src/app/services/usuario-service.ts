@@ -6,8 +6,15 @@ import { ApiService } from './api.sevice';
 export interface Usuario {
   id: number;
   nombreReal: string;
+  nombreUsuario: string;
   contrasenaHash?: string;
   rol: 'administrador' | 'alumno' | string;
+  modalidad?: string;
+}
+
+export interface CambioPasswordDTO {
+  contrasenaActual: string;
+  contrasenaNueva: string;
 }
 
 @Injectable({
@@ -35,5 +42,13 @@ export class UsuarioService {
 
   eliminarUsuario(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiService.apiUrl}/usuario/eliminar/${id}`);
+  }
+
+  actualizarPassword(id: number, dto: CambioPasswordDTO): Observable<void> {
+    return this.http.put<void>(`${this.apiService.apiUrl}/usuario/cambiar-password/${id}`, dto);
+  }
+
+  actualizarFoto(id: number, fotoBase64: string): Observable<void> {
+    return this.http.put<void>(`${this.apiService.apiUrl}/usuario/foto/${id}`, { fotoBase64 });
   }
 }

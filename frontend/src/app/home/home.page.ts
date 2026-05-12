@@ -18,6 +18,8 @@ import { RouterLink } from '@angular/router';
 import { HeaderComponent } from "../components/header/header.component";
 import {proyecto} from "../modelos/proyecto";
 import {ProyectoService} from "../services/proyecto-service";
+import { AuthService } from '../services/auth-service';
+
 
 @Component({
   selector: 'app-home',
@@ -42,7 +44,7 @@ export class HomePage implements OnInit {
   // Lógica de Fichaje
   mostrarTarjetaAsistencia = true;
   isExiting = false;
-  nombreUsuario = "Usuario Pro";
+  nombreUsuario = "";
 
   // Listas de proyectos desde BD
   misProyectos: proyecto[] = [];
@@ -60,6 +62,7 @@ export class HomePage implements OnInit {
   constructor(
     private toastController: ToastController,
     private proyectoService: ProyectoService,
+    private authService: AuthService,
   ) {
     addIcons({
       personCircle, closeOutline, exitOutline, timeOutline,
@@ -70,6 +73,9 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit() {
+    const sesion = this.authService.obtenerSesion();
+    this.nombreUsuario = sesion?.nombreReal ?? 'Usuario';
+
     const ultimoFichaje = localStorage.getItem('fechaFichaje');
     const hoy = new Date().toDateString();
     if (ultimoFichaje === hoy) {
