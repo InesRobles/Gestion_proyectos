@@ -235,3 +235,4 @@ INSERT INTO asistencia (alumno_id, fecha, presente) VALUES
 
 
 ALTER TABLE usuario MODIFY COLUMN foto_usuario LONGTEXT;
+ALTER TABLE proyecto MODIFY COLUMN foto_proyecto LONGTEXT;
