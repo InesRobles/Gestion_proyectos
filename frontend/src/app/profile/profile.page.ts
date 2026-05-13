@@ -258,7 +258,7 @@ export class ProfilePage implements OnInit {
         sesion.nombreUsuario = this.userData.nombre_usuario;
         this.authService.guardarSesion(sesion);
 
-        if (sesion.rol === 'alumno' && this.modalidadIdSeleccionada) {
+        if ((sesion.rol === 'alumno' || sesion.rol === 'administrador') && this.modalidadIdSeleccionada) {
           this.usuarioService.actualizarModalidad(sesion.id, this.modalidadIdSeleccionada).subscribe({
             next: () => {},
             error: () => this.presentToast('Error al actualizar la modalidad', 'warning')

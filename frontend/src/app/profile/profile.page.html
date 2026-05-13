@@ -69,12 +69,8 @@
                       </ion-item>
                     </ion-col>
                     <ion-col size="12" size-md="6">
-                      <!-- Administrador: solo lectura -->
-                      <ion-item class="custom-input" *ngIf="userData.rol !== 'alumno'">
-                        <ion-input label="Modalidad" labelPlacement="stacked" [value]="userData.modalidad || '—'" readonly="true"></ion-input>
-                      </ion-item>
-                      <!-- Alumno: selector editable -->
-                      <div class="custom-input modalidad-select-wrapper" *ngIf="userData.rol === 'alumno'">
+                      <!-- Alumno y administrador: selector editable -->
+                      <div class="custom-input modalidad-select-wrapper" *ngIf="userData.rol === 'alumno' || userData.rol === 'administrador'">
                         <label class="modalidad-label">Modalidad</label>
                         <select class="modalidad-select" [(ngModel)]="modalidadIdSeleccionada">
                           <option [ngValue]="null" disabled>Selecciona una modalidad</option>
