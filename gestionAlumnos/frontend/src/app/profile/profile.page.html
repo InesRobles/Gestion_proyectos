@@ -1,0 +1,188 @@
+<app-header [mostrarFlecha]="true"></app-header>
+
+<ion-content [fullscreen]="true">
+  <ion-button (click)="navegarAdmin()" color="danger" expand="block">
+    ENTRAR PANEL ADMIN
+  </ion-button>
+  <div class="home-wrapper">
+    <div class="content-container">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-lg="4">
+            <ion-card class="interactive-card profile-main-card">
+              <div class="profile-header-bg"></div>
+              <div class="profile-avatar-container">
+                <div class="avatar-big" (click)="fileInput.click()" style="cursor:pointer">
+                  <img *ngIf="fotoUrl" [src]="fotoUrl" class="avatar-img" />
+                  <ion-icon *ngIf="!fotoUrl" name="person-outline"></ion-icon>
+                </div>
+                <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFotoSeleccionada($event)" />
+              </div>
+              <ion-card-header class="ion-text-center">
+                <ion-card-title>{{ userData.nombre_real }}</ion-card-title>
+                <ion-card-subtitle>{{ userData.rol | titlecase }}</ion-card-subtitle>
+              </ion-card-header>
+              <ion-card-content>
+                <div class="user-stats">
+                  <div class="stat-item">
+                    <span class="stat-value">12</span>
+                    <span class="stat-label">Proyectos</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-value">
+                      <ion-icon name="school-outline"></ion-icon>
+                    </span>
+                    <span class="stat-label">{{ userData.modalidad }}</span>
+                  </div>
+                </div>
+                <ion-button expand="block" fill="outline" class="action-button" (click)="fileInput.click()">
+                  Editar Foto
+                </ion-button>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+
+          <ion-col size="12" size-lg="8">
+            <ion-card class="interactive-card info-card">
+              <ion-card-header>
+                <ion-card-title>Configuración de Cuenta</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                <ion-list lines="none">
+                  <ion-row>
+                    <ion-col size="12" size-md="6">
+                      <ion-item class="custom-input">
+                        <ion-input label="Nombre Real" labelPlacement="stacked" [(ngModel)]="userData.nombre_real"></ion-input>
+                      </ion-item>
+                    </ion-col>
+                    <ion-col size="12" size-md="6">
+                      <ion-item class="custom-input">
+                        <ion-input label="Nombre de Usuario" labelPlacement="stacked" [(ngModel)]="userData.nombre_usuario"></ion-input>
+                      </ion-item>
+                    </ion-col>
+                    <ion-col size="12" size-md="6">
+                      <ion-item class="custom-input">
+                        <ion-input label="Rol de Sistema" labelPlacement="stacked" [value]="userData.rol" readonly="true"></ion-input>
+                      </ion-item>
+                    </ion-col>
+                    <ion-col size="12" size-md="6">
+                      <ion-item class="custom-input">
+                        <ion-input label="Modalidad Asignada" labelPlacement="stacked" [value]="userData.modalidad" readonly="true"></ion-input>
+                      </ion-item>
+                    </ion-col>
+                  </ion-row>
+                </ion-list>
+
+                <div class="action-footer">
+                  <div class="main-actions">
+                    <ion-button class="login-button" style="width: 180px;" (click)="guardarCambios()">
+                      Guardar Cambios
+                    </ion-button>
+                    <ion-button fill="outline" color="medium" (click)="abrirModalPassword()">
+                      <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+                      Seguridad
+                    </ion-button>
+                  </div>
+
+                  <ion-button color="danger" fill="clear" [routerLink]="['/login']">
+                    Cerrar Sesión
+                  </ion-button>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+  </div>
+</ion-content>
+
+<ion-modal [isOpen]="isPasswordModalOpen" (didDismiss)="cerrarModalPassword()" class="project-modal">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-title>Seguridad de la Cuenta</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cerrarModalPassword()">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <div class="modal-container">
+        <ion-list lines="none" style="margin-bottom: 20px;">
+          <ion-item>
+            <ion-icon name="time-outline" slot="start" color="medium"></ion-icon>
+            <ion-label>
+              <h2 style="font-weight: bold;">Última conexión</h2>
+              <p>{{ securityData.ultimaConexion }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="shield-checkmark-outline" slot="start" color="medium"></ion-icon>
+            <ion-label>
+              <h2 style="font-weight: bold;">Autenticación en 2 pasos</h2>
+              <p>Capa extra de seguridad</p>
+            </ion-label>
+            <ion-toggle slot="end" [checked]="securityData.dosPasosActivo" (ionChange)="securityData.dosPasosActivo = $event.detail.checked"></ion-toggle>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="desktop-outline" slot="start" color="medium"></ion-icon>
+            <ion-label>
+              <h2 style="font-weight: bold;">Dispositivos activos</h2>
+              <p>{{ securityData.dispositivos }} dispositivos conectados</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+
+        <p class="modal-description-text">Cambia tu contraseña regularmente para mantener tu cuenta protegida.</p>
+
+        <ion-list lines="none">
+          <ion-item class="custom-input">
+            <ion-input
+              label="Contraseña Actual"
+              labelPlacement="stacked"
+              type="password"
+              [value]="passwordData.actual"
+              (ionInput)="passwordData.actual = $event.detail.value ?? ''"
+              placeholder="••••••••">
+            </ion-input>
+          </ion-item>
+
+          <ion-item class="custom-input">
+            <ion-input
+              label="Nueva Contraseña"
+              labelPlacement="stacked"
+              type="password"
+              [value]="passwordData.nueva"
+              (ionInput)="passwordData.nueva = $event.detail.value ?? ''"
+              placeholder="Mínimo 6 caracteres">
+            </ion-input>
+          </ion-item>
+
+          <ion-item class="custom-input">
+            <ion-input
+              label="Confirmar Nueva Contraseña"
+              labelPlacement="stacked"
+              type="password"
+              [value]="passwordData.confirmar"
+              (ionInput)="passwordData.confirmar = $event.detail.value ?? ''"
+              placeholder="Repite la nueva contraseña">
+            </ion-input>
+          </ion-item>
+        </ion-list>
+
+        <div class="modal-actions" style="margin-top: 20px;">
+          <ion-button expand="block" class="login-button" (click)="actualizarPassword()">
+            Actualizar Contraseña
+          </ion-button>
+        </div>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

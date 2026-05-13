@@ -1,0 +1,462 @@
+<app-header [mostrarFlecha]="true"></app-header>
+
+<ion-content [fullscreen]="true">
+  <div class="home-wrapper">
+    <div class="content-container">
+
+      <section class="attendance-section">
+        <ion-card class="attendance-hero-card">
+          <div class="hero-bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+          </div>
+          <div class="attendance-content">
+            <div class="left-column">
+              <div class="user-greeting">
+                <span class="greeting-label">Panel de Control</span>
+                <h1 class="user-name">Administración</h1>
+                <span class="greeting-sub">Gestiona usuarios, roles y proyectos 🛡️</span>
+              </div>
+              <div class="time-box">
+                <div class="time-icon-wrap">
+                  <ion-icon name="people-outline"></ion-icon>
+                </div>
+                <div class="time-text">
+                  <span class="schedule-label">ALUMNOS ACTIVOS</span>
+                  <span class="hours">{{ alumnos.length }} Estudiantes</span>
+                </div>
+              </div>
+            </div>
+            <div class="right-column">
+              <div class="fichar-card">
+                <p class="instruction-text">Cambia el rol de varios usuarios a la vez.</p>
+                <ion-button class="fichar-button" (click)="abrirModalCambioMasivoRol()">
+                  <ion-icon name="people-circle-outline" slot="start"></ion-icon>
+                  CAMBIO MASIVO
+                </ion-button>
+                <span class="fichar-hint">Selecciona usuarios y asigna un rol en bloque</span>
+              </div>
+            </div>
+          </div>
+        </ion-card>
+      </section>
+
+      <hr class="divider">
+
+      <!-- SECCIÓN USUARIOS -->
+      <section>
+        <div class="usuarios-header">
+          <div class="usuarios-title-block">
+            <h2 class="section-title" style="margin: 0;">Usuarios del Sistema</h2>
+            <span class="usuarios-count">{{ filtroUsuarios.length }} usuario{{ filtroUsuarios.length !== 1 ? 's' : '' }}</span>
+          </div>
+
+          <div class="usuarios-controles">
+            <ion-searchbar
+              placeholder="Buscar por nombre o ID..."
+              (ionInput)="buscarUsuario($event)"
+              style="max-width: 320px; --border-radius: 12px;">
+            </ion-searchbar>
+
+            <div class="filtro-roles">
+              <button
+                class="filtro-btn"
+                [class.active]="filtroRol === ''"
+                (click)="filtrarPorRol('')">
+                Todos
+              </button>
+              <button
+                class="filtro-btn filtro-admin"
+                [class.active]="filtroRol === 'administrador'"
+                (click)="filtrarPorRol('administrador')">
+                Admin
+              </button>
+              <button
+                class="filtro-btn filtro-alumno"
+                [class.active]="filtroRol === 'alumno'"
+                (click)="filtrarPorRol('alumno')">
+                Alumno
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTA DE USUARIOS -->
+        <div class="usuarios-lista" *ngIf="!loadingUsuarios">
+
+          <div class="usuario-item" *ngFor="let u of filtroUsuarios">
+            <div class="usuario-avatar" [ngClass]="'avatar-' + u.rol?.toLowerCase()">
+              <ion-icon [name]="getIconoPorRol(u.rol)"></ion-icon>
+            </div>
+            <div class="usuario-info">
+              <span class="usuario-nombre">{{ u.nombreReal }}</span>
+              <span class="usuario-id">ID: {{ u.id }}</span>
+            </div>
+            <div class="usuario-rol-badge" [ngClass]="'rol-' + u.rol?.toLowerCase()">
+              {{ u.rol }}
+            </div>
+            <div class="usuario-acciones">
+              <ion-button fill="clear" size="small" class="accion-btn edit-btn" (click)="abrirModalEdicion(u)">
+                <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" class="accion-btn delete-btn" (click)="eliminarUsuario(u.id)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <!-- ESTADO VACÍO -->
+          <div class="usuarios-vacio" *ngIf="filtroUsuarios.length === 0">
+            <ion-icon name="search-outline"></ion-icon>
+            <p>No se encontraron usuarios con ese criterio.</p>
+          </div>
+
+        </div>
+
+        <!-- SKELETON LOADING -->
+        <div class="usuarios-lista" *ngIf="loadingUsuarios">
+          <div class="usuario-item skeleton" *ngFor="let i of [1,2,3,4,5]">
+            <div class="usuario-avatar skeleton-box"></div>
+            <div class="usuario-info">
+              <span class="skeleton-line wide"></span>
+              <span class="skeleton-line short"></span>
+            </div>
+            <div class="skeleton-line medium"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <hr class="divider">
+
+      <!-- SECCIÓN PROYECTOS -->
+      <section class="proyectos-section">
+        <div class="usuarios-header">
+          <div class="usuarios-title-block">
+            <h2 class="section-title" style="margin: 0;">Proyectos</h2>
+            <span class="usuarios-count">{{ filtroProyectos.length }} proyecto{{ filtroProyectos.length !== 1 ? 's' : '' }}</span>
+          </div>
+
+          <div class="usuarios-controles">
+            <ion-searchbar
+              placeholder="Buscar proyecto..."
+              (ionInput)="buscarProyecto($event)"
+              style="max-width: 280px; --border-radius: 12px;">
+            </ion-searchbar>
+
+            <div class="filtro-roles">
+              <button class="filtro-btn" [class.active]="filtroEstado === ''" (click)="filtrarPorEstado('')">Todos</button>
+              <button class="filtro-btn filtro-encurso"   [class.active]="filtroEstado === 'en curso'"   (click)="filtrarPorEstado('en curso')">En curso</button>
+              <button class="filtro-btn filtro-pausado"   [class.active]="filtroEstado === 'pausado'"    (click)="filtrarPorEstado('pausado')">Pausado</button>
+              <button class="filtro-btn filtro-finalizado"[class.active]="filtroEstado === 'finalizado'" (click)="filtrarPorEstado('finalizado')">Finalizado</button>
+            </div>
+
+            <ion-button class="btn-nuevo-proyecto" (click)="abrirModalProyecto(null)">
+              <ion-icon name="add-outline" slot="start"></ion-icon>
+              Nuevo proyecto
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- LISTA PROYECTOS -->
+        <div class="usuarios-lista" *ngIf="!loadingProyectos">
+
+          <div class="usuario-item proyecto-item" *ngFor="let p of filtroProyectos">
+            <div class="usuario-avatar" [ngClass]="'estado-avatar-' + p.estado.replace(' ', '-')">
+              <ion-icon [name]="getIconoPorEstado(p.estado)"></ion-icon>
+            </div>
+            <div class="usuario-info">
+              <span class="usuario-nombre">{{ p.titulo }}</span>
+              <span class="usuario-id proyecto-desc">{{ p.descripcion }}</span>
+            </div>
+            <div class="proyecto-meta">
+              <div class="proyecto-cupo">
+                <ion-icon name="people-outline"></ion-icon>
+                {{ p.cupoMaximo }} plazas
+              </div>
+            </div>
+            <div class="usuario-rol-badge" [ngClass]="'estado-' + p.estado.replace(' ', '-')">
+              {{ p.estado }}
+            </div>
+            <div class="usuario-acciones">
+              <ion-button fill="clear" size="small" class="accion-btn edit-btn" (click)="abrirModalProyecto(p)">
+                <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" class="accion-btn delete-btn" (click)="eliminarProyecto(p.id)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <div class="usuarios-vacio" *ngIf="filtroProyectos.length === 0">
+            <ion-icon name="folder-open-outline"></ion-icon>
+            <p>No hay proyectos con ese criterio.</p>
+          </div>
+        </div>
+
+        <!-- SKELETON -->
+        <div class="usuarios-lista" *ngIf="loadingProyectos">
+          <div class="usuario-item skeleton" *ngFor="let i of [1,2,3]">
+            <div class="usuario-avatar skeleton-box"></div>
+            <div class="usuario-info">
+              <span class="skeleton-line wide"></span>
+              <span class="skeleton-line short"></span>
+            </div>
+            <div class="skeleton-line medium"></div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </div>
+</ion-content>
+
+<!-- ========================================================= -->
+<!-- MODAL CAMBIO MASIVO DE ROL                                -->
+<!-- ========================================================= -->
+<div class="modal-overlay" *ngIf="modalCambioMasivoAbierto" (click)="cerrarModalCambioMasivoRol()">
+  <div class="modal-card modal-masivo" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-avatar avatar-administrador">
+          <ion-icon name="people-circle-outline"></ion-icon>
+        </div>
+        <div>
+          <h2 class="modal-title">Cambio Masivo de Rol</h2>
+          <span class="modal-subtitle">
+            {{ seleccionadosMasivo.length }} usuario{{ seleccionadosMasivo.length !== 1 ? 's' : '' }} seleccionado{{ seleccionadosMasivo.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+      </div>
+      <ion-button fill="clear" class="modal-close-btn" (click)="cerrarModalCambioMasivoRol()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Selector de rol destino -->
+      <div class="form-group">
+        <label class="form-label">Cambiar rol seleccionados a</label>
+        <select class="form-select" [(ngModel)]="rolMasivoDestino">
+          <option value="administrador">Administrador</option>
+          <option value="alumno">Alumno</option>
+        </select>
+      </div>
+
+      <!-- Buscador -->
+      <div class="masivo-search-wrapper">
+        <ion-icon name="search-outline" class="masivo-search-icon"></ion-icon>
+        <input
+          class="masivo-search-input"
+          type="text"
+          placeholder="Buscar por nombre o ID..."
+          [(ngModel)]="busquedaMasivo"
+          (input)="filtrarUsuariosMasivo()" />
+        <button
+          class="masivo-search-clear"
+          *ngIf="busquedaMasivo"
+          (click)="limpiarBusquedaMasivo()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Acciones rápidas de selección -->
+      <div class="masivo-acciones-rapidas">
+        <button class="filtro-btn" (click)="seleccionarTodosMasivo()">Seleccionar todos</button>
+        <button class="filtro-btn" (click)="deseleccionarTodosMasivo()">Limpiar selección</button>
+        <button class="filtro-btn filtro-alumno" (click)="seleccionarPorRolMasivo('alumno')">Solo alumnos</button>
+        <button class="filtro-btn filtro-admin" (click)="seleccionarPorRolMasivo('administrador')">Solo admins</button>
+      </div>
+
+      <!-- Lista de usuarios seleccionables -->
+      <div class="masivo-lista">
+        <div
+          class="masivo-item"
+          *ngFor="let u of usuariosFiltradosMasivo"
+          [class.masivo-item-selected]="estaSeleccionadoMasivo(u.id)"
+          (click)="toggleSeleccionMasivo(u.id)">
+
+          <div class="masivo-check">
+            <ion-icon
+              [name]="estaSeleccionadoMasivo(u.id) ? 'checkbox-outline' : 'square-outline'">
+            </ion-icon>
+          </div>
+          <div class="usuario-avatar" [ngClass]="'avatar-' + u.rol?.toLowerCase()">
+            <ion-icon [name]="getIconoPorRol(u.rol)"></ion-icon>
+          </div>
+          <div class="usuario-info">
+            <span class="usuario-nombre">{{ u.nombreReal }}</span>
+            <span class="usuario-id">ID: {{ u.id }}</span>
+          </div>
+          <div class="usuario-rol-badge" [ngClass]="'rol-' + u.rol?.toLowerCase()">
+            {{ u.rol }}
+          </div>
+        </div>
+
+        <!-- Vacío búsqueda -->
+        <div class="masivo-vacio" *ngIf="usuariosFiltradosMasivo.length === 0">
+          <ion-icon name="search-outline"></ion-icon>
+          <p>Sin resultados para "{{ busquedaMasivo }}"</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="cerrarModalCambioMasivoRol()">Cancelar</button>
+      <button
+        class="btn-guardar"
+        (click)="aplicarCambioMasivoRol()"
+        [disabled]="guardandoCambioMasivo || seleccionadosMasivo.length === 0">
+        <ion-icon name="checkmark-outline" *ngIf="!guardandoCambioMasivo"></ion-icon>
+        <ion-icon name="hourglass-outline" *ngIf="guardandoCambioMasivo"></ion-icon>
+        {{ guardandoCambioMasivo ? 'Aplicando...' : 'Aplicar a ' + seleccionadosMasivo.length + ' usuario' + (seleccionadosMasivo.length !== 1 ? 's' : '') }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL CREAR / EDITAR PROYECTO                             -->
+<!-- ========================================================= -->
+<div class="modal-overlay" *ngIf="modalProyectoAbierto" (click)="cerrarModalProyecto()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-avatar avatar-proyecto">
+          <ion-icon [name]="proyectoEditando ? 'create-outline' : 'add-circle-outline'"></ion-icon>
+        </div>
+        <div>
+          <h2 class="modal-title">{{ proyectoEditando ? 'Editar proyecto' : 'Nuevo proyecto' }}</h2>
+          <span class="modal-subtitle" *ngIf="proyectoEditando">ID: {{ proyectoEditando.id }}</span>
+          <span class="modal-subtitle" *ngIf="!proyectoEditando">Rellena los datos del proyecto</span>
+        </div>
+      </div>
+      <ion-button fill="clear" class="modal-close-btn" (click)="cerrarModalProyecto()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Título</label>
+        <input class="form-input" type="text" [(ngModel)]="formProyecto.titulo" placeholder="Nombre del proyecto" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea
+          class="form-input form-textarea"
+          [(ngModel)]="formProyecto.descripcion"
+          placeholder="Descripción breve del proyecto"
+          rows="3">
+        </textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Cupo máximo</label>
+          <input class="form-input" type="number" [(ngModel)]="formProyecto.cupoMaximo" min="1" placeholder="Ej: 5" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Estado</label>
+          <select class="form-select" [(ngModel)]="formProyecto.estado">
+            <option value="en curso">En curso</option>
+            <option value="pausado">Pausado</option>
+            <option value="finalizado">Finalizado</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="cerrarModalProyecto()">Cancelar</button>
+      <button class="btn-guardar" (click)="guardarProyecto()" [disabled]="guardandoProyecto || !formProyecto.titulo.trim()">
+        <ion-icon name="checkmark-outline" *ngIf="!guardandoProyecto"></ion-icon>
+        <ion-icon name="hourglass-outline" *ngIf="guardandoProyecto"></ion-icon>
+        {{ guardandoProyecto ? 'Guardando...' : (proyectoEditando ? 'Guardar cambios' : 'Crear proyecto') }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL EDICIÓN USUARIO (sin cambios)                       -->
+<!-- ========================================================= -->
+<div class="modal-overlay" *ngIf="modalEdicionAbierto" (click)="cerrarModalEdicion()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-avatar" [ngClass]="'avatar-' + usuarioEditando?.rol?.toLowerCase()">
+          <ion-icon [name]="getIconoPorRol(usuarioEditando?.rol || '')"></ion-icon>
+        </div>
+        <div>
+          <h2 class="modal-title">Editar Usuario</h2>
+          <span class="modal-subtitle">ID: {{ usuarioEditando?.id }}</span>
+        </div>
+      </div>
+      <ion-button fill="clear" class="modal-close-btn" (click)="cerrarModalEdicion()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nombre real</label>
+        <input
+          class="form-input"
+          type="text"
+          [(ngModel)]="formEdicion.nombreReal"
+          placeholder="Nombre completo" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nombre de usuario</label>
+        <input
+          class="form-input"
+          type="text"
+          [(ngModel)]="formEdicion.nombreUsuario"
+          placeholder="Nombre de usuario" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Rol</label>
+        <select class="form-select" [(ngModel)]="formEdicion.rol">
+          <option value="administrador">Administrador</option>
+          <option value="alumno">Alumno</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Nueva contraseña
+          <span class="form-hint">(dejar vacío para no cambiar)</span>
+        </label>
+        <input
+          class="form-input"
+          type="password"
+          [(ngModel)]="formEdicion.contrasenaHash"
+          placeholder="••••••••" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="cerrarModalEdicion()">Cancelar</button>
+      <button class="btn-guardar" (click)="guardarEdicion()" [disabled]="guardandoEdicion">
+        <ion-icon name="checkmark-outline" *ngIf="!guardandoEdicion"></ion-icon>
+        <ion-icon name="hourglass-outline" *ngIf="guardandoEdicion"></ion-icon>
+        {{ guardandoEdicion ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+    </div>
+
+  </div>
+</div>

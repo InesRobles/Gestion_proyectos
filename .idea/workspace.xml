@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="aa129bd7-0f4c-4eed-ba87-9562a71d0507" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/Script_Gestionar_Alumnos.sql" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/Script_Gestionar_Alumnos.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/controllers/AlumnoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/controllers/AlumnoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/controllers/controladorCors.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/dto/AlumnoDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/dto/AlumnoDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/dto/AsignacionDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/dto/AsignacionDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/dto/ProyectoDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/dto/ProyectoDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/dto/usuarioDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/dto/usuarioDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/AlumnoMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/AlumnoMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/ComentarioMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/ComentarioMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/HorarioMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/HorarioMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/ProyectoMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/ProyectoMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/UsuarioMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/mapper/UsuarioMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Alumno.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Alumno.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Asignacion.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Asignacion.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Comentario.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Comentario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/EstadoProyecto.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/EstadoProyecto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Horario.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Horario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Modalidad.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Modalidad.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Proyecto.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Proyecto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Rol.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Rol.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Usuario.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/models/Usuario.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/repositories/AlumnoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/repositories/AlumnoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/repositories/IUsuarioRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/repositories/UsuarioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/repositories/UsuarioRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/securityConfig/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/securityConfig/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/services/AlumnoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/services/AlumnoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/services/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/java/com/example/backend/services/UsuarioService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/angular.json" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/angular.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/app.routes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/home/home.page.html" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/home/home.page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/home/home.page.scss" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/home/home.page.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/home/home.page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/home/home.page.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/login/login.page.html" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/login/login.page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/login/login.page.scss" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/login/login.page.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/login/login.page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/login/login.page.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/register/register.page.html" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/register/register.page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/register/register.page.scss" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/register/register.page.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/register/register.page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/register/register.page.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/services/api.sevice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/app/services/api.sevice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/environments/environment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/environments/environment.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gestionAlumnos/frontend/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gestionAlumnos/frontend/src/main.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/gestionAlumnos" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="3DfZALxliXCM4RAL7Ghv3np5hDz" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "Ines",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/User/Desktop/gestionAlumnos",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="aa129bd7-0f4c-4eed-ba87-9562a71d0507" name="Changes" comment="" />
+      <created>1778674941051</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1778674941051</updated>
+      <workItem from="1778674942316" duration="16000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

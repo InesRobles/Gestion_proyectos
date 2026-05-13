@@ -1,0 +1,932 @@
+$primary: #764ba2;
+$primary-light: #f0e8f8;
+$primary-dark: #5a3480;
+$accent-admin: #eb445a;
+$accent-alumno: #3880ff;
+$accent-profesor: #2dd36f;
+$bg-app: #f4f7fe;
+$surface: #ffffff;
+$border: rgba(0, 0, 0, 0.07);
+$text-main: #1a1a2e;
+$text-muted: #8892a4;
+$radius-card: 20px;
+$radius-modal: 24px;
+$radius-input: 12px;
+
+// ── BASE ──────────────────────────────────────────────────────────────────────
+.home-wrapper {
+  background-color: $bg-app;
+  min-height: 100%;
+  padding: 20px 0;
+}
+
+.content-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+// ── HERO CARD ─────────────────────────────────────────────────────────────────
+.attendance-section {
+  margin-bottom: 30px;
+  animation: fadeInDown 0.6s ease-out forwards;
+
+  .attendance-hero-card {
+    border-radius: 24px;
+    background: linear-gradient(135deg, #2d1f3d 0%, #4b2c6e 50%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(45, 31, 61, 0.4);
+    border: none;
+
+    .hero-bg-shapes {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+
+      .shape {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .shape-1 { width: 350px; height: 350px; top: -100px; right: -80px; }
+      .shape-2 { width: 200px; height: 200px; bottom: -60px; left: 30%; background: rgba(255,255,255,0.04); }
+      .shape-3 { width: 120px; height: 120px; top: 20px; left: 15%; background: rgba(255,255,255,0.05); }
+    }
+
+    .attendance-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 44px 56px;
+      flex-wrap: wrap;
+      gap: 30px;
+
+      .left-column {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        .user-greeting {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          .greeting-label {
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.65);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+          }
+
+          .user-name {
+            color: #ffffff;
+            font-size: 2.6rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1.1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+          }
+
+          .greeting-sub {
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+          }
+        }
+
+        .time-box {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          background: rgba(255,255,255,0.1);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 14px;
+          padding: 12px 20px;
+          width: fit-content;
+
+          .time-icon-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+
+            ion-icon {
+              font-size: 1.4rem;
+              color: #e0c8ff;
+            }
+          }
+
+          .time-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .schedule-label {
+              font-size: 0.65rem;
+              color: rgba(255,255,255,0.55);
+              font-weight: 700;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+            }
+
+            .hours {
+              font-size: 1.15rem;
+              color: #ffffff;
+              font-weight: 800;
+              letter-spacing: 0.5px;
+            }
+          }
+        }
+      }
+
+      .right-column {
+        .fichar-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          background: rgba(255,255,255,0.1);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255,255,255,0.18);
+          border-radius: 20px;
+          padding: 28px 36px;
+
+          .instruction-text {
+            margin: 0;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+          }
+
+          .fichar-button {
+            --background: #ffffff;
+            --color: #764ba2;
+            --border-radius: 14px;
+            --box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            height: 52px;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            width: 100%;
+            min-width: 200px;
+          }
+
+          .fichar-hint {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.4);
+            text-align: center;
+            max-width: 200px;
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ── PROYECTOS ─────────────────────────────────────────────────────────────────
+.new-projects {
+  padding-bottom: 50px;
+
+  .section-header {
+    margin-bottom: 25px;
+    .section-subtitle { color: #666; margin-top: -15px; font-size: 1rem; }
+  }
+
+  .new-project-card {
+    border-radius: $radius-card;
+    border: 1px solid $border;
+    background: $surface;
+
+    .cat-label {
+      color: $primary;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+  }
+}
+
+// ── GENERALES ─────────────────────────────────────────────────────────────────
+.section-title { font-size: 1.8rem; font-weight: 800; color: $text-main; margin-bottom: 20px; }
+.divider { border: 0; height: 1px; background: $border; margin: 40px 0; }
+.interactive-card {
+  transition: all 0.3s ease;
+  border-radius: 15px;
+  &:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+}
+
+// ── STATUS ────────────────────────────────────────────────────────────────────
+.status-section {
+  background: $bg-app;
+  padding: 18px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #e0e6f0;
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .progress-percent { font-size: 1rem; font-weight: 600; color: #444; }
+  }
+}
+
+// ── USUARIOS LISTA ────────────────────────────────────────────────────────────
+.usuarios-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .usuarios-title-block {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+
+    .usuarios-count { font-size: 0.9rem; color: $text-muted; font-weight: 500; }
+  }
+
+  .usuarios-controles {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+.filtro-roles {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  .filtro-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #ddd;
+    background: $surface;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #555;
+    transition: all 0.2s ease;
+
+    &:hover { border-color: $primary; color: $primary; }
+    &.active { background: $primary; border-color: $primary; color: white; }
+    &.filtro-admin.active  { background: $accent-admin;   border-color: $accent-admin; }
+    &.filtro-alumno.active { background: $accent-alumno;  border-color: $accent-alumno; }
+  }
+}
+
+.usuarios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.usuario-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: $surface;
+  border-radius: 14px;
+  padding: 14px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid $border;
+  transition: box-shadow 0.2s ease;
+
+  &:hover { box-shadow: 0 6px 18px rgba(118,75,162,0.1); }
+
+  .usuario-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.3rem;
+    background: $primary-light;
+    color: $primary;
+
+    &.avatar-administrador { background: rgba($accent-admin, 0.12); color: $accent-admin; }
+    &.avatar-alumno        { background: rgba($accent-alumno, 0.12); color: $accent-alumno; }
+  }
+
+  .usuario-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    .usuario-nombre {
+      font-weight: 700;
+      font-size: 0.97rem;
+      color: $text-main;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .usuario-id { font-size: 0.78rem; color: $text-muted; }
+  }
+
+  .usuario-rol-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    background: $primary-light;
+    color: $primary;
+
+    &.rol-administrador { background: rgba($accent-admin, 0.12);   color: darken($accent-admin, 5%); }
+    &.rol-alumno        { background: rgba($accent-alumno, 0.12);  color: darken($accent-alumno, 5%); }
+  }
+
+  .usuario-acciones {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+
+    .accion-btn { --border-radius: 8px; }
+    .edit-btn   { --color: #{$accent-alumno}; }
+    .delete-btn { --color: #{$accent-admin}; }
+  }
+}
+
+.usuarios-vacio {
+  text-align: center;
+  padding: 50px 20px;
+  color: #bbb;
+
+  ion-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+  p { font-size: 1rem; margin: 0; }
+}
+
+// Skeleton
+.usuario-item.skeleton {
+  pointer-events: none;
+
+  @mixin shimmer-bg {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+  }
+
+  .skeleton-box { @include shimmer-bg; border-radius: 50%; }
+  .skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+    display: block;
+    @include shimmer-bg;
+
+    &.wide   { width: 160px; }
+    &.short  { width: 70px; margin-top: 6px; }
+    &.medium { width: 80px; }
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODALES — sistema compartido
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 10, 30, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: overlayIn 0.2s ease;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-card {
+  background: #16112a;
+  border-radius: $radius-modal;
+  width: 100%;
+  max-width: 480px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 32px 80px rgba(0,0,0,0.55);
+  overflow: hidden;
+  animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  // Modal masivo más ancho
+  &.modal-masivo {
+    max-width: 560px;
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+
+  .modal-header-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .modal-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    background: rgba(255,255,255,0.07);
+    flex-shrink: 0;
+
+    &.avatar-administrador { background: rgba(139, 92, 246, 0.2); color: #b89dfa; }
+    &.avatar-alumno        { background: rgba(56, 128, 255, 0.2); color: #7fb3ff; }
+    &.avatar-profesor      { background: rgba(45, 211, 111, 0.2); color: #6ae89a; }
+  }
+
+  .modal-title {
+    margin: 0 0 2px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #f0ecff;
+    letter-spacing: -0.01em;
+  }
+
+  .modal-subtitle {
+    display: block;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.38);
+    font-weight: 400;
+  }
+
+  .modal-close-btn {
+    --color: rgba(255,255,255,0.35);
+    --padding-start: 6px;
+    --padding-end: 6px;
+    transition: color 0.15s;
+
+    &:hover { --color: rgba(255,255,255,0.7); }
+  }
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+.modal-body {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.form-hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: rgba(255,255,255,0.28);
+  font-size: 0.75rem;
+  margin-left: 4px;
+}
+
+.form-input,
+.form-select {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: $radius-input;
+  padding: 12px 15px;
+  color: #f0ecff;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::placeholder { color: rgba(255,255,255,0.2); }
+
+  &:focus {
+    border-color: rgba(139, 92, 246, 0.6);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+  }
+}
+
+.form-select {
+  cursor: pointer;
+  option { background: #1e1530; color: #f0ecff; }
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 16px 24px 22px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+
+  .btn-cancelar {
+    flex: 1;
+    padding: 12px;
+    border-radius: $radius-input;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: transparent;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.7);
+    }
+  }
+
+  .btn-guardar {
+    flex: 2;
+    padding: 12px;
+    border-radius: $radius-input;
+    border: none;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d3fcf 100%);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 16px rgba(109, 63, 207, 0.35);
+
+    ion-icon { font-size: 1rem; }
+
+    &:not(:disabled):hover { opacity: 0.92; transform: translateY(-1px); }
+    &:not(:disabled):active { transform: scale(0.98); }
+    &:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODAL MASIVO — componentes específicos
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── PROYECTOS ─────────────────────────────────────────────────────────────────
+
+.proyectos-section {
+  padding-bottom: 50px;
+}
+
+.btn-nuevo-proyecto {
+  --background: #{$primary};
+  --background-hover: #{$primary-dark};
+  --border-radius: 12px;
+  height: 40px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.proyecto-item {
+  .proyecto-desc {
+    max-width: 400px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .proyecto-meta {
+    display: flex;
+    align-items: center;
+
+    .proyecto-cupo {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: $text-muted;
+      white-space: nowrap;
+
+      ion-icon { font-size: 0.95rem; }
+    }
+  }
+}
+
+// Avatares de estado proyecto
+.estado-avatar-en-curso   { background: rgba($accent-alumno, 0.12); color: $accent-alumno; }
+.estado-avatar-pausado    { background: rgba(255, 165, 0, 0.12);    color: #e6920a; }
+.estado-avatar-finalizado { background: rgba(45, 211, 111, 0.12);   color: #2dd36f; }
+
+// Badges de estado
+.usuario-rol-badge {
+  &.estado-en-curso   { background: rgba($accent-alumno, 0.12); color: darken($accent-alumno, 5%); }
+  &.estado-pausado    { background: rgba(255, 165, 0, 0.12);    color: #c47a00; }
+  &.estado-finalizado { background: rgba(45, 211, 111, 0.12);   color: darken(#2dd36f, 15%); }
+}
+
+// Filtros estado
+.filtro-btn {
+  &.filtro-encurso.active   { background: $accent-alumno; border-color: $accent-alumno; }
+  &.filtro-pausado.active   { background: #e6920a;        border-color: #e6920a; }
+  &.filtro-finalizado.active{ background: #2dd36f;        border-color: #2dd36f; }
+}
+
+// Avatar modal proyecto
+.modal-avatar {
+  &.avatar-proyecto { background: rgba(45, 211, 111, 0.2); color: #5ee88a; }
+}
+
+// Textarea del modal
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+// Fila de dos columnas en el modal
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+// Buscador del modal masivo
+.masivo-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .masivo-search-icon {
+    position: absolute;
+    left: 13px;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.3);
+    pointer-events: none;
+  }
+
+  .masivo-search-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: $radius-input;
+    padding: 11px 40px 11px 38px;
+    color: #f0ecff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    box-sizing: border-box;
+
+    &::placeholder { color: rgba(255,255,255,0.22); }
+
+    &:focus {
+      border-color: rgba(139, 92, 246, 0.55);
+      background: rgba(255,255,255,0.07);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+  }
+
+  .masivo-search-clear {
+    position: absolute;
+    right: 10px;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    border-radius: 6px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255,255,255,0.4);
+    font-size: 0.85rem;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.75); }
+  }
+}
+
+.masivo-vacio {
+  text-align: center;
+  padding: 24px 16px;
+  color: rgba(255,255,255,0.25);
+
+  ion-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+  p { font-size: 0.85rem; margin: 0; }
+}
+
+.masivo-acciones-rapidas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .filtro-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: rgba(255,255,255,0.5);
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: rgba(139, 92, 246, 0.5);
+      color: #b89dfa;
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    &.filtro-admin:hover  { border-color: rgba($accent-admin, 0.5); color: lighten($accent-admin, 20%); background: rgba($accent-admin, 0.1); }
+    &.filtro-alumno:hover { border-color: rgba($accent-alumno, 0.5); color: lighten($accent-alumno, 20%); background: rgba($accent-alumno, 0.1); }
+  }
+}
+
+.masivo-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+}
+
+.masivo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+  background: rgba(255,255,255,0.03);
+
+  &:hover {
+    background: rgba(139, 92, 246, 0.07);
+    border-color: rgba(139, 92, 246, 0.2);
+  }
+
+  &.masivo-item-selected {
+    background: rgba(139, 92, 246, 0.13);
+    border-color: rgba(139, 92, 246, 0.35);
+
+    .masivo-check ion-icon { color: #b89dfa; }
+    .usuario-nombre { color: #f0ecff; }
+  }
+
+  .masivo-check {
+    flex-shrink: 0;
+    width: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.2);
+      transition: color 0.15s;
+    }
+  }
+
+  .usuario-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+
+    &.avatar-administrador { background: rgba($accent-admin, 0.18); color: lighten($accent-admin, 15%); }
+    &.avatar-alumno        { background: rgba($accent-alumno, 0.18); color: lighten($accent-alumno, 15%); }
+  }
+
+  .usuario-info {
+    flex: 1;
+    min-width: 0;
+
+    .usuario-nombre {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.15s;
+    }
+
+    .usuario-id {
+      display: block;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+    }
+  }
+
+  .usuario-rol-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.3);
+
+    &.rol-administrador { background: rgba($accent-admin, 0.18); color: lighten($accent-admin, 20%); }
+    &.rol-alumno        { background: rgba($accent-alumno, 0.18); color: lighten($accent-alumno, 20%); }
+  }
+}
+
+// Vista previa de imagen en el modal
+.foto-preview-wrapper {
+  margin-top: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(118, 75, 162, 0.2);
+  max-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f4fd;
+
+  .foto-preview {
+    width: 100%;
+    max-height: 180px;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+// Foto miniatura en la lista de proyectos
+.proyecto-avatar {
+  overflow: hidden;
+
+  .proyecto-foto-mini {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+}
+

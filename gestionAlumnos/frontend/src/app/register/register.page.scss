@@ -1,0 +1,104 @@
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.interactive-card {
+  width: 100%;
+  max-width: 850px; // Un poco más ancha por tener más campos
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  }
+}
+
+.form-section {
+  padding: 20px;
+  ion-card-title {
+    font-weight: 800;
+    margin-bottom: 25px;
+    color: #333;
+    letter-spacing: 1px;
+  }
+}
+
+.inputs-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 5px;
+}
+
+.custom-input {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  .input-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #764ba2;
+    letter-spacing: 0.3px;
+    padding-left: 4px;
+  }
+
+  ion-input.styled-input {
+    --background: #f4f0fa;
+    --color: #2d1f3d;
+    --placeholder-color: #b09cc8;
+    --padding-start: 14px;
+    --padding-end: 14px;
+    --border-radius: 12px;
+    border: 1.5px solid #e0d6f0;
+    border-radius: 12px;
+    font-size: 0.97rem;
+    height: 46px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus-within {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.12);
+    }
+  }
+}
+
+.register-button {
+  --border-radius: 12px;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  height: 55px;
+  --background: #764ba2; // Color acorde al degradado
+  font-weight: bold;
+}
+
+.logo-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f9ff;
+  border-radius: 20px;
+  padding: 50px;
+  height: 100%;
+}
+
+.img-register-large {
+  font-size: 160px;
+  color: #764ba2;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.1));
+}
+
+ion-note {
+  cursor: pointer;
+  &:hover {
+    color: #667eea;
+  }
+}
