@@ -151,7 +151,7 @@
                     [disabled]="!puedeInscribirse(p)"
                     (click)="inscribirse(p)">
                     <ion-icon name="add-circle-outline" slot="start"></ion-icon>
-                    {{ p.cuposDisponibles > 0 ? 'Inscribirse' : 'Sin cupos' }}
+                    {{ getTextoBotonInscripcion(p) }}
                   </ion-button>
                 </div>
               </ion-card>

@@ -182,6 +182,12 @@ export class HomePage implements OnInit {
   puedeInscribirse(p: proyecto): boolean {
     return p.estado === 'en curso' && p.cuposDisponibles > 0;
   }
+  getTextoBotonInscripcion(p: proyecto): string {
+    if (p.estado === 'finalizado') return 'Finalizado';
+    if (p.estado === 'pausado')    return 'Pausado';
+    if (p.cuposDisponibles <= 0)   return 'Sin cupos';
+    return 'Inscribirse';
+  }
 
   // --- ACCIONES ---
   async fichar() {

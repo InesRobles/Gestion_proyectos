@@ -79,7 +79,7 @@ public class ProyectoService {
                         "No se encontró un alumno para el usuario: " + usuarioId))
                 .getId();
         return proyectoRepository
-                .findByAsignaciones_AlumnoIdNotContaining(alumnoId, EstadoProyecto.EN_CURSO)
+                .findByAsignaciones_AlumnoIdNotContaining(alumnoId)
                 .stream()
                 .map(p -> {
                     long inscritos = asignacionRepository.countByIdProyectoId(p.getId());
@@ -87,7 +87,6 @@ public class ProyectoService {
                     dto.setCuposDisponibles(p.getCupoMaximo() - (int) inscritos);
                     return dto;
                 })
-                .filter(dto -> dto.getCuposDisponibles() > 0)
                 .collect(Collectors.toList());
     }
     // ─── CREATE ──────────────────────────────────────────────────────────────
