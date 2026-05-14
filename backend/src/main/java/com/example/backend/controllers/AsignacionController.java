@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -29,8 +30,6 @@ public class AsignacionController {
         return asignacionService.findAll();
     }
 
-    // Devuelve los proyectos en los que está inscrito el usuario (por su usuarioId)
-    // El frontend llama a: GET /api/asignacion/alumno/{usuarioId}
     @GetMapping("/alumno/{usuarioId}")
     public ResponseEntity<List<ProyectoDTO>> getProyectosPorAlumno(@PathVariable Long usuarioId) {
         List<ProyectoDTO> proyectos = asignacionService.getProyectosPorUsuario(usuarioId);
@@ -43,5 +42,13 @@ public class AsignacionController {
         Long proyectoId = body.get("proyectoId");
         AsignacionDTO resultado = asignacionService.inscribir(alumnoId, proyectoId);
         return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> salir(@RequestBody Map<String, Long> body) {
+        Long alumnoId   = body.get("alumnoId");
+        Long proyectoId = body.get("proyectoId");
+        asignacionService.salir(alumnoId, proyectoId);
+        return ResponseEntity.noContent().build();
     }
 }

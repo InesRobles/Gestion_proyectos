@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
-  IonCardTitle, IonModal, IonBadge, IonCardContent, IonSearchbar,
+  IonCardTitle, IonModal, IonBadge, IonCardContent,
   IonItem, IonLabel, ToastController, IonList, IonInput
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -15,7 +15,6 @@ import {
   listOutline, checkmarkDoneCircle, eyeOutline,
   peopleOutline, folderOpenOutline, searchOutline
 } from 'ionicons/icons';
-import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
 import { proyecto } from '../modelos/proyecto';
 import { ProyectoService } from '../services/proyecto-service';
@@ -32,7 +31,7 @@ import { forkJoin } from 'rxjs';
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
     IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
     IonCardTitle, IonModal, IonBadge, IonCardContent, CommonModule,
-    FormsModule, RouterLink, IonSearchbar, HeaderComponent,
+    FormsModule, HeaderComponent,
     IonItem, IonLabel, IonInput, IonList
   ]
 })
@@ -43,17 +42,13 @@ export class HomePage implements OnInit {
   esProyectoInscrito = false;
   nuevoComentario: string = '';
 
-  // Lógica de Fichaje
   mostrarTarjetaAsistencia = true;
   isExiting = false;
   nombreUsuario = '';
 
-  // Proyectos del alumno logado (ya inscrito)
   misProyectos: proyecto[] = [];
-  // Proyectos disponibles para inscribirse (el alumno NO está en ellos)
   nuevosProyectos: proyecto[] = [];
 
-  // Listas filtradas (las que se muestran)
   misProyectosFiltrados: proyecto[] = [];
   nuevosProyectosFiltrados: proyecto[] = [];
 
@@ -74,12 +69,10 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit() {
-    // Suscripción reactiva a la sesión — se actualiza si cambia el usuario
     this.authService.sesion$.subscribe(sesion => {
       this.nombreUsuario = sesion?.nombreReal ?? 'Usuario';
 
       if (sesion?.id) {
-        // Clave de fichaje única por usuario para que no se mezclen entre usuarios
         const ultimoFichaje = localStorage.getItem(`fechaFichaje_${sesion.id}`);
         const hoy = new Date().toDateString();
         this.mostrarTarjetaAsistencia = ultimoFichaje !== hoy;
@@ -100,9 +93,6 @@ export class HomePage implements OnInit {
 
     this.loadingProyectos = true;
 
-    // Cargamos en paralelo:
-    // 1. Los proyectos donde el alumno ya está inscrito
-    // 2. Todos los proyectos de la BD
     forkJoin({
       misProyectos: this.proyectoService.getProyectosActivos(sesion.id),
       nuevosProyectos: this.proyectoService.getProyectosDisponibles(sesion.id)
@@ -182,6 +172,7 @@ export class HomePage implements OnInit {
   puedeInscribirse(p: proyecto): boolean {
     return p.estado === 'en curso' && p.cuposDisponibles > 0;
   }
+
   getTextoBotonInscripcion(p: proyecto): string {
     if (p.estado === 'finalizado') return 'Finalizado';
     if (p.estado === 'pausado')    return 'Pausado';
@@ -189,12 +180,10 @@ export class HomePage implements OnInit {
     return 'Inscribirse';
   }
 
-  // --- ACCIONES ---
   async fichar() {
     const sesion = this.authService.obtenerSesion();
     const hoy = new Date().toDateString();
 
-    // Clave única por usuario para que el fichaje no se comparta entre cuentas
     localStorage.setItem(`fechaFichaje_${sesion?.id}`, hoy);
 
     const toast = await this.toastController.create({
@@ -242,8 +231,6 @@ export class HomePage implements OnInit {
           position: 'bottom'
         });
         await toast.present();
-
-        // Recargar ambas listas para reflejar el cambio correctamente
         this.cargarProyectos();
       },
       error: async (err) => {
@@ -273,5 +260,33 @@ export class HomePage implements OnInit {
       this.proyectoSeleccionado.comentarios.push(this.nuevoComentario);
       this.nuevoComentario = '';
     }
+  }
+
+  async salirDeProyecto(p: proyecto) {
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) return;
+
+    this.proyectoService.salir(sesion.id, p.id).subscribe({
+      next: async () => {
+        const toast = await this.toastController.create({
+          message: `✅ Has salido de "${p.titulo}" correctamente.`,
+          duration: 2500,
+          color: 'success',
+          position: 'bottom'
+        });
+        await toast.present();
+        this.cargarProyectos();
+      },
+      error: async (err) => {
+        const mensaje = err?.error?.mensaje ?? 'Error al salir del proyecto. Inténtalo de nuevo.';
+        const toast = await this.toastController.create({
+          message: `❌ ${mensaje}`,
+          duration: 3500,
+          color: 'danger',
+          position: 'bottom'
+        });
+        await toast.present();
+      }
+    });
   }
 }

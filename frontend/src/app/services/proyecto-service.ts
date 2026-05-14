@@ -11,16 +11,14 @@ export class ProyectoService {
 
   constructor(private http: HttpClient, private apiService: ApiService) {}
 
-  // Todos los proyectos de la BD
   getProyectos(): Observable<proyecto[]> {
     return this.http.get<proyecto[]>(`${this.apiService.apiUrl}/proyecto`);
   }
 
-  // Proyectos en los que el alumno ya está inscrito
-  // El backend debe exponer: GET /asignacion/alumno/{alumnoId}
   getProyectosPorAlumno(alumnoId: number): Observable<proyecto[]> {
     return this.http.get<proyecto[]>(`${this.apiService.apiUrl}/asignacion/alumno/${alumnoId}`);
   }
+
   getProyectosActivos(alumnoId: number): Observable<proyecto[]> {
     return this.http.get<proyecto[]>(
       `${this.apiService.apiUrl}/proyecto/alumno/${alumnoId}/activos`
@@ -51,5 +49,11 @@ export class ProyectoService {
 
   inscribirse(alumnoId: number, proyectoId: number): Observable<any> {
     return this.http.post(`${this.apiService.apiUrl}/asignacion`, { alumnoId, proyectoId });
+  }
+
+  salir(alumnoId: number, proyectoId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiService.apiUrl}/asignacion`, {
+      body: { alumnoId, proyectoId }
+    });
   }
 }

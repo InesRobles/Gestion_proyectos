@@ -92,4 +92,19 @@ public class AsignacionService {
         Asignacion guardada = asignacionRepository.save(asignacion);
         return asignacionMapper.toDTO(guardada);
     }
+
+    @Transactional
+    public void salir(Long usuarioId, Long proyectoId) {
+        Alumno alumno = alumnoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new ElementoNoEncontradoException(
+                        "No se encontró un alumno asociado al usuario con id: " + usuarioId));
+
+        AsignacionId id = new AsignacionId(alumno.getId(), proyectoId);
+
+        if (!asignacionRepository.existsById(id)) {
+            throw new ElementoNoEncontradoException("El alumno no está inscrito en ese proyecto.");
+        }
+
+        asignacionRepository.deleteById(id);
+    }
 }

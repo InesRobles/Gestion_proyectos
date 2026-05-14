@@ -85,7 +85,6 @@
                       {{ p.cuposDisponibles }} / {{ p.cupoMaximo }} cupos libres
                     </span>
                   </div>
-                  <!-- Barra visual de ocupación -->
                   <div class="progress-track" style="margin-top: 8px;">
                     <div class="progress-fill" [style.width.%]="getPorcentajeCupo(p)"></div>
                   </div>
@@ -94,6 +93,10 @@
                   <ion-button fill="solid" class="action-button" (click)="verDetalles(p, true)">
                     <ion-icon name="eye-outline" slot="start"></ion-icon>
                     Ver Detalles
+                  </ion-button>
+                  <ion-button fill="outline" color="danger" class="action-button" (click)="salirDeProyecto(p)">
+                    <ion-icon name="exit-outline" slot="start"></ion-icon>
+                    Salir
                   </ion-button>
                 </div>
               </ion-card>
@@ -138,13 +141,11 @@
                       {{ p.cuposDisponibles }} / {{ p.cupoMaximo }} cupos libres
                     </span>
                   </div>
-                  <!-- Barra visual de ocupación -->
                   <div class="progress-track" style="margin-top: 8px;">
                     <div class="progress-fill" [style.width.%]="getPorcentajeCupo(p)"></div>
                   </div>
                 </ion-card-content>
                 <div class="card-footer">
-                  <!-- Botón desactivado si no hay cupo o el proyecto no está en curso -->
                   <ion-button
                     fill="solid"
                     class="inscribir-btn"
@@ -211,7 +212,6 @@
                   {{ proyectoSeleccionado.cuposDisponibles }} / {{ proyectoSeleccionado.cupoMaximo }} cupos libres
                 </span>
               </div>
-              <!-- Barra de cupos en el modal -->
               <div class="progress-track" style="margin-top: 12px;">
                 <div class="progress-fill" [style.width.%]="getPorcentajeCupo(proyectoSeleccionado)"></div>
               </div>
