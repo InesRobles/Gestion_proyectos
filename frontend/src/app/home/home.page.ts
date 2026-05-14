@@ -17,7 +17,6 @@ import {
   peopleOutline, folderOpenOutline, searchOutline,
   calendarOutline, saveOutline
 } from 'ionicons/icons';
-import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
 import { proyecto } from '../modelos/proyecto';
 import { ProyectoService } from '../services/proyecto-service';
@@ -26,6 +25,7 @@ import { AuthService } from '../services/auth-service';
 import { AsistenciaService } from '../services/asistencia-service';
 import { inject } from '@angular/core';
 import { forkJoin } from 'rxjs';
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-home',
@@ -47,7 +47,6 @@ export class HomePage implements OnInit {
   esProyectoInscrito = false;
   nuevoComentario: string = '';
 
-  // Lógica de Fichaje
   mostrarTarjetaAsistencia = true;
   isExiting = false;
   nombreUsuario = '';
@@ -66,6 +65,7 @@ export class HomePage implements OnInit {
   // Proyectos
   misProyectos: proyecto[] = [];
   nuevosProyectos: proyecto[] = [];
+
   misProyectosFiltrados: proyecto[] = [];
   nuevosProyectosFiltrados: proyecto[] = [];
   loadingProyectos = true;
@@ -90,6 +90,14 @@ export class HomePage implements OnInit {
   ngOnInit() {
     this.authService.sesion$.subscribe(sesion => {
       this.nombreUsuario = sesion?.nombreReal ?? 'Usuario';
+
+      if (sesion?.id) {
+        const ultimoFichaje = localStorage.getItem(`fechaFichaje_${sesion.id}`);
+        const hoy = new Date().toDateString();
+        this.mostrarTarjetaAsistencia = ultimoFichaje !== hoy;
+      } else {
+        this.mostrarTarjetaAsistencia = true;
+      }
     });
     this.cargarProyectos();
     this.cargarHorarioYFichaje();
@@ -261,6 +269,7 @@ export class HomePage implements OnInit {
     if (!sesion?.id) { this.loadingProyectos = false; return; }
 
     this.loadingProyectos = true;
+
     forkJoin({
       misProyectos: this.proyectoService.getProyectosActivos(sesion.id),
       nuevosProyectos: this.proyectoService.getProyectosDisponibles(sesion.id)
@@ -337,26 +346,43 @@ export class HomePage implements OnInit {
     return p.estado === 'en curso' && p.cuposDisponibles > 0;
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // FICHAR
-  // ─────────────────────────────────────────────────────────────
-  async fichar() {
+  getTextoBotonInscripcion(p: proyecto): string {
+    if (p.estado === 'finalizado') return 'Finalizado';
+    if (p.estado === 'pausado')    return 'Pausado';
+    if (p.cuposDisponibles <= 0)   return 'Sin cupos';
+    return 'Inscribirse';
+  }
+
+async fichar() {
     if (!this.alumnoIdReal) return;
+
+    // Obtenemos la sesión para el localStorage
+    const sesion = this.authService.obtenerSesion();
 
     this.asistenciaService.fichar(this.alumnoIdReal).subscribe({
       next: async () => {
+        const hoy = new Date().toISOString().split('T')[0];
+        if (sesion?.id) {
+          localStorage.setItem(`fechaFichaje_${sesion.id}`, hoy);
+        }
+
         const toast = await this.toastController.create({
           message: '✅ Te has fichado correctamente',
-          duration: 2000, position: 'top', color: 'success'
+          duration: 2000,
+          position: 'top',
+          color: 'success'
         });
         await toast.present();
+
         this.isExiting = true;
-        setTimeout(() => this.mostrarTarjetaAsistencia = false, 500);
+        setTimeout(() => (this.mostrarTarjetaAsistencia = false), 500);
       },
       error: async () => {
         const toast = await this.toastController.create({
           message: '❌ Error al registrar el fichaje',
-          duration: 2000, position: 'top', color: 'danger'
+          duration: 2000,
+          position: 'top',
+          color: 'danger'
         });
         await toast.present();
       }
@@ -370,7 +396,9 @@ export class HomePage implements OnInit {
     if (p.cuposDisponibles <= 0) {
       const toast = await this.toastController.create({
         message: `❌ El proyecto "${p.titulo}" no tiene cupos disponibles.`,
-        duration: 3000, color: 'danger', position: 'bottom'
+        duration: 3000,
+        color: 'danger',
+        position: 'bottom'
       });
       await toast.present();
       return;
@@ -383,7 +411,9 @@ export class HomePage implements OnInit {
       next: async () => {
         const toast = await this.toastController.create({
           message: `✅ Te has inscrito en "${p.titulo}" correctamente.`,
-          duration: 2500, color: 'success', position: 'bottom'
+          duration: 2500,
+          color: 'success',
+          position: 'bottom'
         });
         await toast.present();
         this.cargarProyectos();
@@ -391,7 +421,10 @@ export class HomePage implements OnInit {
       error: async (err) => {
         const mensaje = err?.error?.mensaje ?? 'Error al inscribirse. Inténtalo de nuevo.';
         const toast = await this.toastController.create({
-          message: `❌ ${mensaje}`, duration: 3500, color: 'danger', position: 'bottom'
+          message: `❌ ${mensaje}`,
+          duration: 3500,
+          color: 'danger',
+          position: 'bottom'
         });
         await toast.present();
       }
@@ -415,5 +448,33 @@ export class HomePage implements OnInit {
       this.proyectoSeleccionado.comentarios.push(this.nuevoComentario);
       this.nuevoComentario = '';
     }
+  }
+
+  async salirDeProyecto(p: proyecto) {
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) return;
+
+    this.proyectoService.salir(sesion.id, p.id).subscribe({
+      next: async () => {
+        const toast = await this.toastController.create({
+          message: `✅ Has salido de "${p.titulo}" correctamente.`,
+          duration: 2500,
+          color: 'success',
+          position: 'bottom'
+        });
+        await toast.present();
+        this.cargarProyectos();
+      },
+      error: async (err) => {
+        const mensaje = err?.error?.mensaje ?? 'Error al salir del proyecto. Inténtalo de nuevo.';
+        const toast = await this.toastController.create({
+          message: `❌ ${mensaje}`,
+          duration: 3500,
+          color: 'danger',
+          position: 'bottom'
+        });
+        await toast.present();
+      }
+    });
   }
 }
