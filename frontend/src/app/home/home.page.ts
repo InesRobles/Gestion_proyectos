@@ -5,21 +5,23 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
   IonCardTitle, IonModal, IonBadge, IonCardContent, IonSearchbar,
-  IonItem, IonLabel, ToastController, IonList, IonInput, IonProgressBar
+  IonItem, IonLabel, ToastController, IonList, IonInput
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personCircle, closeOutline, exitOutline, timeOutline,
   logInOutline, addCircleOutline, chatbubblesOutline,
   chatbubbleEllipsesOutline, send, statsChartOutline,
-  listOutline, checkmarkDoneCircle, eyeOutline
+  listOutline, checkmarkDoneCircle, eyeOutline,
+  peopleOutline, folderOpenOutline, searchOutline
 } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
-import { HeaderComponent } from "../components/header/header.component";
-import {proyecto} from "../modelos/proyecto";
-import {ProyectoService} from "../services/proyecto-service";
+import { HeaderComponent } from '../components/header/header.component';
+import { proyecto } from '../modelos/proyecto';
+import { ProyectoService } from '../services/proyecto-service';
 import { AuthService } from '../services/auth-service';
-
+import { inject } from '@angular/core';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -31,7 +33,7 @@ import { AuthService } from '../services/auth-service';
     IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
     IonCardTitle, IonModal, IonBadge, IonCardContent, CommonModule,
     FormsModule, RouterLink, IonSearchbar, HeaderComponent,
-    IonItem, IonLabel, IonInput, IonProgressBar, IonList
+    IonItem, IonLabel, IonInput, IonList
   ]
 })
 export class HomePage implements OnInit {
@@ -44,10 +46,11 @@ export class HomePage implements OnInit {
   // Lógica de Fichaje
   mostrarTarjetaAsistencia = true;
   isExiting = false;
-  nombreUsuario = "";
+  nombreUsuario = '';
 
-  // Listas de proyectos desde BD
+  // Proyectos del alumno logado (ya inscrito)
   misProyectos: proyecto[] = [];
+  // Proyectos disponibles para inscribirse (el alumno NO está en ellos)
   nuevosProyectos: proyecto[] = [];
 
   // Listas filtradas (las que se muestran)
@@ -56,45 +59,59 @@ export class HomePage implements OnInit {
 
   loadingProyectos = true;
 
-  // Imagen placeholder para cards sin imagen en BD
-  readonly PLACEHOLDER_IMG = 'https://picsum.photos/seed/proyecto/600/400';
+  private toastController = inject(ToastController);
+  private proyectoService = inject(ProyectoService);
+  private authService = inject(AuthService);
 
-  constructor(
-    private toastController: ToastController,
-    private proyectoService: ProyectoService,
-    private authService: AuthService,
-  ) {
+  constructor() {
     addIcons({
       personCircle, closeOutline, exitOutline, timeOutline,
       logInOutline, addCircleOutline, chatbubblesOutline,
       chatbubbleEllipsesOutline, send, statsChartOutline,
-      listOutline, checkmarkDoneCircle, eyeOutline
+      listOutline, checkmarkDoneCircle, eyeOutline,
+      peopleOutline, folderOpenOutline, searchOutline
     });
   }
 
   ngOnInit() {
-    const sesion = this.authService.obtenerSesion();
-    this.nombreUsuario = sesion?.nombreReal ?? 'Usuario';
+    // Suscripción reactiva a la sesión — se actualiza si cambia el usuario
+    this.authService.sesion$.subscribe(sesion => {
+      this.nombreUsuario = sesion?.nombreReal ?? 'Usuario';
 
-    const ultimoFichaje = localStorage.getItem('fechaFichaje');
-    const hoy = new Date().toDateString();
-    if (ultimoFichaje === hoy) {
-      this.mostrarTarjetaAsistencia = false;
-    }
+      if (sesion?.id) {
+        // Clave de fichaje única por usuario para que no se mezclen entre usuarios
+        const ultimoFichaje = localStorage.getItem(`fechaFichaje_${sesion.id}`);
+        const hoy = new Date().toDateString();
+        this.mostrarTarjetaAsistencia = ultimoFichaje !== hoy;
+      } else {
+        this.mostrarTarjetaAsistencia = true;
+      }
+    });
 
     this.cargarProyectos();
   }
 
   cargarProyectos() {
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) {
+      this.loadingProyectos = false;
+      return;
+    }
+
     this.loadingProyectos = true;
-    this.proyectoService.getProyectos().subscribe({
-      next: (res) => {
-        // Proyectos "en curso" son los del alumno activo
-        this.misProyectos = res.filter(p => p.estado === 'en curso');
-        // El resto (pausado, finalizado) van a "Explorar"
-        this.nuevosProyectos = res.filter(p => p.estado !== 'en curso');
-        this.misProyectosFiltrados = [...this.misProyectos];
-        this.nuevosProyectosFiltrados = [...this.nuevosProyectos];
+
+    // Cargamos en paralelo:
+    // 1. Los proyectos donde el alumno ya está inscrito
+    // 2. Todos los proyectos de la BD
+    forkJoin({
+      misProyectos: this.proyectoService.getProyectosActivos(sesion.id),
+      nuevosProyectos: this.proyectoService.getProyectosDisponibles(sesion.id)
+    }).subscribe({
+      next: ({ misProyectos, nuevosProyectos }) => {
+        this.misProyectos = misProyectos;
+        this.nuevosProyectos = nuevosProyectos;
+        this.misProyectosFiltrados = [...misProyectos];
+        this.nuevosProyectosFiltrados = [...nuevosProyectos];
         this.loadingProyectos = false;
       },
       error: async () => {
@@ -130,17 +147,14 @@ export class HomePage implements OnInit {
     );
   }
 
-  // Devuelve la clase CSS para el chip de estado (sin espacios)
   getClaseEstado(estado: string): string {
     return 'estado-' + (estado ?? '').replace(/ /g, '-');
   }
 
-  // Devuelve la imagen placeholder con seed único por proyecto para que cada card tenga una distinta
   getImagenProyecto(p: proyecto): string {
     return `https://picsum.photos/seed/${p.id}/600/400`;
   }
 
-  // Traduce el estado del enum a una etiqueta legible
   getEtiquetaEstado(estado: string): string {
     switch (estado) {
       case 'en curso':   return 'En Curso';
@@ -150,7 +164,6 @@ export class HomePage implements OnInit {
     }
   }
 
-  // Color del badge según estado
   getColorEstado(estado: string): string {
     switch (estado) {
       case 'en curso':   return 'success';
@@ -160,10 +173,23 @@ export class HomePage implements OnInit {
     }
   }
 
+  getPorcentajeCupo(p: proyecto): number {
+    if (!p.cupoMaximo || p.cupoMaximo === 0) return 0;
+    const ocupados = p.cupoMaximo - p.cuposDisponibles;
+    return Math.min((ocupados / p.cupoMaximo) * 100, 100);
+  }
+
+  puedeInscribirse(p: proyecto): boolean {
+    return p.estado === 'en curso' && p.cuposDisponibles > 0;
+  }
+
   // --- ACCIONES ---
   async fichar() {
+    const sesion = this.authService.obtenerSesion();
     const hoy = new Date().toDateString();
-    localStorage.setItem('fechaFichaje', hoy);
+
+    // Clave única por usuario para que el fichaje no se comparta entre cuentas
+    localStorage.setItem(`fechaFichaje_${sesion?.id}`, hoy);
 
     const toast = await this.toastController.create({
       message: '✅ Te has fichado correctamente',
@@ -174,17 +200,57 @@ export class HomePage implements OnInit {
     await toast.present();
 
     this.isExiting = true;
-    setTimeout(() => this.mostrarTarjetaAsistencia = false, 500);
+    setTimeout(() => (this.mostrarTarjetaAsistencia = false), 500);
   }
 
-  async inscribirse(proyecto: proyecto) {
-    const toast = await this.toastController.create({
-      message: `🚀 Inscripción enviada para: ${proyecto.titulo}`,
-      duration: 2500,
-      color: 'primary',
-      position: 'bottom'
+  async inscribirse(p: proyecto) {
+    if (p.cuposDisponibles <= 0) {
+      const toast = await this.toastController.create({
+        message: `❌ El proyecto "${p.titulo}" no tiene cupos disponibles.`,
+        duration: 3000,
+        color: 'danger',
+        position: 'bottom'
+      });
+      await toast.present();
+      return;
+    }
+
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) {
+      const toast = await this.toastController.create({
+        message: 'No se pudo obtener tu sesión. Inicia sesión de nuevo.',
+        duration: 3000,
+        color: 'warning',
+        position: 'bottom'
+      });
+      await toast.present();
+      return;
+    }
+
+    this.proyectoService.inscribirse(sesion.id, p.id).subscribe({
+      next: async () => {
+        const toast = await this.toastController.create({
+          message: `✅ Te has inscrito en "${p.titulo}" correctamente.`,
+          duration: 2500,
+          color: 'success',
+          position: 'bottom'
+        });
+        await toast.present();
+
+        // Recargar ambas listas para reflejar el cambio correctamente
+        this.cargarProyectos();
+      },
+      error: async (err) => {
+        const mensaje = err?.error?.mensaje ?? 'Error al inscribirse. Inténtalo de nuevo.';
+        const toast = await this.toastController.create({
+          message: `❌ ${mensaje}`,
+          duration: 3500,
+          color: 'danger',
+          position: 'bottom'
+        });
+        await toast.present();
+      }
     });
-    await toast.present();
   }
 
   verDetalles(p: proyecto, inscrito: boolean) {

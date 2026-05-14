@@ -19,6 +19,8 @@ public class ProyectoDTO {
 
     private Integer cupoMaximo;
 
+    private Integer cuposDisponibles;
+
     private EstadoProyecto estado;
 
     private String fotoProyecto;

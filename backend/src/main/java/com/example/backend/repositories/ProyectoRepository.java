@@ -1,5 +1,6 @@
 package com.example.backend.repositories;
 
+import com.example.backend.models.EstadoProyecto;
 import com.example.backend.models.Proyecto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,11 +13,14 @@ import java.util.List;
 public interface ProyectoRepository extends JpaRepository<Proyecto, Long> {
 
     // Proyectos en los que el alumno SÍ está inscrito, filtrados por estado
-    List<Proyecto> findByAsignaciones_AlumnoIdAndEstadoIn(Long alumnoId, List<String> estados);
+    List<Proyecto> findByAsignaciones_AlumnoIdAndEstadoIn(Long alumnoId, List<EstadoProyecto> estados);
 
     // Proyectos en los que el alumno NO está inscrito
     @Query("SELECT p FROM Proyecto p WHERE p.id NOT IN (" +
-            "  SELECT a.proyecto.id FROM Asignacion a WHERE a.alumno.id = :alumnoId" +
-            ")")
-    List<Proyecto> findByAsignaciones_AlumnoIdNotContaining(@Param("alumnoId") Long alumnoId);
+            "  SELECT a.id.proyectoId FROM Asignacion a WHERE a.id.alumnoId = :alumnoId" +
+            ") AND p.estado = :estado")
+    List<Proyecto> findByAsignaciones_AlumnoIdNotContaining(
+            @Param("alumnoId") Long alumnoId,
+            @Param("estado") EstadoProyecto estado
+    );
 }

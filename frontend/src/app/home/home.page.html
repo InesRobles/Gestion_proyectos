@@ -17,7 +17,7 @@
                 <div class="user-greeting">
                   <span class="greeting-label">Hola de nuevo,</span>
                   <h1 class="user-name">{{ nombreUsuario }}</h1>
-                  <span class="greeting-sub">Que tengas un excelente dia de trabajo 🚀</span>
+                  <span class="greeting-sub">Que tengas un excelente día de trabajo 🚀</span>
                 </div>
                 <div class="time-box">
                   <div class="time-icon-wrap">
@@ -82,8 +82,12 @@
                   <div class="meta-row">
                     <span class="meta-item">
                       <ion-icon name="people-outline"></ion-icon>
-                      Cupo: {{ p.cupoMaximo }}
+                      {{ p.cuposDisponibles }} / {{ p.cupoMaximo }} cupos libres
                     </span>
+                  </div>
+                  <!-- Barra visual de ocupación -->
+                  <div class="progress-track" style="margin-top: 8px;">
+                    <div class="progress-fill" [style.width.%]="getPorcentajeCupo(p)"></div>
                   </div>
                 </ion-card-content>
                 <div class="card-footer">
@@ -105,11 +109,11 @@
 
       <hr class="divider">
 
-      <!-- OTROS PROYECTOS (pausados / finalizados) -->
+      <!-- EXPLORAR PROYECTOS -->
       <section class="project-section new-projects">
         <div class="section-header">
           <h2 class="section-title">Explorar Proyectos</h2>
-          <p class="section-subtitle">Consulta el estado de todos los proyectos disponibles.</p>
+          <p class="section-subtitle">Inscríbete en proyectos con cupo disponible.</p>
         </div>
 
         <ion-grid *ngIf="!loadingProyectos">
@@ -131,14 +135,23 @@
                   <div class="meta-row">
                     <span class="meta-item">
                       <ion-icon name="people-outline"></ion-icon>
-                      Cupo: {{ p.cupoMaximo }}
+                      {{ p.cuposDisponibles }} / {{ p.cupoMaximo }} cupos libres
                     </span>
+                  </div>
+                  <!-- Barra visual de ocupación -->
+                  <div class="progress-track" style="margin-top: 8px;">
+                    <div class="progress-fill" [style.width.%]="getPorcentajeCupo(p)"></div>
                   </div>
                 </ion-card-content>
                 <div class="card-footer">
-                  <ion-button fill="solid" class="inscribir-btn" (click)="inscribirse(p)">
+                  <!-- Botón desactivado si no hay cupo o el proyecto no está en curso -->
+                  <ion-button
+                    fill="solid"
+                    class="inscribir-btn"
+                    [disabled]="!puedeInscribirse(p)"
+                    (click)="inscribirse(p)">
                     <ion-icon name="add-circle-outline" slot="start"></ion-icon>
-                    Inscribirse
+                    {{ p.cuposDisponibles > 0 ? 'Inscribirse' : 'Sin cupos' }}
                   </ion-button>
                 </div>
               </ion-card>
@@ -146,7 +159,7 @@
 
             <div class="lista-vacia" *ngIf="nuevosProyectosFiltrados.length === 0">
               <ion-icon name="search-outline"></ion-icon>
-              <p>No hay otros proyectos disponibles.</p>
+              <p>No hay proyectos disponibles para explorar.</p>
             </div>
           </ion-row>
         </ion-grid>
@@ -195,8 +208,12 @@
                 </ion-badge>
                 <span class="meta-item">
                   <ion-icon name="people-outline"></ion-icon>
-                  Cupo máximo: {{ proyectoSeleccionado.cupoMaximo }}
+                  {{ proyectoSeleccionado.cuposDisponibles }} / {{ proyectoSeleccionado.cupoMaximo }} cupos libres
                 </span>
+              </div>
+              <!-- Barra de cupos en el modal -->
+              <div class="progress-track" style="margin-top: 12px;">
+                <div class="progress-fill" [style.width.%]="getPorcentajeCupo(proyectoSeleccionado)"></div>
               </div>
             </div>
 
