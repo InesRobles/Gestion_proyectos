@@ -7,6 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AsignacionRepository extends JpaRepository<Asignacion, AsignacionId> {
-    long countByIdProyectoId(Long proyectoId);
-    boolean existsByIdAlumnoIdAndIdProyectoId(Long alumnoId, Long proyectoId);
 }

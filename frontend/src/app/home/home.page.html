@@ -82,7 +82,7 @@
                   <div class="meta-row">
                     <span class="meta-item">
                       <ion-icon name="people-outline"></ion-icon>
-                      Cupos: {{ p.cuposDisponibles }} / {{ p.cupoMaximo }}
+                      Cupo: {{ p.cupoMaximo }}
                     </span>
                   </div>
                 </ion-card-content>
@@ -128,10 +128,12 @@
                   <p class="project-description">{{ p.descripcion }}</p>
                 </ion-card-header>
                 <ion-card-content class="card-body">
+                  <div class="meta-row">
                     <span class="meta-item">
                       <ion-icon name="people-outline"></ion-icon>
-                      Disponibles: {{ p.cuposDisponibles }} / {{ p.cupoMaximo }}
+                      Cupo: {{ p.cupoMaximo }}
                     </span>
+                  </div>
                 </ion-card-content>
                 <div class="card-footer">
                   <ion-button fill="solid" class="inscribir-btn" (click)="inscribirse(p)">
@@ -193,7 +195,7 @@
                 </ion-badge>
                 <span class="meta-item">
                   <ion-icon name="people-outline"></ion-icon>
-                  Cupos disponibles: {{ proyectoSeleccionado.cuposDisponibles }} / {{ proyectoSeleccionado.cupoMaximo }}
+                  Cupo máximo: {{ proyectoSeleccionado.cupoMaximo }}
                 </span>
               </div>
             </div>

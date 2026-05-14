@@ -5,6 +5,6 @@ export interface proyecto {
   titulo: string;
   descripcion: string;
   cupoMaximo: number;
-  cuposDisponibles: number;
   estado: EstadoProyecto;
+  fotoProyecto?: string | null;
 }

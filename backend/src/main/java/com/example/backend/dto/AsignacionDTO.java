@@ -15,5 +15,4 @@ public class AsignacionDTO {
     // Datos extra útiles para mostrar en el frontend
     private String nombreAlumno;
     private String tituloProyecto;
-
 }

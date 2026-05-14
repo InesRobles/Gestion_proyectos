@@ -1,13 +1,14 @@
 <app-header [mostrarFlecha]="true"></app-header>
 
 <ion-content [fullscreen]="true">
-  <ion-button (click)="navegarAdmin()" color="danger" expand="block">
+  <ion-button *ngIf="userData.rol === 'administrador'" (click)="navegarAdmin()" color="danger" expand="block">
     ENTRAR PANEL ADMIN
   </ion-button>
   <div class="home-wrapper">
     <div class="content-container">
       <ion-grid>
         <ion-row>
+          <!-- ── COLUMNA IZQUIERDA: tarjeta de perfil ── -->
           <ion-col size="12" size-lg="4">
             <ion-card class="interactive-card profile-main-card">
               <div class="profile-header-bg"></div>
@@ -42,6 +43,7 @@
             </ion-card>
           </ion-col>
 
+          <!-- ── COLUMNA DERECHA: configuración ── -->
           <ion-col size="12" size-lg="8">
             <ion-card class="interactive-card info-card">
               <ion-card-header>
@@ -67,9 +69,13 @@
                       </ion-item>
                     </ion-col>
                     <ion-col size="12" size-md="6">
-                      <ion-item class="custom-input">
-                        <ion-input label="Modalidad Asignada" labelPlacement="stacked" [value]="userData.modalidad" readonly="true"></ion-input>
-                      </ion-item>
+                      <!-- Alumno y administrador: selector editable -->
+                      <div class="custom-input modalidad-select-wrapper" *ngIf="userData.rol === 'alumno' || userData.rol === 'administrador'">
+                        <label class="modalidad-label">Modalidad</label>
+                        <select class="modalidad-select" [(ngModel)]="modalidadIdSeleccionada" (ngModelChange)="onModalidadChange($event)">                          <option [ngValue]="null" disabled>Selecciona una modalidad</option>
+                          <option *ngFor="let m of modalidades" [ngValue]="m.id">{{ m.nombre }}</option>
+                        </select>
+                      </div>
                     </ion-col>
                   </ion-row>
                 </ion-list>
@@ -91,6 +97,54 @@
                 </div>
               </ion-card-content>
             </ion-card>
+
+            <!-- ── GESTIÓN DE MODALIDADES (solo administrador) ── -->
+            <ion-card class="interactive-card info-card" *ngIf="userData.rol === 'administrador'">
+              <ion-card-header>
+                <ion-card-title>Gestionar Modalidades</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                <!-- Crear nueva modalidad -->
+                <ion-row class="ion-align-items-center" style="margin-bottom: 16px;">
+                  <ion-col>
+                    <ion-item class="custom-input">
+                      <ion-input
+                        label="Nueva modalidad"
+                        labelPlacement="stacked"
+                        placeholder="Ej: Híbrida"
+                        [(ngModel)]="nuevaModalidadNombre">
+                      </ion-input>
+                    </ion-item>
+                  </ion-col>
+                  <ion-col size="auto">
+                    <ion-button (click)="crearModalidad()" [disabled]="!nuevaModalidadNombre.trim()">
+                      <ion-icon name="add-outline" slot="start"></ion-icon>
+                      Añadir
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+
+                <!-- Lista de modalidades existentes -->
+                <ion-list lines="full">
+                  <ion-item *ngFor="let m of modalidades">
+                    <ion-label>{{ m.nombre }}</ion-label>
+                    <ion-button
+                      slot="end"
+                      fill="clear"
+                      color="danger"
+                      (click)="eliminarModalidad(m.id)"
+                      title="Eliminar modalidad">
+                      <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                    </ion-button>
+                  </ion-item>
+                  <ion-item *ngIf="modalidades.length === 0">
+                    <ion-label color="medium">No hay modalidades creadas.</ion-label>
+                  </ion-item>
+                </ion-list>
+              </ion-card-content>
+            </ion-card>
+
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -98,6 +152,7 @@
   </div>
 </ion-content>
 
+<!-- ── MODAL CAMBIO DE CONTRASEÑA ── -->
 <ion-modal [isOpen]="isPasswordModalOpen" (didDismiss)="cerrarModalPassword()" class="project-modal">
   <ng-template>
     <ion-header class="ion-no-border">

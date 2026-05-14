@@ -32,10 +32,4 @@ public class AlumnoService {
         return alumnoRepository.findById(id)
                 .map(alumnoMapper::toDTO);
     }
-
-    public com.example.backend.models.Alumno crearPerfilParaUsuario(com.example.backend.models.Usuario usuario) {
-        com.example.backend.models.Alumno alumno = new com.example.backend.models.Alumno();
-        alumno.setUsuario(usuario);
-        return alumnoRepository.save(alumno);
-    }
 }

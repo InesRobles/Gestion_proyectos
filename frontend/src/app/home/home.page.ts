@@ -19,7 +19,7 @@ import { HeaderComponent } from "../components/header/header.component";
 import {proyecto} from "../modelos/proyecto";
 import {ProyectoService} from "../services/proyecto-service";
 import { AuthService } from '../services/auth-service';
-import { inject } from '@angular/core';
+
 
 @Component({
   selector: 'app-home',
@@ -59,11 +59,11 @@ export class HomePage implements OnInit {
   // Imagen placeholder para cards sin imagen en BD
   readonly PLACEHOLDER_IMG = 'https://picsum.photos/seed/proyecto/600/400';
 
-
-  private toastController = inject(ToastController);
-  private proyectoService = inject(ProyectoService);
-  private authService = inject(AuthService);
-  constructor(){
+  constructor(
+    private toastController: ToastController,
+    private proyectoService: ProyectoService,
+    private authService: AuthService,
+  ) {
     addIcons({
       personCircle, closeOutline, exitOutline, timeOutline,
       logInOutline, addCircleOutline, chatbubblesOutline,
@@ -86,38 +86,27 @@ export class HomePage implements OnInit {
   }
 
   cargarProyectos() {
-    const sesion = this.authService.obtenerSesion();
-    if (!sesion?.id) {
-      this.loadingProyectos = false;
-      return;
-    }
-
     this.loadingProyectos = true;
-    
-    // Hacemos ambas peticiones simultáneamente
-    import('rxjs').then(({ forkJoin }) => {
-      forkJoin({
-        activos: this.proyectoService.getProyectosActivosByAlumno(sesion.id),
-        explorar: this.proyectoService.getProyectosExplorarByAlumno(sesion.id)
-      }).subscribe({
-        next: ({ activos, explorar }) => {
-          this.misProyectos = activos;
-          this.nuevosProyectos = explorar;
-          this.misProyectosFiltrados = [...this.misProyectos];
-          this.nuevosProyectosFiltrados = [...this.nuevosProyectos];
-          this.loadingProyectos = false;
-        },
-        error: async () => {
-          const toast = await this.toastController.create({
-            message: 'Error al cargar los proyectos',
-            duration: 2000,
-            color: 'danger',
-            position: 'top'
-          });
-          await toast.present();
-          this.loadingProyectos = false;
-        }
-      });
+    this.proyectoService.getProyectos().subscribe({
+      next: (res) => {
+        // Proyectos "en curso" son los del alumno activo
+        this.misProyectos = res.filter(p => p.estado === 'en curso');
+        // El resto (pausado, finalizado) van a "Explorar"
+        this.nuevosProyectos = res.filter(p => p.estado !== 'en curso');
+        this.misProyectosFiltrados = [...this.misProyectos];
+        this.nuevosProyectosFiltrados = [...this.nuevosProyectos];
+        this.loadingProyectos = false;
+      },
+      error: async () => {
+        const toast = await this.toastController.create({
+          message: 'Error al cargar los proyectos',
+          duration: 2000,
+          color: 'danger',
+          position: 'top'
+        });
+        await toast.present();
+        this.loadingProyectos = false;
+      }
     });
   }
 
@@ -188,58 +177,16 @@ export class HomePage implements OnInit {
     setTimeout(() => this.mostrarTarjetaAsistencia = false, 500);
   }
 
-  async inscribirse(p: proyecto) {
-    // Verificación local antes de llamar al backend
-    if (p.cuposDisponibles !== undefined && p.cuposDisponibles <= 0) {
-      const toast = await this.toastController.create({
-        message: `❌ El proyecto "${p.titulo}" no tiene cupos disponibles.`,
-        duration: 3000,
-        color: 'danger',
-        position: 'bottom'
-      });
-      await toast.present();
-      return;
-    }
-    const sesion = this.authService.obtenerSesion();
-    if (!sesion?.id) {
-      const toast = await this.toastController.create({
-        message: 'No se pudo obtener tu sesión. Inicia sesión de nuevo.',
-        duration: 3000,
-        color: 'warning',
-        position: 'bottom'
-      });
-      await toast.present();
-      return;
-    }
-
-    this.proyectoService.inscribirse(sesion.id, p.id).subscribe({
-      next: async () => {
-        // Actualizar cupos disponibles localmente
-        p.cuposDisponibles = (p.cuposDisponibles ?? 1) - 1;
-
-        const toast = await this.toastController.create({
-          message: `✅ Te has inscrito en "${p.titulo}" correctamente.`,
-          duration: 2500,
-          color: 'success',
-          position: 'bottom'
-        });
-        await toast.present();
-
-        // Recargar proyectos para reflejar el estado actualizado
-        this.cargarProyectos();
-      },
-      error: async (err) => {
-        const mensaje = err?.error?.mensaje ?? 'Error al inscribirse. Inténtalo de nuevo.';
-        const toast = await this.toastController.create({
-          message: `❌ ${mensaje}`,
-          duration: 3500,
-          color: 'danger',
-          position: 'bottom'
-        });
-        await toast.present();
-      }
+  async inscribirse(proyecto: proyecto) {
+    const toast = await this.toastController.create({
+      message: `🚀 Inscripción enviada para: ${proyecto.titulo}`,
+      duration: 2500,
+      color: 'primary',
+      position: 'bottom'
     });
+    await toast.present();
   }
+
   verDetalles(p: proyecto, inscrito: boolean) {
     this.proyectoSeleccionado = p;
     this.esProyectoInscrito = inscrito;

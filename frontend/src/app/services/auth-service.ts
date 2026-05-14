@@ -40,6 +40,7 @@ export class AuthService {
   }
 
   guardarSesion(usuario: LoginResponse): void {
+    localStorage.removeItem('sesion');
     localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
     this.sesionSubject.next(usuario);
   }
@@ -50,8 +51,11 @@ export class AuthService {
   }
 
   cerrarSesion(): void {
-    localStorage.removeItem('usuarioLogado');
-    this.sesionSubject.next(null);
+    const sesion = this.obtenerSesion();
+    if (sesion?.id) {
+      localStorage.removeItem(`profile_foto_${sesion.id}`);
+    }
+    localStorage.removeItem('sesion');
   }
 
   estaLogado(): boolean {

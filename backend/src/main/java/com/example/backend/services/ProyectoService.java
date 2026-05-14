@@ -22,60 +22,37 @@ public class ProyectoService {
     @Autowired
     private ProyectoMapper proyectoMapper;
 
-    @Autowired
-    private com.example.backend.repositories.AsignacionRepository asignacionRepository;
-
-    // Helper para mapear y calcular cupos reales
-    private ProyectoDTO enrichDTO(Proyecto proyecto) {
-        ProyectoDTO dto = proyectoMapper.toDTO(proyecto);
-        long inscritos = asignacionRepository.countByIdProyectoId(proyecto.getId());
-        dto.setCuposDisponibles(proyecto.getCupoMaximo() - (int)inscritos);
-        return dto;
-    }
-
     // ─── READ ────────────────────────────────────────────────────────────────
 
     public List<ProyectoDTO> findAll() {
         return proyectoRepository.findAll().stream()
-                .map(this::enrichDTO)
+                .map(proyectoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     public Optional<ProyectoDTO> findById(Long id) {
-        return proyectoRepository.findById(id).map(this::enrichDTO);
-    }
-
-    @Autowired
-    private com.example.backend.repositories.AlumnoRepository alumnoRepository;
-
-    private Long getAlumnoId(Long usuarioId) {
-        return alumnoRepository.findByUsuarioId(usuarioId)
-                .map(com.example.backend.models.Alumno::getId)
-                .orElse(-1L);
+        return proyectoRepository.findById(id).map(proyectoMapper::toDTO);
     }
 
     // Proyectos 'en curso' o 'pausado' donde el alumno está inscrito
-    public List<ProyectoDTO> findActivosByAlumno(Long usuarioId) {
-        Long alumnoId = getAlumnoId(usuarioId);
+    public List<ProyectoDTO> findActivosByAlumno(Long alumnoId) {
         return proyectoRepository
-                .findByAsignaciones_AlumnoIdAndEstadoIn(alumnoId, List.of(com.example.backend.models.EstadoProyecto.EN_CURSO, com.example.backend.models.EstadoProyecto.PAUSADO))
-                .stream().map(this::enrichDTO).collect(Collectors.toList());
+                .findByAsignaciones_AlumnoIdAndEstadoIn(alumnoId, List.of("en curso", "pausado"))
+                .stream().map(proyectoMapper::toDTO).collect(Collectors.toList());
     }
 
     // Proyectos 'finalizado' donde el alumno está inscrito
-    public List<ProyectoDTO> findFinalizadosByAlumno(Long usuarioId) {
-        Long alumnoId = getAlumnoId(usuarioId);
+    public List<ProyectoDTO> findFinalizadosByAlumno(Long alumnoId) {
         return proyectoRepository
-                .findByAsignaciones_AlumnoIdAndEstadoIn(alumnoId, List.of(com.example.backend.models.EstadoProyecto.FINALIZADO))
-                .stream().map(this::enrichDTO).collect(Collectors.toList());
+                .findByAsignaciones_AlumnoIdAndEstadoIn(alumnoId, List.of("finalizado"))
+                .stream().map(proyectoMapper::toDTO).collect(Collectors.toList());
     }
 
     // Proyectos donde el alumno NO está inscrito
-    public List<ProyectoDTO> findNoInscritosByAlumno(Long usuarioId) {
-        Long alumnoId = getAlumnoId(usuarioId);
+    public List<ProyectoDTO> findNoInscritosByAlumno(Long alumnoId) {
         return proyectoRepository
                 .findByAsignaciones_AlumnoIdNotContaining(alumnoId)
-                .stream().map(this::enrichDTO).collect(Collectors.toList());
+                .stream().map(proyectoMapper::toDTO).collect(Collectors.toList());
     }
 
     // ─── CREATE ──────────────────────────────────────────────────────────────
@@ -83,7 +60,7 @@ public class ProyectoService {
     public ProyectoDTO create(ProyectoDTO dto) {
         Proyecto proyecto = proyectoMapper.toEntity(dto);
         Proyecto guardado = proyectoRepository.save(proyecto);
-        return enrichDTO(guardado);
+        return proyectoMapper.toDTO(guardado);
     }
 
     // ─── UPDATE ──────────────────────────────────────────────────────────────
@@ -94,8 +71,8 @@ public class ProyectoService {
             existing.setDescripcion(dto.getDescripcion());
             existing.setCupoMaximo(dto.getCupoMaximo());
             existing.setEstado(dto.getEstado());
-            Proyecto actualizado = proyectoRepository.save(existing);
-            return enrichDTO(actualizado);
+            existing.setFotoProyecto(dto.getFotoProyecto());
+            return proyectoMapper.toDTO(proyectoRepository.save(existing));
         });
     }
 

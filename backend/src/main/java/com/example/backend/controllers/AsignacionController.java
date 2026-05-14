@@ -9,12 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Map;
+
 @RestController
 @RequestMapping("/api/asignacion")
 public class AsignacionController {
@@ -27,11 +24,10 @@ public class AsignacionController {
         return asignacionService.findAll();
     }
 
-    @PostMapping
-    public ResponseEntity<AsignacionDTO> inscribir(@RequestBody Map<String, Long> body) {
-        Long alumnoId   = body.get("alumnoId");
-        Long proyectoId = body.get("proyectoId");
-        AsignacionDTO resultado = asignacionService.inscribir(alumnoId, proyectoId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+    @GetMapping("/{id}")
+    public ResponseEntity<AsignacionDTO> findById(@PathVariable AsignacionId id) {
+        return asignacionService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

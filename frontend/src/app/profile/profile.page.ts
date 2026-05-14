@@ -10,13 +10,14 @@ import {
 import { addIcons } from 'ionicons';
 import {
   personCircle, personOutline, closeOutline, schoolOutline, lockClosedOutline, exitOutline,
-  timeOutline, shieldCheckmarkOutline, desktopOutline
+  timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline
 } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
 import { AuthService } from '../services/auth-service';
 import { UsuarioService } from '../services/usuario-service';
 import { CambioPasswordDTO } from '../services/usuario-service';
+import { ModalidadService } from '../services/modalidad-service';
 
 @Component({
   selector: 'app-profile',
@@ -36,6 +37,10 @@ export class ProfilePage implements OnInit {
 
   isPasswordModalOpen = false;
   fotoUrl: string | null = null;
+
+  modalidades: { id: number; nombre: string }[] = [];
+  modalidadIdSeleccionada: number | null = null;
+  nuevaModalidadNombre = '';
 
   userData = {
     nombre_real: '',
@@ -61,18 +66,22 @@ export class ProfilePage implements OnInit {
     private toastController: ToastController,
     private authService: AuthService,
     private usuarioService: UsuarioService,
+    private modalidadService: ModalidadService,
   ) {
     addIcons({
       personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline,
-      timeOutline, shieldCheckmarkOutline, desktopOutline
+      timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline
     });
   }
 
   ngOnInit(): void {
-    const savedFoto = localStorage.getItem('profile_foto');
+    const sesion = this.authService.obtenerSesion();
+    const fotoKey = `profile_foto_${sesion?.id}`;
+    const savedFoto = localStorage.getItem(fotoKey);
     if (savedFoto) this.fotoUrl = savedFoto;
 
-    const sesion = this.authService.obtenerSesion();
+    this.cargarModalidades();
+
     if (!sesion) {
       this.presentToast('No hay sesión activa. Por favor inicia sesión.', 'danger');
       this.navCtrl.navigateRoot('/login');
@@ -92,8 +101,11 @@ export class ProfilePage implements OnInit {
           nombre_real: usuario.nombreReal,
           nombre_usuario: usuario.nombreUsuario,
           rol: usuario.rol,
-          modalidad: usuario.modalidad ?? ''
+          modalidad: usuario.modalidadNombre ?? usuario.modalidad ?? ''
         };
+        if (usuario.modalidadId) {
+          this.modalidadIdSeleccionada = usuario.modalidadId;
+        }
         if (!this.fotoUrl && (usuario as any).fotoUsuario) {
           this.fotoUrl = (usuario as any).fotoUsuario;
         }
@@ -105,7 +117,55 @@ export class ProfilePage implements OnInit {
   }
 
   // ──────────────────────────────────────────────
-  // FOTO — con compresión para evitar el límite de localStorage (5MB)
+  // MODALIDADES
+  // ──────────────────────────────────────────────
+
+  cargarModalidades(): void {
+    this.modalidadService.getModalidades().subscribe({
+      next: (mods) => this.modalidades = mods,
+      error: () => this.presentToast('No se pudieron cargar las modalidades', 'warning')
+    });
+  }
+
+  crearModalidad(): void {
+    const nombre = this.nuevaModalidadNombre.trim();
+    if (!nombre) return;
+
+    this.modalidadService.crearModalidad(nombre).subscribe({
+      next: (nueva) => {
+        this.modalidades = [...this.modalidades, nueva];
+        this.nuevaModalidadNombre = '';
+        this.presentToast(`Modalidad "${nueva.nombre}" creada`, 'success');
+      },
+      error: (err) => {
+        const mensaje = err?.error?.mensaje ?? 'Error al crear la modalidad';
+        this.presentToast(mensaje, 'danger');
+      }
+    });
+  }
+
+  eliminarModalidad(id: number): void {
+    const modalidad = this.modalidades.find(m => m.id === id);
+    if (!modalidad) return;
+
+    this.modalidadService.eliminarModalidad(id).subscribe({
+      next: () => {
+        this.modalidades = this.modalidades.filter(m => m.id !== id);
+        // Si el alumno tenía esa modalidad seleccionada, limpiarla
+        if (this.modalidadIdSeleccionada === id) {
+          this.modalidadIdSeleccionada = null;
+        }
+        this.presentToast(`Modalidad "${modalidad.nombre}" eliminada`, 'success');
+      },
+      error: (err) => {
+        const mensaje = err?.error?.mensaje ?? 'Error al eliminar la modalidad';
+        this.presentToast(mensaje, 'danger');
+      }
+    });
+  }
+
+  // ──────────────────────────────────────────────
+  // FOTO
   // ──────────────────────────────────────────────
 
   onFotoSeleccionada(event: Event) {
@@ -114,7 +174,6 @@ export class ProfilePage implements OnInit {
 
     const file = input.files[0];
 
-    // Rechazar archivos demasiado grandes antes de procesar (>4MB)
     if (file.size > 4 * 1024 * 1024) {
       this.presentToast('La imagen es demasiado grande. Usa una imagen menor de 4MB.', 'warning');
       return;
@@ -122,44 +181,30 @@ export class ProfilePage implements OnInit {
 
     this.comprimirImagen(file, 800, 0.75).then((base64Comprimida) => {
       this.fotoUrl = base64Comprimida;
+      const sesion = this.authService.obtenerSesion();
+      const fotoKey = `profile_foto_${sesion?.id}`;
 
-      // Guardar en localStorage con control de errores
       try {
-        localStorage.setItem('profile_foto', base64Comprimida);
+        localStorage.setItem(fotoKey, base64Comprimida);
       } catch (e) {
-        console.warn('localStorage lleno, no se pudo guardar la foto localmente:', e);
-        // Limpiar la foto anterior para liberar espacio e intentar de nuevo
-        localStorage.removeItem('profile_foto');
-        try {
-          localStorage.setItem('profile_foto', base64Comprimida);
-        } catch (e2) {
-          console.warn('No se pudo guardar en localStorage ni tras limpiar:', e2);
-        }
+        localStorage.removeItem(fotoKey);
+        try { localStorage.setItem(fotoKey, base64Comprimida); } catch (e2) {}
       }
 
-      // Subir al backend
-      const sesion = this.authService.obtenerSesion();
       if (sesion) {
         this.usuarioService.actualizarFoto(sesion.id, base64Comprimida).subscribe({
           next: () => this.presentToast('Foto actualizada correctamente', 'success'),
           error: (err) => {
-            console.error('Error al subir foto al servidor:', err.status, err.error);
+            console.error('Error al subir foto:', err.status, err.error);
             this.presentToast('Foto guardada localmente (error al subir al servidor)', 'warning');
           }
         });
       }
-    }).catch((err) => {
-      console.error('Error al procesar la imagen:', err);
+    }).catch(() => {
       this.presentToast('No se pudo procesar la imagen seleccionada', 'danger');
     });
   }
 
-  /**
-   * Comprime una imagen usando un canvas HTML.
-   * @param file     Archivo de imagen original
-   * @param maxSize  Ancho/alto máximo en píxeles (mantiene proporción)
-   * @param quality  Calidad JPEG entre 0 y 1
-   */
   private comprimirImagen(file: File, maxSize: number, quality: number): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -168,7 +213,6 @@ export class ProfilePage implements OnInit {
         const img = new Image();
         img.onerror = () => reject(new Error('Error al cargar la imagen'));
         img.onload = () => {
-          // Calcular nuevas dimensiones manteniendo la proporción
           let { width, height } = img;
           if (width > height && width > maxSize) {
             height = Math.round((height * maxSize) / width);
@@ -177,13 +221,11 @@ export class ProfilePage implements OnInit {
             width = Math.round((width * maxSize) / height);
             height = maxSize;
           }
-
           const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           if (!ctx) return reject(new Error('No se pudo crear el contexto canvas'));
-
           ctx.drawImage(img, 0, 0, width, height);
           resolve(canvas.toDataURL('image/jpeg', quality));
         };
@@ -217,6 +259,14 @@ export class ProfilePage implements OnInit {
         sesion.nombreReal = this.userData.nombre_real;
         sesion.nombreUsuario = this.userData.nombre_usuario;
         this.authService.guardarSesion(sesion);
+
+        if ((sesion.rol === 'alumno' || sesion.rol === 'administrador') && this.modalidadIdSeleccionada) {
+          this.usuarioService.actualizarModalidad(sesion.id, this.modalidadIdSeleccionada).subscribe({
+            next: () => {},
+            error: () => this.presentToast('Error al actualizar la modalidad', 'warning')
+          });
+        }
+
         await this.presentToast('Cambios guardados correctamente', 'success');
       },
       error: async (err) => {
@@ -248,17 +298,14 @@ export class ProfilePage implements OnInit {
       await this.presentToast('Por favor, rellena todos los campos', 'warning');
       return;
     }
-
     if (nueva !== confirmar) {
       await this.presentToast('Las nuevas contraseñas no coinciden', 'danger');
       return;
     }
-
     if (nueva.length < 6) {
       await this.presentToast('La nueva contraseña debe tener al menos 6 caracteres', 'warning');
       return;
     }
-
     if (actual === nueva) {
       await this.presentToast('La nueva contraseña debe ser diferente a la actual', 'warning');
       return;
@@ -270,10 +317,7 @@ export class ProfilePage implements OnInit {
       return;
     }
 
-    const dto: CambioPasswordDTO = {
-      contrasenaActual: actual,
-      contrasenaNueva: nueva
-    };
+    const dto: CambioPasswordDTO = { contrasenaActual: actual, contrasenaNueva: nueva };
 
     this.usuarioService.actualizarPassword(sesion.id, dto).subscribe({
       next: async () => {
@@ -282,17 +326,10 @@ export class ProfilePage implements OnInit {
         this.passwordData = { actual: '', nueva: '', confirmar: '' };
       },
       error: async (err) => {
-        // Log completo para diagnosticar el 500 del backend
-        console.error('Error al cambiar contraseña — Status:', err.status);
-        console.error('Error al cambiar contraseña — Body:', err.error);
-        console.error('Error al cambiar contraseña — DTO enviado:', dto);
-
+        console.error('Error al cambiar contraseña — Status:', err.status, 'Body:', err.error);
         let mensaje = 'Error al actualizar la contraseña';
-        if (err.status === 400) {
-          mensaje = err?.error?.mensaje ?? 'La contraseña actual es incorrecta';
-        } else if (err.status === 500) {
-          mensaje = 'Error interno del servidor. Revisa los logs del backend.';
-        }
+        if (err.status === 400) mensaje = err?.error?.mensaje ?? 'La contraseña actual es incorrecta';
+        else if (err.status === 500) mensaje = 'Error interno del servidor. Revisa los logs del backend.';
         await this.presentToast(mensaje, 'danger');
       }
     });
@@ -314,5 +351,12 @@ export class ProfilePage implements OnInit {
 
   navegarAdmin() {
     this.navCtrl.navigateForward('/home-admin');
+  }
+
+  onModalidadChange(id: number | null): void {
+    const encontrada = this.modalidades.find(m => m.id === id);
+    if (encontrada) {
+      this.userData.modalidad = encontrada.nombre;
+    }
   }
 }

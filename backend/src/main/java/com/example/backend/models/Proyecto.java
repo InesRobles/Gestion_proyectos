@@ -31,6 +31,9 @@ public class Proyecto {
     @Column(name = "estado")
     private EstadoProyecto estado;
 
+    @Column(name = "foto_proyecto", columnDefinition = "LONGTEXT")
+    private String fotoProyecto;
+
     @OneToMany(mappedBy = "proyecto")
     private Set<Asignacion> asignaciones = new HashSet<>();
 }

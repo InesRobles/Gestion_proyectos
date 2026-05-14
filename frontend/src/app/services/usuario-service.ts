@@ -10,6 +10,8 @@ export interface Usuario {
   contrasenaHash?: string;
   rol: 'administrador' | 'alumno' | string;
   modalidad?: string;
+  modalidadId?: number;
+  modalidadNombre?: string;
 }
 
 export interface CambioPasswordDTO {
@@ -50,5 +52,9 @@ export class UsuarioService {
 
   actualizarFoto(id: number, fotoBase64: string): Observable<void> {
     return this.http.put<void>(`${this.apiService.apiUrl}/usuario/foto/${id}`, { fotoBase64 });
+  }
+
+  actualizarModalidad(usuarioId: number, modalidadId: number): Observable<void> {
+    return this.http.put<void>(`${this.apiService.apiUrl}/usuario/${usuarioId}/modalidad/${modalidadId}`, {});
   }
 }

@@ -374,6 +374,27 @@
           </select>
         </div>
       </div>
+
+      <div class="form-group">
+        <label class="form-label">Imagen del proyecto</label>
+        <div class="imagen-uploader" [class.tiene-imagen]="formProyecto.fotoProyecto" (click)="triggerInputImagen()">
+          <img *ngIf="formProyecto.fotoProyecto" [src]="formProyecto.fotoProyecto" class="imagen-preview" alt="Preview del proyecto" />
+          <div class="imagen-placeholder" *ngIf="!formProyecto.fotoProyecto">
+            <ion-icon name="image-outline"></ion-icon>
+            <span>Haz clic para subir una imagen</span>
+            <span class="imagen-hint">JPG, PNG o WebP · Máx. 2 MB</span>
+          </div>
+          <button class="imagen-quitar-btn" *ngIf="formProyecto.fotoProyecto" (click)="quitarImagenProyecto($event)">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+        <input
+          #inputImagen
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          style="display:none"
+          (change)="onImagenSeleccionada($event)" />
+      </div>
     </div>
 
     <div class="modal-footer">

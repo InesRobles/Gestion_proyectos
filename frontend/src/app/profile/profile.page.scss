@@ -155,3 +155,38 @@ ion-content {
     .modal-description-text { color: #666; font-size: 1.05rem; margin-bottom: 25px; }
   }
 }
+
+// ─── Selector de modalidad ────────────────────────────────────────────────────
+.modalidad-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 16px;
+  background: var(--ion-item-background, var(--ion-background-color));
+  border-radius: 10px;
+  min-height: 58px;
+  justify-content: center;
+}
+
+.modalidad-label {
+  font-size: 0.72rem;
+  color: var(--ion-color-medium);
+  font-weight: 500;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.modalidad-select {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--ion-text-color);
+  cursor: pointer;
+  appearance: auto;
+
+  option {
+    background: var(--ion-background-color);
+    color: var(--ion-text-color);
+  }
+}

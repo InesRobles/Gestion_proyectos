@@ -21,4 +21,8 @@ public class UsuarioDTO {
     private String nombreReal;
 
     private String fotoUsuario;
+
+    private Long modalidadId;
+
+    private String modalidadNombre;
 }

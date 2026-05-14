@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -16,7 +16,8 @@ import {
   closeOutline, checkmarkOutline, hourglassOutline,
   peopleCircleOutline, checkboxOutline, squareOutline,
   addOutline, createOutline, addCircleOutline, folderOpenOutline,
-  playCircleOutline, pauseCircleOutline, checkmarkCircleOutline
+  playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
+  imageOutline
 } from 'ionicons/icons';
 import { alumno } from '../modelos/alumno';
 import { AlumnoService } from '../services/alumno-service';
@@ -53,7 +54,9 @@ export class HomeAdminPage implements OnInit {
   modalProyectoAbierto: boolean = false;
   proyectoEditando: proyecto | null = null;
   guardandoProyecto: boolean = false;
-  formProyecto = { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso' as EstadoProyecto };
+  formProyecto = { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso' as EstadoProyecto, fotoProyecto: '' };
+
+  @ViewChild('inputImagen') inputImagenRef!: ElementRef<HTMLInputElement>;
 
   // Usuarios
   usuarios: Usuario[] = [];
@@ -90,7 +93,8 @@ export class HomeAdminPage implements OnInit {
       closeOutline, checkmarkOutline, hourglassOutline,
       peopleCircleOutline, checkboxOutline, squareOutline,
       addOutline, createOutline, addCircleOutline, folderOpenOutline,
-      playCircleOutline, pauseCircleOutline, checkmarkCircleOutline
+      playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
+      imageOutline
     });
   }
 
@@ -158,8 +162,8 @@ export class HomeAdminPage implements OnInit {
   abrirModalProyecto(p: proyecto | null) {
     this.proyectoEditando = p;
     this.formProyecto = p
-      ? { titulo: p.titulo, descripcion: p.descripcion, cupoMaximo: p.cupoMaximo, estado: p.estado }
-      : { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso' };
+      ? { titulo: p.titulo, descripcion: p.descripcion, cupoMaximo: p.cupoMaximo, estado: p.estado, fotoProyecto: p.fotoProyecto ?? '' }
+      : { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso', fotoProyecto: '' };
     this.guardandoProyecto = false;
     this.modalProyectoAbierto = true;
   }
@@ -175,10 +179,11 @@ export class HomeAdminPage implements OnInit {
     this.guardandoProyecto = true;
 
     const payload: Partial<proyecto> = {
-      titulo:      this.formProyecto.titulo,
-      descripcion: this.formProyecto.descripcion,
-      cupoMaximo:  this.formProyecto.cupoMaximo,
-      estado:      this.formProyecto.estado,
+      titulo:       this.formProyecto.titulo,
+      descripcion:  this.formProyecto.descripcion,
+      cupoMaximo:   this.formProyecto.cupoMaximo,
+      estado:       this.formProyecto.estado,
+      fotoProyecto: this.formProyecto.fotoProyecto || null,
     };
 
     if (this.proyectoEditando) {
@@ -421,6 +426,36 @@ export class HomeAdminPage implements OnInit {
         this.guardandoCambioMasivo = false;
       }
     });
+  }
+
+  // ─── Imagen proyecto ─────────────────────────────────────────────────────────
+
+  triggerInputImagen() {
+    this.inputImagenRef?.nativeElement.click();
+  }
+
+  onImagenSeleccionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.mostrarToast('La imagen no puede superar los 2 MB', 'warning');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.formProyecto.fotoProyecto = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  quitarImagenProyecto(event: Event) {
+    event.stopPropagation();
+    this.formProyecto.fotoProyecto = '';
   }
 
   getModalidadTexto(mod: number): string {

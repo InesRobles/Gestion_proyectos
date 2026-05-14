@@ -12,7 +12,7 @@ import java.util.List;
 public interface ProyectoRepository extends JpaRepository<Proyecto, Long> {
 
     // Proyectos en los que el alumno SÍ está inscrito, filtrados por estado
-    List<Proyecto> findByAsignaciones_AlumnoIdAndEstadoIn(Long alumnoId, List<com.example.backend.models.EstadoProyecto> estados);
+    List<Proyecto> findByAsignaciones_AlumnoIdAndEstadoIn(Long alumnoId, List<String> estados);
 
     // Proyectos en los que el alumno NO está inscrito
     @Query("SELECT p FROM Proyecto p WHERE p.id NOT IN (" +

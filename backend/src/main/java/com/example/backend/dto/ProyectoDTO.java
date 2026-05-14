@@ -18,8 +18,8 @@ public class ProyectoDTO {
     private String descripcion;
 
     private Integer cupoMaximo;
-    
-    private Integer cuposDisponibles;
 
     private EstadoProyecto estado;
+
+    private String fotoProyecto;
 }
