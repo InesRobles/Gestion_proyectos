@@ -47,6 +47,9 @@ export class HomeAdminPage implements OnInit {
   alumnos: alumno[] = [];
   loading: boolean = true;
 
+  mostrarTodosUsuarios: boolean = false;
+  mostrarTodosProyectos: boolean = false;
+
   // ── FIX: mapa usuarioId → alumnoId para cruzar usuarios con asistencia ──────
   // La tabla asistencia guarda alumnoId, pero la lista de usuarios usa usuario.id.
   // Sin este mapa, haFichadoHoy() siempre devuelve false porque compara IDs distintos.
@@ -687,5 +690,13 @@ export class HomeAdminPage implements OnInit {
 
   getModalidadTexto(mod: number): string {
     return mod === 1 ? 'Presencial' : 'Remoto';
+  }
+
+  toggleMostrarTodosUsuarios() {
+    this.mostrarTodosUsuarios = !this.mostrarTodosUsuarios;
+  }
+
+  toggleMostrarTodosProyectos() {
+    this.mostrarTodosProyectos = !this.mostrarTodosProyectos;
   }
 }
