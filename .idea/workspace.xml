@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="aa129bd7-0f4c-4eed-ba87-9562a71d0507" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Script_Gestionar_Alumnos.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Script_Gestionar_Alumnos.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/dto/ProyectoDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/dto/ProyectoDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/models/Proyecto.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/models/Proyecto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/services/ProyectoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/example/backend/services/ProyectoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/home-admin/home-admin.page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/home-admin/home-admin.page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/home-admin/home-admin.page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/home-admin/home-admin.page.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/home/home.page.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/home/home.page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/home/home.page.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/home/home.page.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/modelos/proyecto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/modelos/proyecto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/profile/profile.page.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/profile/profile.page.scss" afterDir="false" />
-    </list>
+    <list default="true" id="aa129bd7-0f4c-4eed-ba87-9562a71d0507" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="ines" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="ines" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
@@ -39,7 +45,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "Ines",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/User/Desktop/gestionAlumnos",
