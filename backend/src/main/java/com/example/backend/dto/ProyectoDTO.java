@@ -24,4 +24,6 @@ public class ProyectoDTO {
     private EstadoProyecto estado;
 
     private String fotoProyecto;
+
+    private String videoUrl;
 }

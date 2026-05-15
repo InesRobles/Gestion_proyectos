@@ -5,16 +5,13 @@ USE gestion_alumnos;
 -- Desactivar revisión de llaves foráneas temporalmente para limpieza
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Borrado de tablas previas para ejecución limpia
-DROP TABLE IF EXISTS asistencia, horario, comentario, asignacion, proyecto, alumno, modalidad, usuario;
-
 -- Activar revisión de llaves foráneas
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =========================================
 -- 1. TABLA USUARIOS
 -- =========================================
-CREATE TABLE usuario (
+CREATE TABLE IF NOT EXISTS usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
     contrasena_hash VARCHAR(255) NOT NULL,
@@ -26,7 +23,7 @@ CREATE TABLE usuario (
 -- =========================================
 -- 2. TABLA MODALIDADES
 -- =========================================
-CREATE TABLE modalidad (
+CREATE TABLE IF NOT EXISTS modalidad (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE
 );
@@ -34,7 +31,7 @@ CREATE TABLE modalidad (
 -- =========================================
 -- 3. TABLA ALUMNOS
 -- =========================================
-CREATE TABLE alumno (
+CREATE TABLE IF NOT EXISTS alumno (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT UNIQUE,
     modalidad_id INT,
@@ -45,7 +42,7 @@ CREATE TABLE alumno (
 -- =========================================
 -- 4. TABLA PROYECTOS
 -- =========================================
-CREATE TABLE proyecto (
+CREATE TABLE IF NOT EXISTS proyecto (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(100) NOT NULL,
     descripcion VARCHAR(500),
@@ -57,7 +54,7 @@ CREATE TABLE proyecto (
 -- =========================================
 -- 5. TABLA ASIGNACIONES
 -- =========================================
-CREATE TABLE asignacion (
+CREATE TABLE IF NOT EXISTS asignacion (
     alumno_id INT,
     proyecto_id INT,
     PRIMARY KEY (alumno_id, proyecto_id),
@@ -87,7 +84,7 @@ DELIMITER ;
 -- =========================================
 -- 7. TABLA COMENTARIOS
 -- =========================================
-CREATE TABLE comentario (
+CREATE TABLE IF NOT EXISTS comentario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     proyecto_id INT,
     usuario_id INT,
@@ -100,7 +97,7 @@ CREATE TABLE comentario (
 -- =========================================
 -- 8. TABLA HORARIOS
 -- =========================================
-CREATE TABLE horario (
+CREATE TABLE IF NOT EXISTS horario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     alumno_id INT,
     dia_semana VARCHAR(20) NOT NULL,
@@ -112,7 +109,7 @@ CREATE TABLE horario (
 -- =========================================
 -- 9. TABLA ASISTENCIA
 -- =========================================
-CREATE TABLE asistencia (
+CREATE TABLE IF NOT EXISTS asistencia (
     id INT AUTO_INCREMENT PRIMARY KEY,
     alumno_id INT,
     fecha DATE DEFAULT (CURRENT_DATE),
@@ -124,10 +121,10 @@ CREATE TABLE asistencia (
 -- INSERCIÓN DE DATOS
 -- =========================================
 
-INSERT INTO modalidad (nombre) VALUES ('Presencial'), ('Online'), ('Semipresencial');
+INSERT IGNORE INTO modalidad (nombre) VALUES ('Presencial'), ('Online'), ('Semipresencial');
 
 -- 1 admin + 11 alumnos
-INSERT INTO usuario (nombre_usuario, contrasena_hash, rol, nombre_real) VALUES 
+INSERT IGNORE INTO usuario (nombre_usuario, contrasena_hash, rol, nombre_real) VALUES
 ('admin_jose',    'hash_secure_123', 'administrador', 'José Rodríguez'),
 ('maria_garcia',  'hash_student_99', 'alumno',        'María García'),
 ('carlos_ruiz',   'hash_student_88', 'alumno',        'Carlos Ruiz'),
@@ -142,7 +139,7 @@ INSERT INTO usuario (nombre_usuario, contrasena_hash, rol, nombre_real) VALUES
 ('clara_santos',  'hash_student_09', 'alumno',        'Clara Santos');
 
 -- alumno.usuario_id apunta a usuarios 2-12 → alumno_id 1-11
-INSERT INTO alumno (usuario_id, modalidad_id) VALUES
+INSERT IGNORE INTO alumno (usuario_id, modalidad_id) VALUES
 (2,  1),   -- alumno_id 1  → María       Presencial
 (3,  2),   -- alumno_id 2  → Carlos      Online
 (4,  1),   -- alumno_id 3  → Ana         Presencial
@@ -156,7 +153,7 @@ INSERT INTO alumno (usuario_id, modalidad_id) VALUES
 (12, 2);   -- alumno_id 11 → Clara       Online
 
 -- 8 proyectos con los tres estados
-INSERT INTO proyecto (titulo, descripcion, cupo_maximo, estado) VALUES
+INSERT IGNORE INTO proyecto (titulo, descripcion, cupo_maximo, estado) VALUES
 ('Sistema de Gestión IA',      'Desarrollo de un core basado en redes neuronales',             3,  'en curso'),    -- id 1
 ('App Móvil Reciclaje',        'Aplicación para incentivar el reciclaje urbano',               5,  'en curso'),    -- id 2
 ('Portal E-learning',          'Plataforma educativa para zonas rurales',                      10, 'finalizado'),  -- id 3
@@ -167,7 +164,7 @@ INSERT INTO proyecto (titulo, descripcion, cupo_maximo, estado) VALUES
 ('Scraper Ofertas Empleo',     'Herramienta que agrega ofertas de empleo de varias webs',      4,  'pausado');     -- id 8
 
 -- Asignaciones (respetando cupos; alumno_id=1 tiene activo+finalizado para ver las 3 secciones)
-INSERT INTO asignacion (alumno_id, proyecto_id) VALUES
+INSERT IGNORE INTO asignacion (alumno_id, proyecto_id) VALUES
 (1,  1),   -- María    → activo
 (1,  3),   -- María    → finalizado
 (2,  1),   -- Carlos   → activo
@@ -189,7 +186,7 @@ INSERT INTO asignacion (alumno_id, proyecto_id) VALUES
 (11, 6);   -- Clara    → activo
 
 -- Comentarios
-INSERT INTO comentario (proyecto_id, usuario_id, texto) VALUES
+INSERT IGNORE INTO comentario (proyecto_id, usuario_id, texto) VALUES
 (1, 1, 'He subido el primer bosquejo del modelo a la nube.'),
 (1, 1, '¿Alguien puede revisar la API de conexión?'),
 (2, 1, 'Excelente progreso con el diseño de la interfaz.'),
@@ -202,7 +199,7 @@ INSERT INTO comentario (proyecto_id, usuario_id, texto) VALUES
 (8, 1, 'En espera de acceso a las APIs de las webs objetivo.');
 
 -- Horarios
-INSERT INTO horario (alumno_id, dia_semana, hora_inicio, hora_fin) VALUES
+INSERT IGNORE INTO horario (alumno_id, dia_semana, hora_inicio, hora_fin) VALUES
 (1,  'Lunes',     '09:00', '13:00'),
 (2,  'Martes',    '15:00', '19:00'),
 (3,  'Miércoles', '09:00', '13:00'),
@@ -216,7 +213,7 @@ INSERT INTO horario (alumno_id, dia_semana, hora_inicio, hora_fin) VALUES
 (11, 'Lunes',     '08:00', '12:00');
 
 -- Asistencia: hoy y últimos 2 días
-INSERT INTO asistencia (alumno_id, fecha, presente) VALUES
+INSERT IGNORE INTO asistencia (alumno_id, fecha, presente) VALUES
 (1,  CURDATE(), 1), (2,  CURDATE(), 1), (3,  CURDATE(), 0), (4,  CURDATE(), 1),
 (5,  CURDATE(), 1), (6,  CURDATE(), 0), (7,  CURDATE(), 1), (8,  CURDATE(), 1),
 (9,  CURDATE(), 0), (10, CURDATE(), 1), (11, CURDATE(), 1),
@@ -236,3 +233,4 @@ INSERT INTO asistencia (alumno_id, fecha, presente) VALUES
 
 ALTER TABLE usuario MODIFY COLUMN foto_usuario LONGTEXT;
 ALTER TABLE proyecto MODIFY COLUMN foto_proyecto LONGTEXT;
+ALTER TABLE proyecto ADD COLUMN video_url VARCHAR(500) DEFAULT NULL;

@@ -298,6 +298,8 @@
 
       <!-- Selector de rol destino -->
       <div class="form-group">
+        <label class="form-label">URL del video explicativo</label>
+        <input class="form-input" type="url" [(ngModel)]="formProyecto.videoUrl" placeholder="" />
         <label class="form-label">Cambiar rol seleccionados a</label>
         <select class="form-select" [(ngModel)]="rolMasivoDestino">
           <option value="administrador">Administrador</option>
@@ -452,6 +454,10 @@
           accept="image/jpeg,image/png,image/webp"
           style="display:none"
           (change)="onImagenSeleccionada($event)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL del video explicativo</label>
+        <input class="form-input" type="url" [(ngModel)]="formProyecto.videoUrl" placeholder="https://youtube.com/..." />
       </div>
     </div>
 

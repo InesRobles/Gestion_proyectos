@@ -124,6 +124,7 @@
                   <ion-card-title class="project-title">{{ p.titulo }}</ion-card-title>
                   <p class="project-description">{{ p.descripcion }}</p>
                 </ion-card-header>
+
                 <ion-card-content class="card-body">
                   <div class="meta-row">
                     <span class="meta-item">
@@ -176,6 +177,7 @@
                   <ion-card-title class="project-title">{{ p.titulo }}</ion-card-title>
                   <p class="project-description">{{ p.descripcion }}</p>
                 </ion-card-header>
+
                 <ion-card-content class="card-body">
                   <div class="meta-row">
                     <span class="meta-item">
@@ -239,7 +241,13 @@
           <div class="modal-info-content">
             <h1 class="modal-title">{{ proyectoSeleccionado.titulo }}</h1>
             <p class="modal-description-text">{{ proyectoSeleccionado.descripcion }}</p>
-
+            <a *ngIf="proyectoSeleccionado.videoUrl"
+               [href]="proyectoSeleccionado.videoUrl"
+               target="_blank"
+               class="btn-video">
+              <ion-icon name="play-circle-outline"></ion-icon>
+              Ver video explicativo
+            </a>
             <div class="status-section">
               <ion-label class="section-label">
                 <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>

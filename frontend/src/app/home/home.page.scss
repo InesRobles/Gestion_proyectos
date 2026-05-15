@@ -499,6 +499,25 @@ $bg-app: #f4f7fe;
     margin: 10px 0 22px 0;
     font-size: 1rem;
   }
+  .btn-video {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #764ba2;
+    border: 1.5px solid #764ba2;
+    border-radius: 10px;
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 22px;
+    transition: background 0.2s ease, color 0.2s ease;
+    ion-icon { font-size: 1.1rem; }
+    &:hover {
+      background: #764ba2;
+      color: #fff;
+    }
+  }
 }
 
 // Etiquetas de sección genéricas
