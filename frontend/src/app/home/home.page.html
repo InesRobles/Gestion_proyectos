@@ -95,7 +95,7 @@
 
       <!-- PROYECTOS EN CURSO -->
       <section>
-        <h2 class="section-title">Tus Proyectos Activos</h2>
+        <h2 class="section-title">Tus Proyectos</h2>
 
         <ion-grid *ngIf="loadingProyectos">
           <ion-row>
@@ -118,7 +118,9 @@
                 <div class="image-container">
                   <img [src]="getImagenProyecto(p)" alt="Proyecto"/>
                   <div class="card-overlay"></div>
-                  <div class="estado-chip estado-en-curso">En Curso</div>
+                  <div class="estado-chip" [ngClass]="getClaseEstado(p.estado)">
+                    {{ getEtiquetaEstado(p.estado) }}
+                  </div>
                 </div>
                 <ion-card-header class="card-header-content">
                   <ion-card-title class="project-title">{{ p.titulo }}</ion-card-title>

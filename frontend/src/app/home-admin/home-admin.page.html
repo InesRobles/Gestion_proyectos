@@ -28,7 +28,7 @@
                 </div>
                 <div class="time-text">
                   <span class="schedule-label">ALUMNOS ACTIVOS</span>
-                  <span class="hours">{{ alumnos.length }} Estudiantes</span>
+                  <span class="hours">{{ fichadosHoyIds.size }} / {{ alumnos.length }} Estudiantes</span>
                 </div>
               </div>
 
@@ -51,17 +51,17 @@
                 </div>
                 <div class="horario-form-fields">
                   <div class="form-field">
-                    <label class="form-label-hero">Día</label>
-                    <select class="form-select-hero" [(ngModel)]="formHorario.diaSemana">
+                    <label class="form-label">Día</label>
+                    <select class="form-select" [(ngModel)]="formHorario.diaSemana">
                       <option *ngFor="let dia of diasSemana" [value]="dia">{{ dia }}</option>
                     </select>
                   </div>
                   <div class="form-field">
-                    <label class="form-label-hero">Hora inicio</label>
+                    <label class="form-label">Hora inicio</label>
                     <input type="time" class="form-input-time" [(ngModel)]="formHorario.horaInicio" />
                   </div>
                   <div class="form-field">
-                    <label class="form-label-hero">Hora fin</label>
+                    <label class="form-label">Hora fin</label>
                     <input type="time" class="form-input-time" [(ngModel)]="formHorario.horaFin" />
                   </div>
                 </div>
