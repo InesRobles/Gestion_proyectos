@@ -113,13 +113,22 @@ export class ProfilePage implements OnInit {
         if (!this.fotoUrl && (usuario as any).fotoUsuario) {
           this.fotoUrl = (usuario as any).fotoUsuario;
         }
+        // Total de proyectos inscritos (para el contador del perfil)
         this.proyectoService.getProyectosPorAlumno(sesion.id).subscribe({
           next: (proyectos) => {
             this.numProyectos = proyectos.length;
-            this.proyectosActivos = proyectos.filter(p => p.estado === 'en curso');
           },
           error: () => {
             this.numProyectos = 0;
+          }
+        });
+
+// Proyectos activos con cupos en tiempo real (va directo a la tabla de proyectos)
+        this.proyectoService.getProyectosActivos(sesion.id).subscribe({
+          next: (proyectos) => {
+            this.proyectosActivos = proyectos;
+          },
+          error: () => {
             this.proyectosActivos = [];
           }
         });

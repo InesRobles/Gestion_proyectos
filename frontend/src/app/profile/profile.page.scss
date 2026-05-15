@@ -2,7 +2,6 @@ $primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 $glass-bg: rgba(255, 255, 255, 0.1);
 $bg-app: #f4f7fe;
 
-/* Añadimos el fondo directamente al content para que nunca se vea blanco */
 ion-content {
   --background: #f4f7fe;
 }
@@ -20,11 +19,13 @@ ion-content {
     width: 100%; max-width: 1400px; margin: 0 auto;
   }
 }
+
 .admin-banner {
   padding: 12px 20px 0;
   max-width: 1200px;
   margin: 0 auto;
 }
+
 .logo-text {
   color: white; font-size: 1.8rem; font-weight: 900; margin: 0;
   span { color: #a1c4fd; font-weight: 300; }
@@ -58,11 +59,11 @@ ion-content {
 }
 
 .profile-main-card {
-  overflow: visible;  // ← cambiar hidden → visible
+  overflow: visible;
   .profile-header-bg {
     height: 120px;
     background: $primary-gradient;
-    border-radius: 24px 24px 0 0;  // ← añadir para que no quede raro sin overflow
+    border-radius: 24px 24px 0 0;
   }
   .profile-avatar-container {
     display: flex; justify-content: center; margin-top: -55px;
@@ -89,10 +90,12 @@ ion-content {
   border: none;
   .stat-item {
     display: flex; flex-direction: column; align-items: center;
-    .stat-value { font-size: 1.5rem;
+    .stat-value {
+      font-size: 1.5rem;
       background: linear-gradient(135deg, #667eea, #764ba2);
       -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent; }
+      -webkit-text-fill-color: transparent;
+    }
     .stat-label { font-size: 0.8rem; color: #888; }
   }
 }
@@ -130,7 +133,7 @@ ion-content {
 .login-button {
   --border-radius: 12px;
   font-weight: bold;
-  height: 50px;
+  --height: 50px;
   --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --box-shadow: 0 8px 20px rgba(118, 75, 162, 0.35);
   letter-spacing: 0.5px;
@@ -141,20 +144,20 @@ ion-content {
   margin-top: 30px; flex-wrap: wrap; gap: 15px;
   .main-actions { display: flex; align-items: center; gap: 10px; }
 }
-.action-button{
+
+.action-button {
   --border-color: #764ba2;
   --color: #764ba2;
   border-radius: 20px;
   font-weight: 600;
   margin-top: 8px;
 }
-// Forzar colores correctos en labels e inputs del perfil
+
 .info-card {
   ion-card-title {
-    padding-bottom: 12px;
-    border-bottom: 3px solid;
-    border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
-    margin-bottom: 4px;
+    padding-bottom: 0;
+    border-bottom: none;
+    margin-bottom: 0;
   }
   ion-card-header ion-card-title {
     font-size: 1.4rem;
@@ -176,12 +179,36 @@ ion-content {
   }
 }
 
-// --- ESTILOS DEL MODAL ---
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid;
+  border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
+
+  ion-card-title {
+    flex: 1;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+.save-header-btn {
+  --border-radius: 12px;
+  --height: 40px;
+  align-items: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
 .project-modal {
   --width: 95%;
   --max-width: 650px;
   --border-radius: 28px;
-  /* Al no poner height, Ionic lo centra perfectamente y lo ajusta al contenido. */
 
   .modal-container {
     padding: 20px 30px 30px;
@@ -189,7 +216,6 @@ ion-content {
   }
 }
 
-// ─── Selector de modalidad ────────────────────────────────────────────────────
 .modalidad-select-wrapper {
   display: flex;
   flex-direction: column;
@@ -223,7 +249,7 @@ ion-content {
     color: var(--ion-text-color);
   }
 }
-// ── PROYECTOS ACTIVOS ──────────────────────────────────────────
+
 .proyectos-card {
   ion-card-title {
     color: #2d1f3d;
@@ -245,8 +271,12 @@ ion-content {
 
 .proyectos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .proyecto-mini-card {
@@ -305,6 +335,16 @@ ion-content {
   line-height: 1.4;
   margin-bottom: 12px;
   min-height: 32px;
+}
+
+.proyecto-mini-footer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: #9a85b0;
+
+  ion-icon { font-size: 1rem; }
 }
 
 .proyecto-mini-footer {

@@ -22,11 +22,9 @@
               <ion-card-header class="ion-text-center">
                 <ion-card-title>{{ userData.nombre_real }}</ion-card-title>
                 <ion-card-subtitle>{{ userData.rol | titlecase }}</ion-card-subtitle>
-                <!-- El chip va FUERA del card-header, no dentro -->
               </ion-card-header>
-                <ion-card-content>
-                  <div style="text-align:center; margin-bottom: 8px;">
-                  </div>
+              <ion-card-content>
+                <div style="text-align:center; margin-bottom: 8px;"></div>
                 <div class="user-stats">
                   <div class="stat-item">
                     <span class="stat-value">{{ numProyectos }}</span>
@@ -54,10 +52,16 @@
           <ion-col size="12" size-lg="8">
             <ion-card class="interactive-card info-card">
               <ion-card-header>
-                <ion-card-title>
-                  <ion-icon name="person-circle-outline" style="vertical-align: middle; margin-right: 8px;"></ion-icon>
-                  Configuración de Cuenta
-                </ion-card-title>
+                <div class="card-header-flex">
+                  <ion-card-title>
+                    <ion-icon name="person-circle-outline" style="vertical-align: middle; margin-right: 8px;"></ion-icon>
+                    Configuración de Cuenta
+                  </ion-card-title>
+                  <ion-button class="login-button save-header-btn" (click)="guardarCambios()">
+                    <ion-icon name="save-outline" slot="start"></ion-icon>
+                    Guardar Cambios
+                  </ion-button>
+                </div>
               </ion-card-header>
 
               <ion-card-content>
@@ -77,6 +81,19 @@
                       <ion-item class="custom-input">
                         <ion-input label="Rol de Sistema" labelPlacement="stacked" [value]="userData.rol" readonly="true"></ion-input>
                       </ion-item>
+                    </ion-col>
+                    <ion-col size="12" size-md="6">
+                      <div class="custom-input modalidad-select-wrapper" *ngIf="userData.rol === 'alumno' || userData.rol === 'administrador'">
+                        <label class="modalidad-label">Modalidad</label>
+                        <select class="modalidad-select" [(ngModel)]="modalidadIdSeleccionada" (ngModelChange)="onModalidadChange($event)">
+                          <option [ngValue]="null" disabled>Selecciona una modalidad</option>
+                          <option *ngFor="let m of modalidades" [ngValue]="m.id">{{ m.nombre }}</option>
+                        </select>
+                      </div>
+                    </ion-col>
+
+                    <!-- ── PROYECTOS: fila completa ── -->
+                    <ion-col size="12">
                       <ion-card class="interactive-card proyectos-card">
                         <ion-card-header>
                           <ion-card-title>
@@ -86,7 +103,6 @@
                         </ion-card-header>
 
                         <ion-card-content>
-                          <!-- Estado vacío -->
                           <div class="proyectos-empty" *ngIf="proyectosActivos.length === 0">
                             <ion-icon name="folder-open-outline"></ion-icon>
                             <p>No tienes proyectos activos en este momento.</p>
@@ -110,29 +126,16 @@
                         </ion-card-content>
                       </ion-card>
                     </ion-col>
-                    <ion-col size="12" size-md="6">
-                      <!-- Alumno y administrador: selector editable -->
-                      <div class="custom-input modalidad-select-wrapper" *ngIf="userData.rol === 'alumno' || userData.rol === 'administrador'">
-                        <label class="modalidad-label">Modalidad</label>
-                        <select class="modalidad-select" [(ngModel)]="modalidadIdSeleccionada" (ngModelChange)="onModalidadChange($event)">                          <option [ngValue]="null" disabled>Selecciona una modalidad</option>
-                          <option *ngFor="let m of modalidades" [ngValue]="m.id">{{ m.nombre }}</option>
-                        </select>
-                      </div>
-                    </ion-col>
                   </ion-row>
                 </ion-list>
 
                 <div class="action-footer">
                   <div class="main-actions">
-                    <ion-button class="login-button" style="width: 180px;" (click)="guardarCambios()">
-                      Guardar Cambios
-                    </ion-button>
                     <ion-button fill="outline" color="medium" (click)="abrirModalPassword()">
                       <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
                       Seguridad
                     </ion-button>
                   </div>
-
                   <ion-button color="danger" fill="clear" [routerLink]="['/login']">
                     Cerrar Sesión
                   </ion-button>
@@ -147,7 +150,6 @@
               </ion-card-header>
 
               <ion-card-content>
-                <!-- Crear nueva modalidad -->
                 <ion-row class="ion-align-items-center" style="margin-bottom: 16px;">
                   <ion-col>
                     <ion-item class="custom-input">
@@ -167,16 +169,10 @@
                   </ion-col>
                 </ion-row>
 
-                <!-- Lista de modalidades existentes -->
                 <ion-list lines="full">
                   <ion-item *ngFor="let m of modalidades">
                     <ion-label>{{ m.nombre }}</ion-label>
-                    <ion-button
-                      slot="end"
-                      fill="clear"
-                      color="danger"
-                      (click)="eliminarModalidad(m.id)"
-                      title="Eliminar modalidad">
+                    <ion-button slot="end" fill="clear" color="danger" (click)="eliminarModalidad(m.id)" title="Eliminar modalidad">
                       <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                     </ion-button>
                   </ion-item>
