@@ -1017,3 +1017,53 @@ $radius-input: 12px;
     font-size: 1rem;
   }
 }
+
+// ── BADGE FICHAJE ─────────────────────────────────────────────────────────────
+.fichado-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 20px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  min-width: 90px;
+  justify-content: center;
+
+  ion-icon { font-size: 13px; }
+
+  &.fichado-si {
+    background: rgba(45, 211, 111, 0.13);
+    color: darken(#2dd36f, 10%);
+  }
+
+  &.fichado-no {
+    background: rgba(235, 68, 90, 0.12);
+    color: darken(#eb445a, 5%);
+  }
+
+  &.fichado-na {
+    color: #c0c8d8;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 300;
+  }
+}
+
+// ── FILTROS FICHADO ───────────────────────────────────────────────────────────
+.filtro-fichado {
+  &.active {
+    background: rgba(45, 211, 111, 0.18) !important;
+    color: darken(#2dd36f, 12%) !important;
+    border-color: #2dd36f !important;
+  }
+}
+
+.filtro-no-fichado {
+  &.active {
+    background: rgba(235, 68, 90, 0.15) !important;
+    color: darken(#eb445a, 5%) !important;
+    border-color: #eb445a !important;
+  }
+}

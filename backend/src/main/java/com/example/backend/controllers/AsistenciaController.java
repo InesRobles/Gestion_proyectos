@@ -4,10 +4,7 @@ import com.example.backend.dto.AsistenciaDTO;
 import com.example.backend.services.AsistenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,5 +25,22 @@ public class AsistenciaController {
         return asistenciaService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<AsistenciaDTO> registrar(@RequestBody AsistenciaDTO dto) {
+        return ResponseEntity.ok(asistenciaService.registrar(dto));
+    }
+
+    @GetMapping("/alumno/{alumnoId}/hoy")
+    public ResponseEntity<AsistenciaDTO> findByAlumnoHoy(@PathVariable Long alumnoId) {
+        return asistenciaService.findByAlumnoHoy(alumnoId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/hoy")
+    public List<AsistenciaDTO> findAllHoy() {
+        return asistenciaService.findAllHoy();
     }
 }

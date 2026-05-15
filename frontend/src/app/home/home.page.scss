@@ -38,6 +38,7 @@ $bg-app: #f4f7fe;
       position: absolute;
       inset: 0;
       pointer-events: none;
+      z-index: 0;
 
       .shape {
         position: absolute;
@@ -55,19 +56,21 @@ $bg-app: #f4f7fe;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 44px 56px;
+      padding: 44px 52px;
       flex-wrap: wrap;
-      gap: 30px;
+      gap: 32px;
 
       .left-column {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 22px;
+        flex: 1;
+        min-width: 260px;
 
         .user-greeting {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 5px;
 
           .greeting-label {
             font-size: 0.95rem;
@@ -146,33 +149,41 @@ $bg-app: #f4f7fe;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 10px;
+          gap: 14px;
           background: rgba(255,255,255,0.1);
           backdrop-filter: blur(10px);
           border: 1px solid rgba(255,255,255,0.18);
           border-radius: 20px;
-          padding: 28px 36px;
+          padding: 32px 40px;
 
           .instruction-text {
             margin: 0;
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.6);
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.55);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             font-weight: 600;
           }
 
           .fichar-button {
             --background: #ffffff;
+            --background-hover: #f0e8ff;
             --color: #764ba2;
-            --border-radius: 14px;
-            --box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-            height: 52px;
-            font-size: 1rem;
+            --border-radius: 16px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            height: 56px;
+            font-size: 0.95rem;
             font-weight: 800;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             width: 100%;
             min-width: 200px;
+
+            &[disabled] {
+              --background: rgba(255,255,255,0.2);
+              --color: rgba(255,255,255,0.4);
+              --box-shadow: none;
+            }
           }
 
           .fichar-hint {
@@ -180,11 +191,85 @@ $bg-app: #f4f7fe;
             color: rgba(255,255,255,0.4);
             text-align: center;
             max-width: 200px;
-            line-height: 1.4;
+            line-height: 1.5;
           }
         }
       }
     }
+  }
+}
+
+// ── FORMULARIO DE HORARIO ────────────────────────────────────
+.horario-form-box {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 18px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 420px;
+
+  .horario-form-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.6);
+    font-weight: 500;
+
+    ion-icon { font-size: 1.1rem; color: #e0c8ff; }
+  }
+
+  .horario-form-fields {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      min-width: 100px;
+
+      .form-label {
+        font-size: 0.65rem;
+        color: rgba(255,255,255,0.5);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .form-select,
+      .form-input-time {
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 10px;
+        padding: 8px 12px;
+        color: #ffffff;
+        font-size: 0.88rem;
+        outline: none;
+        transition: border-color 0.2s, background 0.2s;
+
+        &:focus {
+          border-color: rgba(255,255,255,0.5);
+          background: rgba(255,255,255,0.18);
+        }
+        option { background: #4b2c6e; color: #fff; }
+      }
+    }
+  }
+
+  .guardar-horario-btn {
+    --background: #ffffff;
+    --color: #764ba2;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    font-weight: 700;
+    font-size: 0.88rem;
+    height: 42px;
+    align-self: flex-start;
   }
 }
 
@@ -660,4 +745,10 @@ $bg-app: #f4f7fe;
 
   ion-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
   p { margin: 0; font-size: 0.9rem; }
+}
+
+// ── FICHAR HINT WARNING ───────────────────────────────────────────────────────
+.fichar-hint-warning {
+  color: #ffc409 !important;
+  font-weight: 500;
 }

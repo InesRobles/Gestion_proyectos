@@ -280,9 +280,27 @@ export class ProfilePage implements OnInit {
       nombreUsuario: this.userData.nombre_usuario,
     }).subscribe({
       next: async () => {
-        sesion.nombreReal = this.userData.nombre_real;
-        sesion.nombreUsuario = this.userData.nombre_usuario;
-        this.authService.guardarSesion(sesion);
+        // Recargar el usuario desde el servidor para que el rol (y cualquier otro
+        // campo actualizado manualmente en BD) quede reflejado en la sesión local.
+        this.usuarioService.getUsuarioById(sesion.id).subscribe({
+          next: (usuarioActualizado) => {
+            const sesionActualizada = {
+              ...sesion,
+              nombreReal: usuarioActualizado.nombreReal,
+              nombreUsuario: usuarioActualizado.nombreUsuario,
+              rol: usuarioActualizado.rol,
+            };
+            this.authService.guardarSesion(sesionActualizada);
+            // Actualizar userData local con el rol real
+            this.userData.rol = usuarioActualizado.rol;
+          },
+          error: () => {
+            // Fallback: al menos guardar los campos que sí editamos
+            sesion.nombreReal = this.userData.nombre_real;
+            sesion.nombreUsuario = this.userData.nombre_usuario;
+            this.authService.guardarSesion(sesion);
+          }
+        });
 
         if ((sesion.rol === 'alumno' || sesion.rol === 'administrador') && this.modalidadIdSeleccionada) {
           this.usuarioService.actualizarModalidad(sesion.id, this.modalidadIdSeleccionada).subscribe({

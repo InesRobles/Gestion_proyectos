@@ -32,4 +32,9 @@ public class AlumnoService {
         return alumnoRepository.findById(id)
                 .map(alumnoMapper::toDTO);
     }
+
+    public Optional<AlumnoDTO> findByUsuarioId(Long usuarioId) {
+        return alumnoRepository.findByUsuarioId(usuarioId)
+                .map(alumnoMapper::toDTO);
+    }
 }
