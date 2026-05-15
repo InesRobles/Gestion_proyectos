@@ -13,32 +13,79 @@
               <div class="shape shape-3"></div>
             </div>
             <div class="attendance-content">
+
+              <!-- COLUMNA IZQUIERDA: saludo + horario -->
               <div class="left-column">
                 <div class="user-greeting">
                   <span class="greeting-label">Hola de nuevo,</span>
                   <h1 class="user-name">{{ nombreUsuario }}</h1>
                   <span class="greeting-sub">Que tengas un excelente día de trabajo 🚀</span>
                 </div>
-                <div class="time-box">
+
+                <!-- Horario existente -->
+                <div class="time-box" *ngIf="!mostrarFormHorario">
                   <div class="time-icon-wrap">
                     <ion-icon name="time-outline"></ion-icon>
                   </div>
                   <div class="time-text">
                     <span class="schedule-label">HORARIO DE HOY</span>
-                    <span class="hours">08:00 — 15:00</span>
+                    <span class="hours" *ngIf="horarioHoy">{{ horarioHoy.horaInicio }} — {{ horarioHoy.horaFin }}</span>
+                    <span class="hours" *ngIf="!horarioHoy">Sin horario asignado</span>
                   </div>
                 </div>
+
+                <!-- Formulario para añadir horario cuando no tiene -->
+                <div class="horario-form-box" *ngIf="mostrarFormHorario">
+                  <div class="horario-form-header">
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    <span>No tienes horario para hoy. Añade uno:</span>
+                  </div>
+                  <div class="horario-form-fields">
+                    <div class="form-field">
+                      <label class="form-label">Día</label>
+                      <select class="form-select" [(ngModel)]="formHorario.diaSemana">
+                        <option *ngFor="let dia of diasSemana" [value]="dia">{{ dia }}</option>
+                      </select>
+                    </div>
+                    <div class="form-field">
+                      <label class="form-label">Hora inicio</label>
+                      <input type="time" class="form-input-time" [(ngModel)]="formHorario.horaInicio" />
+                    </div>
+                    <div class="form-field">
+                      <label class="form-label">Hora fin</label>
+                      <input type="time" class="form-input-time" [(ngModel)]="formHorario.horaFin" />
+                    </div>
+                  </div>
+                  <ion-button
+                    class="guardar-horario-btn"
+                    [disabled]="guardandoHorario"
+                    (click)="guardarHorario()">
+                    <ion-icon name="save-outline" slot="start"></ion-icon>
+                    {{ guardandoHorario ? 'Guardando...' : 'Guardar Horario' }}
+                  </ion-button>
+                </div>
               </div>
-              <div class="right-column">
+
+              <!-- COLUMNA DERECHA: botón fichar (solo si hay horario) -->
+              <div class="right-column" *ngIf="!mostrarFormHorario">
                 <div class="fichar-card">
                   <p class="instruction-text">Registra tu asistencia</p>
-                  <ion-button class="fichar-button" (click)="fichar()">
+                  <ion-button
+                    class="fichar-button"
+                    (click)="fichar()"
+                    [disabled]="franjaActiva === null">
                     <ion-icon name="log-in-outline" slot="start"></ion-icon>
                     FICHAR ENTRADA
                   </ion-button>
-                  <span class="fichar-hint">Haz clic para registrar tu entrada de hoy</span>
+                  <span class="fichar-hint" *ngIf="franjaActiva !== null">
+                    Haz clic para registrar tu entrada de hoy
+                  </span>
+                  <span class="fichar-hint fichar-hint-warning" *ngIf="franjaActiva === null && horarioHoy">
+                    Podrás fichar entre las {{ horarioHoy.horaInicio }} y las {{ horarioHoy.horaFin }}
+                  </span>
                 </div>
               </div>
+
             </div>
           </ion-card>
         </section>
@@ -50,7 +97,6 @@
       <section>
         <h2 class="section-title">Tus Proyectos Activos</h2>
 
-        <!-- Skeleton loading -->
         <ion-grid *ngIf="loadingProyectos">
           <ion-row>
             <ion-col size="12" size-sm="6" size-lg="4" size-xl="3" *ngFor="let i of [1,2,3]">
@@ -85,7 +131,6 @@
                       {{ p.cuposDisponibles }} / {{ p.cupoMaximo }} cupos libres
                     </span>
                   </div>
-                  <!-- Barra visual de ocupación -->
                   <div class="progress-track" style="margin-top: 8px;">
                     <div class="progress-fill" [style.width.%]="getPorcentajeCupo(p)"></div>
                   </div>
@@ -138,13 +183,11 @@
                       {{ p.cuposDisponibles }} / {{ p.cupoMaximo }} cupos libres
                     </span>
                   </div>
-                  <!-- Barra visual de ocupación -->
                   <div class="progress-track" style="margin-top: 8px;">
                     <div class="progress-fill" [style.width.%]="getPorcentajeCupo(p)"></div>
                   </div>
                 </ion-card-content>
                 <div class="card-footer">
-                  <!-- Botón desactivado si no hay cupo o el proyecto no está en curso -->
                   <ion-button
                     fill="solid"
                     class="inscribir-btn"
@@ -211,7 +254,6 @@
                   {{ proyectoSeleccionado.cuposDisponibles }} / {{ proyectoSeleccionado.cupoMaximo }} cupos libres
                 </span>
               </div>
-              <!-- Barra de cupos en el modal -->
               <div class="progress-track" style="margin-top: 12px;">
                 <div class="progress-fill" [style.width.%]="getPorcentajeCupo(proyectoSeleccionado)"></div>
               </div>

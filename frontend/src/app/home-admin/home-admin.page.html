@@ -4,7 +4,7 @@
   <div class="home-wrapper">
     <div class="content-container">
 
-      <section class="attendance-section">
+      <section class="attendance-section" [class.exit-animation]="isExiting">
         <ion-card class="attendance-hero-card">
           <div class="hero-bg-shapes">
             <div class="shape shape-1"></div>
@@ -12,13 +12,17 @@
             <div class="shape shape-3"></div>
           </div>
           <div class="attendance-content">
+
+            <!-- COLUMNA IZQUIERDA -->
             <div class="left-column">
               <div class="user-greeting">
                 <span class="greeting-label">Panel de Control</span>
-                <h1 class="user-name">Administración</h1>
+                <h1 class="user-name">{{ nombreUsuario }}</h1>
                 <span class="greeting-sub">Gestiona usuarios, roles y proyectos 🛡️</span>
               </div>
-              <div class="time-box">
+
+              <!-- Ya fichó → mostrar alumnos activos -->
+              <div class="time-box" *ngIf="!mostrarTarjetaAsistencia">
                 <div class="time-icon-wrap">
                   <ion-icon name="people-outline"></ion-icon>
                 </div>
@@ -27,9 +31,74 @@
                   <span class="hours">{{ alumnos.length }} Estudiantes</span>
                 </div>
               </div>
+
+              <!-- Pendiente de fichar → mostrar horario -->
+              <div class="time-box" *ngIf="mostrarTarjetaAsistencia && !mostrarFormHorario">
+                <div class="time-icon-wrap">
+                  <ion-icon name="time-outline"></ion-icon>
+                </div>
+                <div class="time-text">
+                  <span class="schedule-label">HORARIO DE HOY</span>
+                  <span class="hours" *ngIf="horarioHoy">{{ horarioHoy.horaInicio }} — {{ horarioHoy.horaFin }}</span>
+                  <span class="hours" *ngIf="!horarioHoy">Sin horario asignado</span>
+                </div>
+              </div>
+
+              <!-- Sin horario → formulario para añadirlo -->
+              <div class="horario-form-box" *ngIf="mostrarTarjetaAsistencia && mostrarFormHorario">
+                <div class="horario-form-header">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <span>No tienes horario para hoy. Añade uno:</span>
+                </div>
+                <div class="horario-form-fields">
+                  <div class="form-field">
+                    <label class="form-label-hero">Día</label>
+                    <select class="form-select-hero" [(ngModel)]="formHorario.diaSemana">
+                      <option *ngFor="let dia of diasSemana" [value]="dia">{{ dia }}</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label-hero">Hora inicio</label>
+                    <input type="time" class="form-input-time" [(ngModel)]="formHorario.horaInicio" />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label-hero">Hora fin</label>
+                    <input type="time" class="form-input-time" [(ngModel)]="formHorario.horaFin" />
+                  </div>
+                </div>
+                <ion-button
+                  class="guardar-horario-btn"
+                  [disabled]="guardandoHorario"
+                  (click)="guardarHorario()">
+                  <ion-icon name="save-outline" slot="start"></ion-icon>
+                  {{ guardandoHorario ? 'Guardando...' : 'Guardar Horario' }}
+                </ion-button>
+              </div>
             </div>
+
+            <!-- COLUMNA DERECHA -->
             <div class="right-column">
-              <div class="fichar-card">
+
+              <!-- Botón fichar (solo mientras no ha fichado y tiene horario) -->
+              <div class="fichar-card" *ngIf="mostrarTarjetaAsistencia && !mostrarFormHorario">
+                <p class="instruction-text">Registra tu asistencia</p>
+                <ion-button
+                  class="fichar-button"
+                  (click)="fichar()"
+                  [disabled]="franjaActiva === null">
+                  <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                  FICHAR ENTRADA
+                </ion-button>
+                <span class="fichar-hint" *ngIf="franjaActiva !== null">
+                  Haz clic para registrar tu entrada de hoy
+                </span>
+                <span class="fichar-hint fichar-hint-warning" *ngIf="franjaActiva === null && horarioHoy">
+                  Podrás fichar entre las {{ horarioHoy.horaInicio }} y las {{ horarioHoy.horaFin }}
+                </span>
+              </div>
+
+              <!-- Cambio masivo (siempre visible) -->
+              <div class="fichar-card" [class.masivo-standalone]="!mostrarTarjetaAsistencia || mostrarFormHorario">
                 <p class="instruction-text">Cambia el rol de varios usuarios a la vez.</p>
                 <ion-button class="fichar-button" (click)="abrirModalCambioMasivoRol()">
                   <ion-icon name="people-circle-outline" slot="start"></ion-icon>
@@ -37,7 +106,9 @@
                 </ion-button>
                 <span class="fichar-hint">Selecciona usuarios y asigna un rol en bloque</span>
               </div>
+
             </div>
+
           </div>
         </ion-card>
       </section>
@@ -79,6 +150,27 @@
                 Alumno
               </button>
             </div>
+
+            <div class="filtro-roles">
+              <button
+                class="filtro-btn"
+                [class.active]="filtroFichado === ''"
+                (click)="filtrarPorFichado('')">
+                Todos
+              </button>
+              <button
+                class="filtro-btn filtro-fichado"
+                [class.active]="filtroFichado === 'fichado'"
+                (click)="filtrarPorFichado('fichado')">
+                ✓ Fichados
+              </button>
+              <button
+                class="filtro-btn filtro-no-fichado"
+                [class.active]="filtroFichado === 'no-fichado'"
+                (click)="filtrarPorFichado('no-fichado')">
+                ✗ Sin fichar
+              </button>
+            </div>
           </div>
         </div>
 
@@ -95,6 +187,17 @@
             </div>
             <div class="usuario-rol-badge" [ngClass]="'rol-' + u.rol?.toLowerCase()">
               {{ u.rol }}
+            </div>
+            <!-- Badge fichaje — solo relevante para alumnos -->
+            <div *ngIf="u.rol?.toLowerCase() === 'alumno'"
+                 class="fichado-badge"
+                 [class.fichado-si]="haFichadoHoy(u.id)"
+                 [class.fichado-no]="!haFichadoHoy(u.id)">
+              <ion-icon [name]="haFichadoHoy(u.id) ? 'checkmark-outline' : 'close-outline'"></ion-icon>
+              {{ haFichadoHoy(u.id) ? 'Fichado' : 'Sin fichar' }}
+            </div>
+            <div *ngIf="u.rol?.toLowerCase() !== 'alumno'" class="fichado-badge fichado-na">
+              —
             </div>
             <div class="usuario-acciones">
               <ion-button fill="clear" size="small" class="accion-btn edit-btn" (click)="abrirModalEdicion(u)">

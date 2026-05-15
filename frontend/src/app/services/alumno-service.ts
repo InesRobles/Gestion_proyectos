@@ -15,11 +15,25 @@ export class AlumnoService {
     return this.http.get<alumno[]>(`${this.apiService.apiUrl}/alumno`);
   }
 
+  // Busca por alumno.id
   getAlumnoById(id: number): Observable<alumno> {
     return this.http.get<alumno>(`${this.apiService.apiUrl}/alumno/${id}`);
   }
 
+  // Busca el alumno asociado a un usuario (por usuario.id de sesión)
+  getAlumnoByUsuarioId(usuarioId: number): Observable<alumno> {
+    return this.http.get<alumno>(`${this.apiService.apiUrl}/alumno/usuario/${usuarioId}`);
+  }
+
   getProyectos(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiService.apiUrl}/proyecto`);
+  }
+
+  getHorarioAlumno(alumnoId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiService.apiUrl}/horario/alumno/${alumnoId}`);
+  }
+
+  crearHorario(horario: { alumnoId: number; diaSemana: string; horaInicio: string; horaFin: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiService.apiUrl}/horario`, horario);
   }
 }
