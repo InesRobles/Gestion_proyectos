@@ -1,0 +1,176 @@
+// ── AFK Popup ────────────────────────────────────────────────
+// Overlay a pantalla completa, z-index máximo para aparecer
+// sobre cualquier página / modal de la app.
+
+.afk-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+// ── Tarjeta central ──────────────────────────────────────────
+.afk-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 40px 36px 32px;
+  max-width: 340px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow:
+    0 32px 64px rgba(0,0,0,0.22),
+    0 8px 24px rgba(0,0,0,0.12);
+  text-align: center;
+}
+
+// ── Icono animado ─────────────────────────────────────────────
+.afk-icon-ring {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.afk-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.15);
+  animation: afk-pulse 1.6s ease-out infinite;
+}
+
+@keyframes afk-pulse {
+  0%   { transform: scale(0.85); opacity: 1; }
+  100% { transform: scale(1.5);  opacity: 0; }
+}
+
+.afk-icon {
+  font-size: 36px;
+  color: #6366f1;
+  position: relative;
+  z-index: 1;
+  animation: afk-wave 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes afk-wave {
+  from { transform: rotate(-10deg); }
+  to   { transform: rotate(10deg);  }
+}
+
+// ── Textos ────────────────────────────────────────────────────
+.afk-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.afk-desc {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+// ── Countdown SVG ─────────────────────────────────────────────
+.afk-countdown-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.afk-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.afk-ring-bg {
+  fill: none;
+  stroke: #e2e8f0;
+  stroke-width: 4;
+}
+
+.afk-ring-fill {
+  fill: none;
+  stroke: #6366f1;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: #{2 * 3.14159 * 24}; // circunferencia r=24
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.afk-seconds {
+  position: relative;
+  z-index: 1;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e1b4b;
+}
+
+// ── Botón ─────────────────────────────────────────────────────
+.afk-btn {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+
+  ion-icon {
+    font-size: 1.3rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.5);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ── Dark mode básico ──────────────────────────────────────────
+@media (prefers-color-scheme: dark) {
+  .afk-card {
+    background: #1e1b4b;
+  }
+  .afk-title {
+    color: #e0e7ff;
+  }
+  .afk-desc {
+    color: #a5b4fc;
+  }
+  .afk-seconds {
+    color: #e0e7ff;
+  }
+  .afk-ring-bg {
+    stroke: #312e81;
+  }
+}

@@ -117,6 +117,15 @@ CREATE TABLE IF NOT EXISTS asistencia (
     FOREIGN KEY (alumno_id) REFERENCES alumno(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS registro_actividad (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id  INT NOT NULL,
+    fecha       DATE    NOT NULL DEFAULT (CURRENT_DATE),
+    hora        TIME    NOT NULL,
+    respondido  TINYINT(1) NOT NULL DEFAULT 0,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
+);
+
 -- =========================================
 -- INSERCIÓN DE DATOS
 -- =========================================

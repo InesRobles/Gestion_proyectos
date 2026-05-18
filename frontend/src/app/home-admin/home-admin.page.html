@@ -264,6 +264,92 @@
         </div>
       </section>
 
+      <hr class="divider">
+
+      <section class="afk-section">
+
+        <!-- Cabecera -->
+        <div class="usuarios-header">
+          <div class="usuarios-title-block">
+            <h2 class="section-title" style="margin: 0;">Actividad anti-AFK de hoy</h2>
+            <span class="usuarios-count">
+        {{ registrosAfk.length }} registro{{ registrosAfk.length !== 1 ? 's' : '' }}
+      </span>
+          </div>
+
+          <div class="afk-legend">
+            <span class="afk-badge afk-si"><ion-icon name="checkmark-circle-outline"></ion-icon> Respondió</span>
+            <span class="afk-badge afk-no"><ion-icon name="close-circle-outline"></ion-icon> AFK</span>
+          </div>
+        </div>
+
+        <!-- Estado de carga -->
+        <div class="afk-loading" *ngIf="loadingAfk">
+          <ion-icon name="hourglass-outline" class="afk-loading-icon"></ion-icon>
+          <span>Cargando registros...</span>
+        </div>
+
+        <!-- Lista vacía -->
+        <div class="usuarios-vacio" *ngIf="!loadingAfk && registrosAfk.length === 0">
+          <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+          <p>No hay registros de actividad para hoy.</p>
+        </div>
+
+        <!-- Tabla de registros -->
+        <div class="afk-tabla-wrapper" *ngIf="!loadingAfk && registrosAfk.length > 0">
+          <div class="afk-tabla">
+
+            <!-- Cabecera tabla -->
+            <div class="afk-row afk-row-header">
+              <span>Usuario</span>
+              <span>Hora del popup</span>
+              <span>Resultado</span>
+            </div>
+
+            <!-- Filas -->
+            <div
+              class="afk-row"
+              *ngFor="let r of registrosAfk | slice:0:(mostrarTodosAfk ? 9999 : 8)"
+              [class.afk-row-respondio]="r.respondido"
+              [class.afk-row-afk]="!r.respondido"
+            >
+              <!-- Nombre del usuario -->
+              <span class="afk-usuario">
+          <div class="afk-avatar">
+            <ion-icon [name]="getIconoPorUsuarioId(r.usuarioId)"></ion-icon>
+          </div>
+          <div class="afk-usuario-info">
+            <span class="afk-nombre">{{ getNombrePorUsuarioId(r.usuarioId) }}</span>
+            <span class="afk-id">ID: {{ r.usuarioId }}</span>
+          </div>
+        </span>
+
+              <!-- Hora -->
+              <span class="afk-hora">
+          <ion-icon name="time-outline"></ion-icon>
+                {{ r.hora }}
+        </span>
+
+              <!-- Badge resultado -->
+              <span class="afk-resultado">
+          <span class="afk-badge" [class.afk-si]="r.respondido" [class.afk-no]="!r.respondido">
+            <ion-icon [name]="r.respondido ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
+            {{ r.respondido ? 'Respondió' : 'AFK' }}
+          </span>
+        </span>
+            </div>
+          </div>
+
+          <!-- Ver más -->
+          <div class="ver-todo-container" *ngIf="registrosAfk.length > 8">
+            <button class="ver-todo-btn" (click)="mostrarTodosAfk = !mostrarTodosAfk">
+              {{ mostrarTodosAfk ? 'Ver menos' : 'Ver todos (' + registrosAfk.length + ')' }}
+              <ion-icon [name]="mostrarTodosAfk ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+            </button>
+          </div>
+        </div>
+
+      </section>
     </div>
   </div>
 </ion-content>

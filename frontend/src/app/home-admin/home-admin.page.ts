@@ -18,7 +18,10 @@ import {
   peopleCircleOutline, checkboxOutline, squareOutline,
   addOutline, createOutline, addCircleOutline, folderOpenOutline,
   playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
-  imageOutline, timeOutline, logInOutline, calendarOutline, saveOutline
+  imageOutline, timeOutline, logInOutline, calendarOutline, saveOutline,
+  // ── AFK ──────────────────────────────────────────────────────
+  closeCircleOutline, checkmarkDoneCircleOutline,
+  chevronUpOutline, chevronDownOutline
 } from 'ionicons/icons';
 import { alumno } from '../modelos/alumno';
 import { AlumnoService } from '../services/alumno-service';
@@ -29,6 +32,8 @@ import { AuthService } from '../services/auth-service';
 import { proyecto, EstadoProyecto } from '../modelos/proyecto';
 import { HeaderComponent } from '../components/header/header.component';
 import { forkJoin } from 'rxjs';
+import {RegistroActividad, RegistroActividadService} from "../services/registro-actividad-service";
+// ── AFK ────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-home-admin',
@@ -51,8 +56,6 @@ export class HomeAdminPage implements OnInit {
   mostrarTodosProyectos: boolean = false;
 
   // ── FIX: mapa usuarioId → alumnoId para cruzar usuarios con asistencia ──────
-  // La tabla asistencia guarda alumnoId, pero la lista de usuarios usa usuario.id.
-  // Sin este mapa, haFichadoHoy() siempre devuelve false porque compara IDs distintos.
   private usuarioIdToAlumnoId: Map<number, number> = new Map();
 
   // ── Fichaje del administrador ──────────────────────────────────────────────
@@ -91,7 +94,7 @@ export class HomeAdminPage implements OnInit {
   filtroRol: string = '';
   filtroFichado: string = '';
 
-  // Set con los alumnoId que han fichado hoy (viene de la BD)
+  // Set con los alumnoId que han fichado hoy
   fichadosHoyIds: Set<number> = new Set();
 
   // Modal edición individual
@@ -108,8 +111,14 @@ export class HomeAdminPage implements OnInit {
   busquedaMasivo: string = '';
   usuariosFiltradosMasivo: Usuario[] = [];
 
+  // ── AFK ──────────────────────────────────────────────────────
+  registrosAfk: RegistroActividad[] = [];
+  loadingAfk: boolean = true;
+  mostrarTodosAfk: boolean = false;
+
   private asistenciaService = inject(AsistenciaService);
   private authService = inject(AuthService);
+  private registroActividadService = inject(RegistroActividadService);
 
   constructor(
     private alumnoService: AlumnoService,
@@ -126,7 +135,10 @@ export class HomeAdminPage implements OnInit {
       peopleCircleOutline, checkboxOutline, squareOutline,
       addOutline, createOutline, addCircleOutline, folderOpenOutline,
       playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
-      imageOutline, timeOutline, logInOutline, calendarOutline, saveOutline
+      imageOutline, timeOutline, logInOutline, calendarOutline, saveOutline,
+      // ── AFK ────────────────────────────────────────────────
+      closeCircleOutline, checkmarkDoneCircleOutline,
+      chevronUpOutline, chevronDownOutline
     });
   }
 
@@ -135,18 +147,15 @@ export class HomeAdminPage implements OnInit {
       this.nombreUsuario = sesion?.nombreReal ?? 'Administrador';
     });
 
-    // Cargamos alumnos y usuarios juntos para que el mapa esté listo
-    // antes de aplicar el filtro de fichados
     this.cargarAlumnosYUsuarios();
     this.cargarProyectos();
     this.cargarHorarioYFichaje();
+    this.cargarRegistrosAfkHoy(); // ── AFK
   }
 
   // ─────────────────────────────────────────────────────────────
   // CARGA CONJUNTA alumnos + usuarios
   // ─────────────────────────────────────────────────────────────
-  // Unificamos en un solo forkJoin para garantizar que el mapa
-  // usuarioId→alumnoId existe cuando lleguen los fichados de hoy.
   cargarAlumnosYUsuarios() {
     this.loading = true;
     this.loadingUsuarios = true;
@@ -158,9 +167,6 @@ export class HomeAdminPage implements OnInit {
       next: ({ alumnos, usuarios }) => {
         this.alumnos = alumnos;
 
-        // ── FIX: construir el mapa usuarioId → alumnoId ──────────────────
-        // El backend devuelve el campo como "usuarioId" (camelCase estándar).
-        // Si tu entidad lo serializa diferente (ej. "usuario_id"), cámbialo aquí.
         this.usuarioIdToAlumnoId = new Map(
           alumnos
             .filter(a => a.id != null && ((a as any).usuarioId ?? (a as any).usuario_id) != null)
@@ -171,7 +177,6 @@ export class HomeAdminPage implements OnInit {
         this.loading = false;
         this.loadingUsuarios = false;
 
-        // Ahora que el mapa existe, cargamos los fichados y aplicamos filtros
         this.cargarFichadosHoy();
       },
       error: () => {
@@ -188,8 +193,6 @@ export class HomeAdminPage implements OnInit {
   cargarFichadosHoy() {
     this.asistenciaService.fichadosHoy().subscribe({
       next: (lista) => {
-        // Solo se consideran fichados los que tienen presente = 1 (true)
-        // Los registros con presente = 0 existen en la BD pero no cuentan como fichado
         this.fichadosHoyIds = new Set(
           lista.filter(a => !!a.presente).map(a => a.alumnoId)
         );
@@ -215,7 +218,6 @@ export class HomeAdminPage implements OnInit {
       next: (alumno: any) => {
         console.log('[DEBUG] Respuesta getAlumnoByUsuarioId (admin):', JSON.stringify(alumno));
 
-        // ── FIX: misma corrección que en home.page.ts ────────────────────
         const adminId: number = alumno.alumnoId ?? alumno.id;
         if (!adminId) {
           this.mostrarTarjetaAsistencia = false;
@@ -277,7 +279,6 @@ export class HomeAdminPage implements OnInit {
         });
       },
       error: () => {
-        // El administrador no tiene fila en alumno → ocultar tarjeta
         this.mostrarTarjetaAsistencia = false;
       }
     });
@@ -329,10 +330,8 @@ export class HomeAdminPage implements OnInit {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // haFichadoHoy — FIX PRINCIPAL
+  // haFichadoHoy
   // ─────────────────────────────────────────────────────────────
-  // ANTES: comparaba usuario.id contra Set de alumnoId → siempre false
-  // AHORA: convierte usuario.id → alumnoId usando el mapa y comprueba el Set
   haFichadoHoy(usuarioId: number): boolean {
     const alumnoId = this.usuarioIdToAlumnoId.get(usuarioId);
     if (alumnoId === undefined) return false;
@@ -390,12 +389,12 @@ export class HomeAdminPage implements OnInit {
   abrirModalProyecto(p: proyecto | null) {
     this.proyectoEditando = p;
     this.formProyecto = {
-      titulo: p?.titulo || '',
-      descripcion: p?.descripcion || '',
-      cupoMaximo: p?.cupoMaximo || 1,
-      estado: p?.estado || 'en curso',
+      titulo:       p?.titulo       || '',
+      descripcion:  p?.descripcion  || '',
+      cupoMaximo:   p?.cupoMaximo   || 1,
+      estado:       p?.estado       || 'en curso',
       fotoProyecto: p?.fotoProyecto || null,
-      videoUrl: p?.videoUrl || ''   // ← añade esto
+      videoUrl:     p?.videoUrl     || ''
     };
     this.guardandoProyecto = false;
     this.modalProyectoAbierto = true;
@@ -429,7 +428,10 @@ export class HomeAdminPage implements OnInit {
           this.mostrarToast('Proyecto actualizado correctamente', 'success');
           this.cerrarModalProyecto();
         },
-        error: () => { this.mostrarToast('Error al actualizar el proyecto', 'danger'); this.guardandoProyecto = false; }
+        error: () => {
+          this.mostrarToast('Error al actualizar el proyecto', 'danger');
+          this.guardandoProyecto = false;
+        }
       });
     } else {
       this.proyectoService.crearProyecto(payload).subscribe({
@@ -439,7 +441,10 @@ export class HomeAdminPage implements OnInit {
           this.mostrarToast('Proyecto creado correctamente', 'success');
           this.cerrarModalProyecto();
         },
-        error: () => { this.mostrarToast('Error al crear el proyecto', 'danger'); this.guardandoProyecto = false; }
+        error: () => {
+          this.mostrarToast('Error al crear el proyecto', 'danger');
+          this.guardandoProyecto = false;
+        }
       });
     }
   }
@@ -496,7 +501,6 @@ export class HomeAdminPage implements OnInit {
     this.usuarioService.eliminarUsuario(id).subscribe({
       next: () => {
         this.usuarios = this.usuarios.filter(u => u.id !== id);
-        // También limpiar del mapa
         this.usuarioIdToAlumnoId.delete(id);
         this.aplicarFiltros();
         this.mostrarToast('Usuario eliminado correctamente', 'success');
@@ -529,9 +533,9 @@ export class HomeAdminPage implements OnInit {
   abrirModalEdicion(usuario: Usuario) {
     this.usuarioEditando = usuario;
     this.formEdicion = {
-      nombreReal: usuario.nombreReal ?? '',
-      nombreUsuario: (usuario as any).nombreUsuario ?? '',
-      rol: usuario.rol ?? '',
+      nombreReal:     usuario.nombreReal ?? '',
+      nombreUsuario:  (usuario as any).nombreUsuario ?? '',
+      rol:            usuario.rol ?? '',
       contrasenaHash: ''
     };
     this.modalEdicionAbierto = true;
@@ -548,9 +552,9 @@ export class HomeAdminPage implements OnInit {
     this.guardandoEdicion = true;
 
     const payload: any = {
-      nombreReal: this.formEdicion.nombreReal,
+      nombreReal:    this.formEdicion.nombreReal,
       nombreUsuario: this.formEdicion.nombreUsuario,
-      rol: this.formEdicion.rol,
+      rol:           this.formEdicion.rol,
     };
     if (this.formEdicion.contrasenaHash.trim()) {
       payload.contrasenaHash = this.formEdicion.contrasenaHash;
@@ -705,5 +709,37 @@ export class HomeAdminPage implements OnInit {
 
   toggleMostrarTodosProyectos() {
     this.mostrarTodosProyectos = !this.mostrarTodosProyectos;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // ACTIVIDAD ANTI-AFK
+  // ─────────────────────────────────────────────────────────────
+  cargarRegistrosAfkHoy() {
+    this.loadingAfk = true;
+    this.registroActividadService.getHoy().subscribe({
+      next: (registros) => {
+        const unicos = new Map<number, RegistroActividad>();
+        for (const r of registros) {
+          if (!unicos.has(r.usuarioId)) {
+            unicos.set(r.usuarioId, r);
+          }
+        }
+        this.registrosAfk = Array.from(unicos.values());
+        this.loadingAfk = false;
+      },
+      error: () => {
+        this.loadingAfk = false;
+      }
+    });
+  }
+
+  getNombrePorUsuarioId(usuarioId: number): string {
+    const u = this.usuarios.find(u => u.id === usuarioId);
+    return u?.nombreReal ?? `Usuario #${usuarioId}`;
+  }
+
+  getIconoPorUsuarioId(usuarioId: number): string {
+    const u = this.usuarios.find(u => u.id === usuarioId);
+    return this.getIconoPorRol(u?.rol ?? '');
   }
 }

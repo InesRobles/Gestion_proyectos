@@ -1,0 +1,41 @@
+<!-- ============================================================
+     POPUP ANTI-AFK  –  se monta en app.component.html y se
+     muestra globalmente en cualquier página de la app.
+     ============================================================ -->
+<div class="afk-overlay" *ngIf="visible" [@fadeInOut]>
+
+  <div class="afk-card" [@slideUp]>
+
+    <!-- Icono animado -->
+    <div class="afk-icon-ring">
+      <div class="afk-pulse"></div>
+      <ion-icon name="hand-right-outline" class="afk-icon"></ion-icon>
+    </div>
+
+    <!-- Texto -->
+    <h2 class="afk-title">¿Sigues ahí?</h2>
+    <p class="afk-desc">
+      Confirma que estás activo antes de que se agote el tiempo.
+    </p>
+
+    <!-- Countdown circular -->
+    <div class="afk-countdown-wrap">
+      <svg class="afk-ring" viewBox="0 0 56 56">
+        <circle class="afk-ring-bg" cx="28" cy="28" r="24"/>
+        <circle
+          class="afk-ring-fill"
+          cx="28" cy="28" r="24"
+          [style.strokeDashoffset]="dashOffset"
+        />
+      </svg>
+      <span class="afk-seconds">{{ segundosRestantes }}</span>
+    </div>
+
+    <!-- Botón -->
+    <button class="afk-btn" (click)="responder()">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      ¡Estoy aquí!
+    </button>
+
+  </div>
+</div>

@@ -1160,3 +1160,193 @@ $radius-input: 12px;
     border-color: #eb445a !important;
   }
 }
+
+.afk-section {
+  margin-top: 8px;
+}
+
+// Leyenda
+.afk-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+// Badges reutilizables
+.afk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  &.afk-si {
+    background: rgba(34, 197, 94, 0.12);
+    color: #16a34a;
+  }
+
+  &.afk-no {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+  }
+}
+
+// Loading
+.afk-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+
+  .afk-loading-icon {
+    font-size: 1.4rem;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Tabla
+.afk-tabla-wrapper {
+  margin-top: 12px;
+  background: var(--ion-color-light, #f8fafc);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.afk-tabla {
+  width: 100%;
+}
+
+.afk-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  transition: background 0.15s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.afk-row-header {
+    background: rgba(99, 102, 241, 0.06);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ion-color-medium);
+  }
+
+  &.afk-row-respondio:hover {
+    background: rgba(34, 197, 94, 0.04);
+  }
+
+  &.afk-row-afk:hover {
+    background: rgba(239, 68, 68, 0.04);
+  }
+}
+
+// Avatar + nombre
+.afk-usuario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.afk-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 16px;
+    color: #6366f1;
+  }
+}
+
+.afk-usuario-info {
+  display: flex;
+  flex-direction: column;
+
+  .afk-nombre {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--ion-color-dark, #1e293b);
+    line-height: 1.2;
+  }
+
+  .afk-id {
+    font-size: 0.72rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+// Hora
+.afk-hora {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  color: var(--ion-color-medium-shade);
+  white-space: nowrap;
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+// Resultado badge dentro de la fila
+.afk-resultado {
+  display: flex;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+// Ver más
+.ver-todo-container {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+}
+
+.ver-todo-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 20px;
+  background: transparent;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--ion-color-medium-shade);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.06);
+    color: #6366f1;
+  }
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
