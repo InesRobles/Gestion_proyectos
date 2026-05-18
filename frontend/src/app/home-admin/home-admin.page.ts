@@ -18,13 +18,14 @@ import {
   peopleCircleOutline, checkboxOutline, squareOutline,
   addOutline, createOutline, addCircleOutline, folderOpenOutline,
   playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
-  imageOutline, timeOutline, logInOutline, calendarOutline, saveOutline
+  imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
+  checkmarkDoneCircle
 } from 'ionicons/icons';
 import { alumno } from '../modelos/alumno';
 import { AlumnoService } from '../services/alumno-service';
 import { UsuarioService, Usuario } from '../services/usuario-service';
 import { ProyectoService } from '../services/proyecto-service';
-import { AsistenciaService } from '../services/asistencia-service';
+import { AsistenciaService, AsistenciaDTO } from '../services/asistencia-service';
 import { AuthService } from '../services/auth-service';
 import { proyecto, EstadoProyecto } from '../modelos/proyecto';
 import { HeaderComponent } from '../components/header/header.component';
@@ -59,6 +60,7 @@ export class HomeAdminPage implements OnInit {
   mostrarTarjetaAsistencia = false;
   isExiting = false;
   nombreUsuario = '';
+  asistenciaHoy: any = null;
   horarioHoy: { horaInicio: string; horaFin: string } | null = null;
   franjaActiva: 'activa' | null = null;
   mostrarFormHorario = false;
@@ -93,6 +95,7 @@ export class HomeAdminPage implements OnInit {
 
   // Set con los alumnoId que han fichado hoy (viene de la BD)
   fichadosHoyIds: Set<number> = new Set();
+  fichadosHoyMap: Map<number, AsistenciaDTO> = new Map();
 
   // Modal edición individual
   modalEdicionAbierto: boolean = false;
@@ -126,7 +129,8 @@ export class HomeAdminPage implements OnInit {
       peopleCircleOutline, checkboxOutline, squareOutline,
       addOutline, createOutline, addCircleOutline, folderOpenOutline,
       playCircleOutline, pauseCircleOutline, checkmarkCircleOutline,
-      imageOutline, timeOutline, logInOutline, calendarOutline, saveOutline
+      imageOutline, timeOutline, logInOutline, logOutOutline, calendarOutline, saveOutline,
+      checkmarkDoneCircle
     });
   }
 
@@ -193,6 +197,9 @@ export class HomeAdminPage implements OnInit {
         this.fichadosHoyIds = new Set(
           lista.filter(a => !!a.presente).map(a => a.alumnoId)
         );
+        this.fichadosHoyMap = new Map(
+          lista.filter(a => !!a.presente).map(a => [a.alumnoId, a])
+        );
         this.aplicarFiltros();
       },
       error: () => { /* silencioso */ }
@@ -215,7 +222,6 @@ export class HomeAdminPage implements OnInit {
       next: (alumno: any) => {
         console.log('[DEBUG] Respuesta getAlumnoByUsuarioId (admin):', JSON.stringify(alumno));
 
-        // ── FIX: misma corrección que en home.page.ts ────────────────────
         const adminId: number = alumno.alumnoId ?? alumno.id;
         if (!adminId) {
           this.mostrarTarjetaAsistencia = false;
@@ -226,59 +232,63 @@ export class HomeAdminPage implements OnInit {
         this.formHorario.diaSemana = diaHoy;
 
         this.asistenciaService.haFichadoHoy(adminId).subscribe({
-          next: () => {
-            this.mostrarTarjetaAsistencia = false;
+          next: (asistencia) => {
+            this.asistenciaHoy = asistencia;
+            this.mostrarTarjetaAsistencia = true;
+            this.cargarHorarioParaAdmin(adminId, diaHoy, horaActual);
           },
           error: () => {
-            this.alumnoService.getHorarioAlumno(adminId).subscribe({
-              next: (horarios: any[]) => {
-                const horariosHoy = horarios.filter((h: any) =>
-                  h.diaSemana?.toLowerCase() === diaHoy.toLowerCase()
-                );
-
-                if (horariosHoy.length === 0) {
-                  this.horarioHoy = null;
-                  this.franjaActiva = null;
-                  this.mostrarFormHorario = true;
-                  this.mostrarTarjetaAsistencia = true;
-                  return;
-                }
-
-                this.mostrarFormHorario = false;
-                horariosHoy.sort((a: any, b: any) => {
-                  const [aH, aM] = a.horaInicio.split(':').map(Number);
-                  const [bH, bM] = b.horaInicio.split(':').map(Number);
-                  return (aH * 60 + aM) - (bH * 60 + bM);
-                });
-
-                const activo = horariosHoy.find((h: any) => {
-                  const [hiH, hiM] = h.horaInicio.split(':').map(Number);
-                  const [hfH, hfM] = h.horaFin.split(':').map(Number);
-                  return horaActual >= (hiH * 60 + hiM) && horaActual <= (hfH * 60 + hfM);
-                });
-
-                if (activo) {
-                  this.horarioHoy = { horaInicio: activo.horaInicio, horaFin: activo.horaFin };
-                  this.franjaActiva = 'activa';
-                } else {
-                  const proximo = horariosHoy[0];
-                  this.horarioHoy = { horaInicio: proximo.horaInicio, horaFin: proximo.horaFin };
-                  this.franjaActiva = null;
-                }
-                this.mostrarTarjetaAsistencia = true;
-              },
-              error: () => {
-                this.horarioHoy = { horaInicio: '08:00', horaFin: '15:00' };
-                this.franjaActiva = 'activa';
-                this.mostrarTarjetaAsistencia = true;
-              }
-            });
+            this.asistenciaHoy = null;
+            this.mostrarTarjetaAsistencia = true;
+            this.cargarHorarioParaAdmin(adminId, diaHoy, horaActual);
           }
         });
       },
       error: () => {
-        // El administrador no tiene fila en alumno → ocultar tarjeta
         this.mostrarTarjetaAsistencia = false;
+      }
+    });
+  }
+
+  cargarHorarioParaAdmin(adminId: number, diaHoy: string, horaActual: number) {
+    this.alumnoService.getHorarioAlumno(adminId).subscribe({
+      next: (horarios: any[]) => {
+        const horariosHoy = horarios.filter((h: any) =>
+          h.diaSemana?.toLowerCase() === diaHoy.toLowerCase()
+        );
+
+        if (horariosHoy.length === 0) {
+          this.horarioHoy = null;
+          this.franjaActiva = null;
+          this.mostrarFormHorario = true;
+          return;
+        }
+
+        this.mostrarFormHorario = false;
+        horariosHoy.sort((a: any, b: any) => {
+          const [aH, aM] = a.horaInicio.split(':').map(Number);
+          const [bH, bM] = b.horaInicio.split(':').map(Number);
+          return (aH * 60 + aM) - (bH * 60 + bM);
+        });
+
+        const activo = horariosHoy.find((h: any) => {
+          const [hiH, hiM] = h.horaInicio.split(':').map(Number);
+          const [hfH, hfM] = h.horaFin.split(':').map(Number);
+          return horaActual >= (hiH * 60 + hiM) && horaActual <= (hfH * 60 + hfM);
+        });
+
+        if (activo) {
+          this.horarioHoy = { horaInicio: activo.horaInicio, horaFin: activo.horaFin };
+          this.franjaActiva = 'activa';
+        } else {
+          const proximo = horariosHoy[0];
+          this.horarioHoy = { horaInicio: proximo.horaInicio, horaFin: proximo.horaFin };
+          this.franjaActiva = null;
+        }
+      },
+      error: () => {
+        this.horarioHoy = { horaInicio: '08:00', horaFin: '15:00' };
+        this.franjaActiva = 'activa';
       }
     });
   }
@@ -317,26 +327,44 @@ export class HomeAdminPage implements OnInit {
 
     this.asistenciaService.fichar(this.adminIdReal).subscribe({
       next: async () => {
-        await this.mostrarToast('✅ Te has fichado correctamente', 'success');
-        this.isExiting = true;
-        setTimeout(() => this.mostrarTarjetaAsistencia = false, 500);
+        await this.mostrarToast('✅ Entrada registrada correctamente', 'success');
+        this.cargarHorarioYFichaje();
         this.cargarFichadosHoy();
       },
       error: async () => {
-        await this.mostrarToast('❌ Error al registrar el fichaje', 'danger');
+        await this.mostrarToast('❌ Error al registrar la entrada', 'danger');
       }
     });
   }
 
-  // ─────────────────────────────────────────────────────────────
-  // haFichadoHoy — FIX PRINCIPAL
-  // ─────────────────────────────────────────────────────────────
-  // ANTES: comparaba usuario.id contra Set de alumnoId → siempre false
+  async desfichar() {
+    if (!this.adminIdReal) return;
+
+    this.asistenciaService.ficharSalida(this.adminIdReal).subscribe({
+      next: async () => {
+        await this.mostrarToast('✅ Salida registrada correctamente. ¡Buen trabajo hoy! 🚀', 'success');
+        this.cargarHorarioYFichaje();
+        this.cargarFichadosHoy();
+      },
+      error: async (err) => {
+        const mensaje = err?.error?.message ?? 'Error al registrar la salida';
+        await this.mostrarToast(`❌ ${mensaje}`, 'danger');
+      }
+    });
+  }
+
+  
   // AHORA: convierte usuario.id → alumnoId usando el mapa y comprueba el Set
   haFichadoHoy(usuarioId: number): boolean {
     const alumnoId = this.usuarioIdToAlumnoId.get(usuarioId);
     if (alumnoId === undefined) return false;
     return this.fichadosHoyIds.has(alumnoId);
+  }
+
+  obtenerAsistenciaAlumno(usuarioId: number): AsistenciaDTO | null {
+    const alumnoId = this.usuarioIdToAlumnoId.get(usuarioId);
+    if (alumnoId === undefined) return null;
+    return this.fichadosHoyMap.get(alumnoId) || null;
   }
 
   // ─────────────────────────────────────────────────────────────

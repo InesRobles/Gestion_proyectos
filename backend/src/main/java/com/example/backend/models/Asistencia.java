@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -28,4 +29,13 @@ public class Asistencia {
 
     @Column(nullable = false)
     private Boolean presente = false;
+
+    @Column(name = "hora_entrada")
+    private LocalTime horaEntrada;
+
+    @Column(name = "hora_salida")
+    private LocalTime horaSalida;
+
+    @Column(name = "estado")
+    private String estado;
 }

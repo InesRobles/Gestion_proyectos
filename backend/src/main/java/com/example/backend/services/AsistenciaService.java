@@ -6,9 +6,12 @@ import com.example.backend.models.Asistencia;
 import com.example.backend.repositories.AsistenciaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,8 +47,26 @@ public class AsistenciaService {
                     Asistencia a = asistenciaMapper.toEntity(dto);
                     a.setFecha(LocalDate.now());
                     a.setPresente(true);
+                    a.setHoraEntrada(LocalTime.now());
+                    a.setEstado("FICHADO");
                     return asistenciaMapper.toDTO(asistenciaRepository.save(a));
                 });
+    }
+
+    public AsistenciaDTO registrarSalida(Long alumnoId) {
+        Asistencia asistencia = asistenciaRepository
+                .findByAlumnoIdAndFecha(alumnoId, LocalDate.now())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No hay fichaje de entrada para hoy"));
+
+        if (asistencia.getHoraSalida() != null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Ya has registrado la salida de hoy");
+        }
+
+        asistencia.setHoraSalida(LocalTime.now());
+        asistencia.setEstado("TERMINADO");
+        return asistenciaMapper.toDTO(asistenciaRepository.save(asistencia));
     }
 
     public Optional<AsistenciaDTO> findByAlumnoHoy(Long alumnoId) {

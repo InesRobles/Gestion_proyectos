@@ -32,6 +32,12 @@ public class AsistenciaController {
         return ResponseEntity.ok(asistenciaService.registrar(dto));
     }
 
+    // Fichar salida
+    @PatchMapping("/alumno/{alumnoId}/salida")
+    public ResponseEntity<AsistenciaDTO> registrarSalida(@PathVariable Long alumnoId) {
+        return ResponseEntity.ok(asistenciaService.registrarSalida(alumnoId));
+    }
+
     @GetMapping("/alumno/{alumnoId}/hoy")
     public ResponseEntity<AsistenciaDTO> findByAlumnoHoy(@PathVariable Long alumnoId) {
         return asistenciaService.findByAlumnoHoy(alumnoId)

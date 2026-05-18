@@ -5,11 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -24,4 +21,10 @@ public class AsistenciaDTO {
     private LocalDate fecha = LocalDate.now();
 
     private Boolean presente = false;
+
+    private LocalTime horaEntrada;
+
+    private LocalTime horaSalida;
+
+    private String estado;
 }

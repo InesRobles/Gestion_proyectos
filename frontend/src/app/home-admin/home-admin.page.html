@@ -76,14 +76,36 @@
             <div class="right-column">
               <div class="fichar-card" *ngIf="mostrarTarjetaAsistencia && !mostrarFormHorario">
                 <p class="instruction-text">Registra tu asistencia</p>
-                <ion-button class="fichar-button" (click)="fichar()" [disabled]="franjaActiva === null">
-                  <ion-icon name="log-in-outline" slot="start"></ion-icon>
-                  FICHAR ENTRADA
-                </ion-button>
-                <span class="fichar-hint" *ngIf="franjaActiva !== null">Haz clic para registrar tu entrada de hoy</span>
-                <span class="fichar-hint fichar-hint-warning" *ngIf="franjaActiva === null && horarioHoy">
-                  Podrás fichar entre las {{ horarioHoy.horaInicio }} y las {{ horarioHoy.horaFin }}
-                </span>
+
+                <!-- Si no ha fichado entrada -->
+                <ng-container *ngIf="!asistenciaHoy">
+                  <ion-button class="fichar-button" (click)="fichar()" [disabled]="franjaActiva === null">
+                    <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                    FICHAR ENTRADA
+                  </ion-button>
+                  <span class="fichar-hint" *ngIf="franjaActiva !== null">Haz clic para registrar tu entrada de hoy</span>
+                  <span class="fichar-hint fichar-hint-warning" *ngIf="franjaActiva === null && horarioHoy">
+                    Podrás fichar entre las {{ horarioHoy.horaInicio }} y las {{ horarioHoy.horaFin }}
+                  </span>
+                </ng-container>
+
+                <!-- Si ya fichó entrada pero no salida -->
+                <ng-container *ngIf="asistenciaHoy && !asistenciaHoy.horaSalida">
+                  <ion-button class="fichar-button" color="warning" (click)="desfichar()">
+                    <ion-icon name="log-out-outline" slot="start"></ion-icon>
+                    FICHAR SALIDA (DESFICHAR)
+                  </ion-button>
+                  <span class="fichar-hint">Entrada registrada a las {{ asistenciaHoy.horaEntrada ? (asistenciaHoy.horaEntrada | slice:0:5) : '--:--' }}. Haz clic para registrar tu salida de hoy.</span>
+                </ng-container>
+
+                <!-- Si ya fichó salida -->
+                <ng-container *ngIf="asistenciaHoy && asistenciaHoy.horaSalida">
+                  <div class="fichado-completado" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;">
+                    <ion-icon name="checkmark-done-circle" color="success" style="font-size: 36px;"></ion-icon>
+                    <span class="fichar-hint" style="color: var(--ion-color-success); font-weight: bold;">¡Buen trabajo! Asistencia completa hoy</span>
+                    <span class="fichar-hint">Entrada: {{ asistenciaHoy.horaEntrada ? (asistenciaHoy.horaEntrada | slice:0:5) : '--:--' }} | Salida: {{ asistenciaHoy.horaSalida ? (asistenciaHoy.horaSalida | slice:0:5) : '--:--' }}</span>
+                  </div>
+                </ng-container>
               </div>
 
               <div class="fichar-card" [class.masivo-standalone]="!mostrarTarjetaAsistencia || mostrarFormHorario">
@@ -140,9 +162,24 @@
               <div class="usuario-rol-badge" [ngClass]="'rol-' + u.rol?.toLowerCase()">
                 {{ u.rol }}
               </div>
-              <div *ngIf="u.rol?.toLowerCase() === 'alumno'" class="fichado-badge" [class.fichado-si]="haFichadoHoy(u.id)" [class.fichado-no]="!haFichadoHoy(u.id)">
-                <ion-icon [name]="haFichadoHoy(u.id) ? 'checkmark-outline' : 'close-outline'"></ion-icon>
-                {{ haFichadoHoy(u.id) ? 'Fichado' : 'Sin fichar' }}
+              <div *ngIf="u.rol?.toLowerCase() === 'alumno'" style="min-width: 145px; display: flex; align-items: center;">
+                <!-- 1. Sin fichar -->
+                <div *ngIf="!obtenerAsistenciaAlumno(u.id)" class="fichado-badge fichado-no">
+                  <ion-icon name="close-outline"></ion-icon>
+                  Sin fichar
+                </div>
+                
+                <!-- 2. Fichado (En curso): Tiene registro hoy pero no tiene hora de salida -->
+                <div *ngIf="obtenerAsistenciaAlumno(u.id) && !obtenerAsistenciaAlumno(u.id)?.horaSalida" class="fichado-badge" style="background: rgba(255, 196, 9, 0.12); color: #fcc409; border: 1px solid rgba(255, 196, 9, 0.25); display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">
+                  <ion-icon name="time-outline" style="font-size: 16px;"></ion-icon>
+                  Fichado ({{ obtenerAsistenciaAlumno(u.id)?.horaEntrada ? (obtenerAsistenciaAlumno(u.id)?.horaEntrada | slice:0:5) : '--:--' }})
+                </div>
+                
+                <!-- 3. Terminado: Tiene registro hoy y tiene hora de salida -->
+                <div *ngIf="obtenerAsistenciaAlumno(u.id) && obtenerAsistenciaAlumno(u.id)?.horaSalida" class="fichado-badge" style="background: rgba(45, 211, 111, 0.12); color: #2dd36f; border: 1px solid rgba(45, 211, 111, 0.25); display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap;">
+                  <ion-icon name="checkmark-done-circle" style="font-size: 16px; color: #2dd36f;"></ion-icon>
+                  Terminado ({{ obtenerAsistenciaAlumno(u.id)?.horaEntrada ? (obtenerAsistenciaAlumno(u.id)?.horaEntrada | slice:0:5) : '--:--' }} - {{ obtenerAsistenciaAlumno(u.id)?.horaSalida ? (obtenerAsistenciaAlumno(u.id)?.horaSalida | slice:0:5) : '--:--' }})
+                </div>
               </div>
               <div *ngIf="u.rol?.toLowerCase() !== 'alumno'" class="fichado-badge fichado-na">—</div>
               <div class="usuario-acciones">

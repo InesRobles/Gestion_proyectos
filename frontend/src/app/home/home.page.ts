@@ -11,7 +11,7 @@ import {
 import { addIcons } from 'ionicons';
 import {
   personCircle, closeOutline, exitOutline, timeOutline,
-  logInOutline, addCircleOutline, chatbubblesOutline,
+  logInOutline, logOutOutline, addCircleOutline, chatbubblesOutline,
   chatbubbleEllipsesOutline, send, statsChartOutline,
   listOutline, checkmarkDoneCircle, eyeOutline,
   peopleOutline, folderOpenOutline, searchOutline,
@@ -50,6 +50,7 @@ export class HomePage implements OnInit {
   mostrarTarjetaAsistencia = true;
   isExiting = false;
   nombreUsuario = '';
+  asistenciaHoy: any = null;
 
   // Horario del alumno para hoy
   horarioHoy: { horaInicio: string; horaFin: string } | null = null;
@@ -79,7 +80,7 @@ export class HomePage implements OnInit {
   constructor() {
     addIcons({
       personCircle, closeOutline, exitOutline, timeOutline,
-      logInOutline, addCircleOutline, chatbubblesOutline,
+      logInOutline, logOutOutline, addCircleOutline, chatbubblesOutline,
       chatbubbleEllipsesOutline, send, statsChartOutline,
       listOutline, checkmarkDoneCircle, eyeOutline,
       peopleOutline, folderOpenOutline, searchOutline,
@@ -90,14 +91,7 @@ export class HomePage implements OnInit {
   ngOnInit() {
     this.authService.sesion$.subscribe(sesion => {
       this.nombreUsuario = sesion?.nombreReal ?? 'Usuario';
-
-      if (sesion?.id) {
-        const ultimoFichaje = localStorage.getItem(`fechaFichaje_${sesion.id}`);
-        const hoy = new Date().toDateString();
-        this.mostrarTarjetaAsistencia = ultimoFichaje !== hoy;
-      } else {
-        this.mostrarTarjetaAsistencia = true;
-      }
+      this.mostrarTarjetaAsistencia = true;
     });
     this.cargarProyectos();
     this.cargarHorarioYFichaje();
@@ -129,100 +123,83 @@ export class HomePage implements OnInit {
 
         this.alumnoIdReal = alumnoId;
 
-        // Verificar si ya fichó hoy (404 del backend = no ha fichado aún)
+        // Verificar si ya fichó hoy
         this.asistenciaService.haFichadoHoy(alumnoId).subscribe({
-          next: () => {
-            // Ya fichó hoy → ocultar tarjeta
-            this.mostrarTarjetaAsistencia = false;
+          next: (asistencia) => {
+            this.asistenciaHoy = asistencia;
+            this.mostrarTarjetaAsistencia = true;
+            this.cargarHorarioParaAlumno(alumnoId, diaHoy, horaActual);
           },
           error: () => {
-            // No ha fichado → cargar horario
-            this.alumnoService.getHorarioAlumno(alumnoId).subscribe({
-              next: (horarios: any[]) => {
-                // ── CAMBIO PRINCIPAL ──────────────────────────────────────
-                // Si no tiene horario para hoy PERO sí tiene para otros días,
-                // creamos automáticamente el de hoy con esas mismas horas
-                // (así el formulario solo aparece la primera vez en la vida)
-                const horariosHoy = horarios.filter((h: any) =>
-                  h.diaSemana?.toLowerCase() === diaHoy.toLowerCase()
-                );
-
-                if (horariosHoy.length === 0) {
-                  if (horarios.length > 0) {
-                    // Tiene horario de otros días → autocompletar hoy
-                    const ref = horarios[0];
-                    this.alumnoService.crearHorario({
-                      alumnoId: alumnoId,
-                      diaSemana: diaHoy,
-                      horaInicio: ref.horaInicio,
-                      horaFin: ref.horaFin
-                    }).subscribe({
-                      next: () => this.cargarHorarioYFichaje(),
-                      error: () => {
-                        // Si falla el autocompletado, usamos las horas de referencia directamente
-                        this.horarioHoy = { horaInicio: ref.horaInicio, horaFin: ref.horaFin };
-                        this.franjaActiva = 'activa';
-                        this.mostrarTarjetaAsistencia = true;
-                      }
-                    });
-                    return;
-                  }
-
-                  // No tiene ningún horario → mostrar formulario (solo ocurre una vez)
-                  this.horarioHoy = null;
-                  this.franjaActiva = null;
-                  this.mostrarFormHorario = true;
-                  this.mostrarTarjetaAsistencia = true;
-                  return;
-                }
-                // ─────────────────────────────────────────────────────────
-
-                this.mostrarFormHorario = false;
-                horariosHoy.sort((a: any, b: any) => {
-                  const [aH, aM] = a.horaInicio.split(':').map(Number);
-                  const [bH, bM] = b.horaInicio.split(':').map(Number);
-                  return (aH * 60 + aM) - (bH * 60 + bM);
-                });
-
-                const activo = horariosHoy.find((h: any) => {
-                  const [hiH, hiM] = h.horaInicio.split(':').map(Number);
-                  const [hfH, hfM] = h.horaFin.split(':').map(Number);
-                  return horaActual >= (hiH * 60 + hiM) && horaActual <= (hfH * 60 + hfM);
-                });
-
-                if (activo) {
-                  this.horarioHoy = { horaInicio: activo.horaInicio, horaFin: activo.horaFin };
-                  this.franjaActiva = 'activa';
-                } else {
-                  const proximo = horariosHoy[0];
-                  this.horarioHoy = { horaInicio: proximo.horaInicio, horaFin: proximo.horaFin };
-                  this.franjaActiva = null;
-                }
-                this.mostrarTarjetaAsistencia = true;
-              },
-              error: () => {
-                // Error cargando horario → valores por defecto
-                this.horarioHoy = { horaInicio: '08:00', horaFin: '15:00' };
-                this.franjaActiva = 'activa';
-                this.mostrarTarjetaAsistencia = true;
-              }
-            });
+            this.asistenciaHoy = null;
+            this.mostrarTarjetaAsistencia = true;
+            this.cargarHorarioParaAlumno(alumnoId, diaHoy, horaActual);
           }
         });
       },
       error: async (err) => {
         console.warn('[WARN] getAlumnoByUsuarioId error:', err?.status, err?.message);
+        this.mostrarTarjetaAsistencia = false;
+      }
+    });
+  }
 
-        if (err?.status === 404) {
-          this.mostrarTarjetaAsistencia = false;
-        } else {
-          this.mostrarTarjetaAsistencia = false;
-          const toast = await this.toastController.create({
-            message: 'No se pudo cargar el perfil de alumno',
-            duration: 2500, color: 'warning', position: 'top'
-          });
-          await toast.present();
+  cargarHorarioParaAlumno(alumnoId: number, diaHoy: string, horaActual: number) {
+    this.alumnoService.getHorarioAlumno(alumnoId).subscribe({
+      next: (horarios: any[]) => {
+        const horariosHoy = horarios.filter((h: any) =>
+          h.diaSemana?.toLowerCase() === diaHoy.toLowerCase()
+        );
+
+        if (horariosHoy.length === 0) {
+          if (horarios.length > 0) {
+            const ref = horarios[0];
+            this.alumnoService.crearHorario({
+              alumnoId: alumnoId,
+              diaSemana: diaHoy,
+              horaInicio: ref.horaInicio,
+              horaFin: ref.horaFin
+            }).subscribe({
+              next: () => this.cargarHorarioYFichaje(),
+              error: () => {
+                this.horarioHoy = { horaInicio: ref.horaInicio, horaFin: ref.horaFin };
+                this.franjaActiva = 'activa';
+              }
+            });
+            return;
+          }
+
+          this.horarioHoy = null;
+          this.franjaActiva = null;
+          this.mostrarFormHorario = true;
+          return;
         }
+
+        this.mostrarFormHorario = false;
+        horariosHoy.sort((a: any, b: any) => {
+          const [aH, aM] = a.horaInicio.split(':').map(Number);
+          const [bH, bM] = b.horaInicio.split(':').map(Number);
+          return (aH * 60 + aM) - (bH * 60 + bM);
+        });
+
+        const activo = horariosHoy.find((h: any) => {
+          const [hiH, hiM] = h.horaInicio.split(':').map(Number);
+          const [hfH, hfM] = h.horaFin.split(':').map(Number);
+          return horaActual >= (hiH * 60 + hiM) && horaActual <= (hfH * 60 + hfM);
+        });
+
+        if (activo) {
+          this.horarioHoy = { horaInicio: activo.horaInicio, horaFin: activo.horaFin };
+          this.franjaActiva = 'activa';
+        } else {
+          const proximo = horariosHoy[0];
+          this.horarioHoy = { horaInicio: proximo.horaInicio, horaFin: proximo.horaFin };
+          this.franjaActiva = null;
+        }
+      },
+      error: () => {
+        this.horarioHoy = { horaInicio: '08:00', horaFin: '15:00' };
+        this.franjaActiva = 'activa';
       }
     });
   }
@@ -385,20 +362,47 @@ export class HomePage implements OnInit {
         }
 
         const toast = await this.toastController.create({
-          message: '✅ Te has fichado correctamente',
+          message: '✅ Entrada registrada correctamente',
           duration: 2000,
           position: 'top',
           color: 'success'
         });
         await toast.present();
 
-        this.isExiting = true;
-        setTimeout(() => (this.mostrarTarjetaAsistencia = false), 500);
+        this.cargarHorarioYFichaje();
       },
       error: async () => {
         const toast = await this.toastController.create({
-          message: '❌ Error al registrar el fichaje',
+          message: '❌ Error al registrar la entrada',
           duration: 2000,
+          position: 'top',
+          color: 'danger'
+        });
+        await toast.present();
+      }
+    });
+  }
+
+  async desfichar() {
+    if (!this.alumnoIdReal) return;
+
+    this.asistenciaService.ficharSalida(this.alumnoIdReal).subscribe({
+      next: async () => {
+        const toast = await this.toastController.create({
+          message: '✅ Salida registrada correctamente. ¡Buen trabajo hoy! 🚀',
+          duration: 2000,
+          position: 'top',
+          color: 'success'
+        });
+        await toast.present();
+
+        this.cargarHorarioYFichaje();
+      },
+      error: async (err) => {
+        const mensaje = err?.error?.message ?? 'Error al registrar la salida';
+        const toast = await this.toastController.create({
+          message: `❌ ${mensaje}`,
+          duration: 2500,
           position: 'top',
           color: 'danger'
         });

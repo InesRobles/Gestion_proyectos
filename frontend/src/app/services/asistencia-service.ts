@@ -8,6 +8,9 @@ export interface AsistenciaDTO {
   alumnoId: number;
   fecha?: string;
   presente?: boolean;
+  horaEntrada?: string;
+  horaSalida?: string;
+  estado?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -17,6 +20,10 @@ export class AsistenciaService {
 
   fichar(alumnoId: number): Observable<AsistenciaDTO> {
     return this.http.post<AsistenciaDTO>(`${this.api.apiUrl}/asistencia`, { alumnoId });
+  }
+
+  ficharSalida(alumnoId: number): Observable<AsistenciaDTO> {
+    return this.http.patch<AsistenciaDTO>(`${this.api.apiUrl}/asistencia/alumno/${alumnoId}/salida`, {});
   }
 
   haFichadoHoy(alumnoId: number): Observable<AsistenciaDTO> {
