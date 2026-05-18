@@ -5,6 +5,7 @@
     <div class="content-container">
       <ion-grid>
         <ion-row>
+
           <!-- ── COLUMNA IZQUIERDA: tarjeta de perfil ── -->
           <ion-col size="12" size-lg="4">
             <ion-card class="interactive-card profile-main-card">
@@ -21,11 +22,10 @@
                 <ion-card-subtitle>{{ userData.rol | titlecase }}</ion-card-subtitle>
               </ion-card-header>
               <ion-card-content>
-                <div style="text-align:center; margin-bottom: 8px;"></div>
                 <div class="user-stats">
                   <div class="stat-item">
                     <span class="stat-value">{{ numProyectos }}</span>
-                    <span class="stat-label">Proyectos inscrito</span>
+                    <span class="stat-label">Proyectos inscritos</span>
                   </div>
                   <div class="stat-item">
                     <span class="stat-value">
@@ -47,6 +47,8 @@
 
           <!-- ── COLUMNA DERECHA: configuración ── -->
           <ion-col size="12" size-lg="8">
+
+            <!-- CONFIGURACIÓN DE CUENTA -->
             <ion-card class="interactive-card info-card">
               <ion-card-header>
                 <div class="card-header-flex">
@@ -88,43 +90,79 @@
                         </select>
                       </div>
                     </ion-col>
-
-                    <!-- ── PROYECTOS: fila completa ── -->
-                    <ion-col size="12">
-                      <ion-card class="interactive-card proyectos-card">
-                        <ion-card-header>
-                          <ion-card-title>
-                            <ion-icon name="folder-open-outline" style="vertical-align:middle; margin-right:8px;"></ion-icon>
-                            Proyectos activos
-                          </ion-card-title>
-                        </ion-card-header>
-
-                        <ion-card-content>
-                          <div class="proyectos-empty" *ngIf="proyectosActivos.length === 0">
-                            <ion-icon name="folder-open-outline"></ion-icon>
-                            <p>No tienes proyectos activos en este momento.</p>
-                          </div>
-                          <div class="proyectos-grid" *ngIf="proyectosActivos.length > 0">
-                            <div class="proyecto-mini-card" *ngFor="let p of proyectosActivos">
-                              <div class="proyecto-mini-header">
-                                <div class="proyecto-mini-icon">
-                                  <ion-icon name="briefcase-outline"></ion-icon>
-                                </div>
-                                <div class="proyecto-mini-badge">En curso</div>
-                              </div>
-                              <div class="proyecto-mini-titulo">{{ p.titulo }}</div>
-                              <div class="proyecto-mini-desc">{{ p.descripcion | slice:0:60 }}{{ p.descripcion.length > 60 ? '...' : '' }}</div>
-                              <div class="proyecto-mini-footer">
-                                <ion-icon name="people-outline"></ion-icon>
-                                <span>{{ p.cupoMaximo - p.cuposDisponibles }} / {{ p.cupoMaximo }} miembros</span>
-                              </div>
-                            </div>
-                          </div>
-                        </ion-card-content>
-                      </ion-card>
-                    </ion-col>
                   </ion-row>
                 </ion-list>
+
+                <!-- ── HORARIO ── -->
+                <div class="horario-section" *ngIf="alumnoIdReal">
+                  <div class="section-header">
+                    <ion-icon name="time-outline"></ion-icon>
+                    <span>Mi Horario</span>
+                  </div>
+                  <p class="section-subtitle">
+                    Horario actual:
+                    <strong *ngIf="horariosActuales.length > 0">{{ horariosActuales[0].horaInicio }} – {{ horariosActuales[0].horaFin }}</strong>
+                    <strong *ngIf="horariosActuales.length === 0">No configurado</strong>
+                  </p>
+                  <div class="horario-inputs">
+                    <div class="horario-field">
+                      <label class="horario-label">Hora de entrada</label>
+                      <input
+                        type="time"
+                        [(ngModel)]="nuevoHorario.horaInicio"
+                        class="horario-input" />
+                    </div>
+                    <div class="horario-sep">→</div>
+                    <div class="horario-field">
+                      <label class="horario-label">Hora de salida</label>
+                      <input
+                        type="time"
+                        [(ngModel)]="nuevoHorario.horaFin"
+                        class="horario-input" />
+                    </div>
+                    <ion-button
+                      class="login-button horario-btn"
+                      (click)="actualizarHorario()"
+                      [disabled]="guardandoHorario">
+                      <ion-icon name="save-outline" slot="start"></ion-icon>
+                      {{ guardandoHorario ? 'Guardando...' : 'Guardar' }}
+                    </ion-button>
+                  </div>
+                </div>
+
+                <!-- ── PROYECTOS ── -->
+                <ion-col size="12" style="padding: 0; margin-top: 16px;">
+                  <ion-card class="interactive-card proyectos-card">
+                    <ion-card-header>
+                      <ion-card-title>
+                        <ion-icon name="folder-open-outline" style="vertical-align:middle; margin-right:8px;"></ion-icon>
+                        Proyectos activos
+                      </ion-card-title>
+                    </ion-card-header>
+                    <ion-card-content>
+                      <div class="proyectos-empty" *ngIf="proyectosActivos.length === 0">
+                        <ion-icon name="folder-open-outline"></ion-icon>
+                        <p>No tienes proyectos activos en este momento.</p>
+                      </div>
+                      <div class="proyectos-grid" *ngIf="proyectosActivos.length > 0">
+                        <div class="proyecto-mini-card" *ngFor="let p of proyectosActivos">
+                          <div class="proyecto-mini-header">
+                            <div class="proyecto-mini-icon">
+                              <ion-icon name="briefcase-outline"></ion-icon>
+                            </div>
+                            <div class="proyecto-mini-badge">En curso</div>
+                          </div>
+                          <div class="proyecto-mini-titulo">{{ p.titulo }}</div>
+                          <div class="proyecto-mini-desc">{{ p.descripcion | slice:0:60 }}{{ p.descripcion.length > 60 ? '...' : '' }}</div>
+                          <div class="proyecto-mini-footer">
+                            <ion-icon name="people-outline"></ion-icon>
+                            <span>{{ p.cupoMaximo - p.cuposDisponibles }} / {{ p.cupoMaximo }} miembros</span>
+                          </div>
+                        </div>
+                      </div>
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
 
                 <div class="action-footer">
                   <div class="main-actions">
@@ -145,7 +183,6 @@
               <ion-card-header>
                 <ion-card-title>Gestionar Modalidades</ion-card-title>
               </ion-card-header>
-
               <ion-card-content>
                 <ion-row class="ion-align-items-center" style="margin-bottom: 16px;">
                   <ion-col>
@@ -165,11 +202,10 @@
                     </ion-button>
                   </ion-col>
                 </ion-row>
-
                 <ion-list lines="full">
                   <ion-item *ngFor="let m of modalidades">
                     <ion-label>{{ m.nombre }}</ion-label>
-                    <ion-button slot="end" fill="clear" color="danger" (click)="eliminarModalidad(m.id)" title="Eliminar modalidad">
+                    <ion-button slot="end" fill="clear" color="danger" (click)="eliminarModalidad(m.id)">
                       <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                     </ion-button>
                   </ion-item>
@@ -211,7 +247,6 @@
               <p>{{ securityData.ultimaConexion }}</p>
             </ion-label>
           </ion-item>
-
           <ion-item>
             <ion-icon name="shield-checkmark-outline" slot="start" color="medium"></ion-icon>
             <ion-label>
@@ -220,7 +255,6 @@
             </ion-label>
             <ion-toggle slot="end" [checked]="securityData.dosPasosActivo" (ionChange)="securityData.dosPasosActivo = $event.detail.checked"></ion-toggle>
           </ion-item>
-
           <ion-item>
             <ion-icon name="desktop-outline" slot="start" color="medium"></ion-icon>
             <ion-label>
@@ -243,7 +277,6 @@
               placeholder="••••••••">
             </ion-input>
           </ion-item>
-
           <ion-item class="custom-input">
             <ion-input
               label="Nueva Contraseña"
@@ -254,7 +287,6 @@
               placeholder="Mínimo 6 caracteres">
             </ion-input>
           </ion-item>
-
           <ion-item class="custom-input">
             <ion-input
               label="Confirmar Nueva Contraseña"

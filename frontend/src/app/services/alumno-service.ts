@@ -36,4 +36,9 @@ export class AlumnoService {
   crearHorario(horario: { alumnoId: number; diaSemana: string; horaInicio: string; horaFin: string }): Observable<any> {
     return this.http.post<any>(`${this.apiService.apiUrl}/horario`, horario);
   }
+
+  // Elimina un horario concreto por su id
+  deleteHorario(horarioId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiService.apiUrl}/horario/${horarioId}`);
+  }
 }

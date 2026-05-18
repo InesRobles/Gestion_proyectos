@@ -19,7 +19,10 @@ import { UsuarioService } from '../services/usuario-service';
 import { CambioPasswordDTO } from '../services/usuario-service';
 import { ModalidadService } from '../services/modalidad-service';
 import { ProyectoService } from '../services/proyecto-service';
+import { AlumnoService } from '../services/alumno-service';
 import { proyecto } from '../modelos/proyecto';
+import { forkJoin } from 'rxjs';
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -44,6 +47,13 @@ export class ProfilePage implements OnInit {
   modalidades: { id: number; nombre: string }[] = [];
   modalidadIdSeleccionada: number | null = null;
   nuevaModalidadNombre = '';
+
+  // ── HORARIO ──────────────────────────────────────────────────
+  alumnoIdReal: number | null = null;
+  horariosActuales: any[] = [];           // horarios cargados de BD
+  nuevoHorario = { horaInicio: '', horaFin: '' };
+  guardandoHorario = false;
+  // ─────────────────────────────────────────────────────────────
 
   userData = {
     nombre_real: '',
@@ -71,10 +81,11 @@ export class ProfilePage implements OnInit {
     private usuarioService: UsuarioService,
     private modalidadService: ModalidadService,
     private proyectoService: ProyectoService,
+    private alumnoService: AlumnoService,
   ) {
     addIcons({
       personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline,
-      timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline,  folderOpenOutline, briefcaseOutline, peopleOutline
+      timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline, folderOpenOutline, briefcaseOutline, peopleOutline
     });
   }
 
@@ -113,31 +124,101 @@ export class ProfilePage implements OnInit {
         if (!this.fotoUrl && (usuario as any).fotoUsuario) {
           this.fotoUrl = (usuario as any).fotoUsuario;
         }
-        // Total de proyectos inscritos (para el contador del perfil)
+
         this.proyectoService.getProyectosPorAlumno(sesion.id).subscribe({
-          next: (proyectos) => {
-            this.numProyectos = proyectos.length;
-          },
-          error: () => {
-            this.numProyectos = 0;
-          }
+          next: (proyectos) => { this.numProyectos = proyectos.length; },
+          error: () => { this.numProyectos = 0; }
         });
 
-// Proyectos activos con cupos en tiempo real (va directo a la tabla de proyectos)
         this.proyectoService.getProyectosActivos(sesion.id).subscribe({
-          next: (proyectos) => {
-            this.proyectosActivos = proyectos;
-          },
-          error: () => {
-            this.proyectosActivos = [];
-          }
+          next: (proyectos) => { this.proyectosActivos = proyectos; },
+          error: () => { this.proyectosActivos = []; }
         });
       },
       error: () => {
         this.presentToast('No se pudieron cargar todos los datos del perfil', 'warning');
       }
-
     });
+
+    // Cargar alumnoId y horario actual
+    this.alumnoService.getAlumnoByUsuarioId(sesion.id).subscribe({
+      next: (alumno: any) => {
+        const alumnoId: number = alumno.alumnoId ?? alumno.id;
+        if (!alumnoId) return;
+        this.alumnoIdReal = alumnoId;
+        this.cargarHorarios(alumnoId);
+      },
+      error: () => {} // usuario sin perfil alumno → sección horario no se muestra
+    });
+  }
+
+  // ──────────────────────────────────────────────
+  // HORARIO
+  // ──────────────────────────────────────────────
+
+  cargarHorarios(alumnoId: number): void {
+    this.alumnoService.getHorarioAlumno(alumnoId).subscribe({
+      next: (horarios) => {
+        this.horariosActuales = horarios;
+        // Pre-rellenar el formulario con el horario existente (si tiene)
+        if (horarios.length > 0) {
+          this.nuevoHorario.horaInicio = horarios[0].horaInicio;
+          this.nuevoHorario.horaFin = horarios[0].horaFin;
+        }
+      },
+      error: () => { this.horariosActuales = []; }
+    });
+  }
+
+  async actualizarHorario(): Promise<void> {
+    if (!this.alumnoIdReal || !this.nuevoHorario.horaInicio || !this.nuevoHorario.horaFin) {
+      await this.presentToast('Rellena la hora de entrada y de salida', 'warning');
+      return;
+    }
+
+    this.guardandoHorario = true;
+
+    // 1. Borrar todos los horarios actuales
+    const borrados = this.horariosActuales.map(h =>
+      this.alumnoService.deleteHorario(h.id)
+    );
+
+    const guardarNuevos = () => {
+      const diasLaborables = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+      const creaciones = diasLaborables.map(dia =>
+        this.alumnoService.crearHorario({
+          alumnoId: this.alumnoIdReal!,
+          diaSemana: dia,
+          horaInicio: this.nuevoHorario.horaInicio,
+          horaFin: this.nuevoHorario.horaFin
+        })
+      );
+
+      forkJoin(creaciones).subscribe({
+        next: async () => {
+          this.guardandoHorario = false;
+          this.cargarHorarios(this.alumnoIdReal!);
+          await this.presentToast('Horario actualizado correctamente', 'success');
+        },
+        error: async () => {
+          this.guardandoHorario = false;
+          await this.presentToast('Error al guardar el nuevo horario', 'danger');
+        }
+      });
+    };
+
+    if (borrados.length > 0) {
+      forkJoin(borrados).subscribe({
+        next: () => guardarNuevos(),
+        error: async () => {
+          // Si algún borrado falla, intentamos igualmente crear los nuevos
+          guardarNuevos();
+        }
+      });
+    } else {
+      // No había horarios previos → crear directamente
+      guardarNuevos();
+    }
   }
 
   // ──────────────────────────────────────────────
@@ -175,7 +256,6 @@ export class ProfilePage implements OnInit {
     this.modalidadService.eliminarModalidad(id).subscribe({
       next: () => {
         this.modalidades = this.modalidades.filter(m => m.id !== id);
-        // Si el alumno tenía esa modalidad seleccionada, limpiarla
         if (this.modalidadIdSeleccionada === id) {
           this.modalidadIdSeleccionada = null;
         }

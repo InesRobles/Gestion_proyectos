@@ -25,7 +25,7 @@ import { AuthService } from '../services/auth-service';
 import { AsistenciaService } from '../services/asistencia-service';
 import { inject } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import {RouterLink} from "@angular/router";
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -55,12 +55,12 @@ export class HomePage implements OnInit {
   horarioHoy: { horaInicio: string; horaFin: string } | null = null;
   franjaActiva: 'activa' | null = null;
 
-  // Formulario para añadir horario cuando no tiene
+  // Formulario para añadir horario cuando no tiene NINGUNO guardado
   mostrarFormHorario = false;
   guardandoHorario = false;
   alumnoIdReal: number | null = null;
-  formHorario = { diaSemana: '', horaInicio: '', horaFin: '' };
-  diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  // Ya no necesita diaSemana: se guarda para todos los días laborables de golpe
+  formHorario = { horaInicio: '', horaFin: '' };
 
   // Proyectos
   misProyectos: proyecto[] = [];
@@ -117,27 +117,17 @@ export class HomePage implements OnInit {
 
     this.alumnoService.getAlumnoByUsuarioId(sesion.id).subscribe({
       next: (alumno: any) => {
-
-        // ── FIX: el backend puede devolver el id del alumno en distintos
-        //         campos según cómo esté mapeada la entidad.
-        //         Probamos alumnoId primero (por si devuelve un DTO con ese campo)
-        //         y si no existe usamos id (objeto alumno directo).
-        //
-        // 👉 Abre la consola del navegador y comprueba el log de abajo.
-        //    Verás exactamente qué devuelve el backend y podrás ajustar si hace falta.
         console.log('[DEBUG] Respuesta getAlumnoByUsuarioId:', JSON.stringify(alumno));
 
         const alumnoId: number = alumno.alumnoId ?? alumno.id;
 
         if (!alumnoId) {
-          // El backend devolvió algo pero sin id reconocible → no mostrar tarjeta
           console.warn('[WARN] No se pudo determinar el alumnoId del usuario', sesion.id);
           this.mostrarTarjetaAsistencia = false;
           return;
         }
 
         this.alumnoIdReal = alumnoId;
-        this.formHorario.diaSemana = diaHoy;
 
         // Verificar si ya fichó hoy (404 del backend = no ha fichado aún)
         this.asistenciaService.haFichadoHoy(alumnoId).subscribe({
@@ -146,21 +136,46 @@ export class HomePage implements OnInit {
             this.mostrarTarjetaAsistencia = false;
           },
           error: () => {
-            // No ha fichado → cargar horario para ver si puede fichar
+            // No ha fichado → cargar horario
             this.alumnoService.getHorarioAlumno(alumnoId).subscribe({
               next: (horarios: any[]) => {
+                // ── CAMBIO PRINCIPAL ──────────────────────────────────────
+                // Si no tiene horario para hoy PERO sí tiene para otros días,
+                // creamos automáticamente el de hoy con esas mismas horas
+                // (así el formulario solo aparece la primera vez en la vida)
                 const horariosHoy = horarios.filter((h: any) =>
                   h.diaSemana?.toLowerCase() === diaHoy.toLowerCase()
                 );
 
                 if (horariosHoy.length === 0) {
-                  // Sin horario → mostrar formulario para añadirlo
+                  if (horarios.length > 0) {
+                    // Tiene horario de otros días → autocompletar hoy
+                    const ref = horarios[0];
+                    this.alumnoService.crearHorario({
+                      alumnoId: alumnoId,
+                      diaSemana: diaHoy,
+                      horaInicio: ref.horaInicio,
+                      horaFin: ref.horaFin
+                    }).subscribe({
+                      next: () => this.cargarHorarioYFichaje(),
+                      error: () => {
+                        // Si falla el autocompletado, usamos las horas de referencia directamente
+                        this.horarioHoy = { horaInicio: ref.horaInicio, horaFin: ref.horaFin };
+                        this.franjaActiva = 'activa';
+                        this.mostrarTarjetaAsistencia = true;
+                      }
+                    });
+                    return;
+                  }
+
+                  // No tiene ningún horario → mostrar formulario (solo ocurre una vez)
                   this.horarioHoy = null;
                   this.franjaActiva = null;
                   this.mostrarFormHorario = true;
                   this.mostrarTarjetaAsistencia = true;
                   return;
                 }
+                // ─────────────────────────────────────────────────────────
 
                 this.mostrarFormHorario = false;
                 horariosHoy.sort((a: any, b: any) => {
@@ -186,7 +201,7 @@ export class HomePage implements OnInit {
                 this.mostrarTarjetaAsistencia = true;
               },
               error: () => {
-                // Error cargando horario → valores por defecto para no bloquear al usuario
+                // Error cargando horario → valores por defecto
                 this.horarioHoy = { horaInicio: '08:00', horaFin: '15:00' };
                 this.franjaActiva = 'activa';
                 this.mostrarTarjetaAsistencia = true;
@@ -196,16 +211,11 @@ export class HomePage implements OnInit {
         });
       },
       error: async (err) => {
-        // ── FIX usuario nuevo: si no tiene registro de alumno (404)
-        //    ocultamos la tarjeta de asistencia en vez de mostrar error roto.
-        //    Si el error es otro, mostramos un toast informativo.
         console.warn('[WARN] getAlumnoByUsuarioId error:', err?.status, err?.message);
 
         if (err?.status === 404) {
-          // Usuario sin perfil de alumno → no mostrar sección de fichaje
           this.mostrarTarjetaAsistencia = false;
         } else {
-          // Error de red u otro → tampoco mostramos la tarjeta rota
           this.mostrarTarjetaAsistencia = false;
           const toast = await this.toastController.create({
             message: 'No se pudo cargar el perfil de alumno',
@@ -218,13 +228,12 @@ export class HomePage implements OnInit {
   }
 
   // ─────────────────────────────────────────────────────────────
-  // GUARDAR HORARIO
+  // GUARDAR HORARIO (primera vez — guarda lunes a viernes de golpe)
   // ─────────────────────────────────────────────────────────────
   async guardarHorario() {
-    if (!this.alumnoIdReal || !this.formHorario.diaSemana ||
-      !this.formHorario.horaInicio || !this.formHorario.horaFin) {
+    if (!this.alumnoIdReal || !this.formHorario.horaInicio || !this.formHorario.horaFin) {
       const toast = await this.toastController.create({
-        message: 'Rellena todos los campos del horario',
+        message: 'Rellena la hora de entrada y salida',
         duration: 2000, color: 'warning', position: 'top'
       });
       await toast.present();
@@ -233,18 +242,21 @@ export class HomePage implements OnInit {
 
     this.guardandoHorario = true;
 
-    const payload = {
-      alumnoId: this.alumnoIdReal,
-      diaSemana: this.formHorario.diaSemana,
-      horaInicio: this.formHorario.horaInicio,
-      horaFin: this.formHorario.horaFin
-    };
+    const diasLaborables = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    const peticiones = diasLaborables.map(dia =>
+      this.alumnoService.crearHorario({
+        alumnoId: this.alumnoIdReal!,
+        diaSemana: dia,
+        horaInicio: this.formHorario.horaInicio,
+        horaFin: this.formHorario.horaFin
+      })
+    );
 
-    this.alumnoService.crearHorario(payload).subscribe({
+    forkJoin(peticiones).subscribe({
       next: async () => {
         this.guardandoHorario = false;
         const toast = await this.toastController.create({
-          message: '✅ Horario guardado correctamente',
+          message: '✅ Horario guardado para toda la semana',
           duration: 2000, color: 'success', position: 'top'
         });
         await toast.present();
@@ -363,7 +375,6 @@ export class HomePage implements OnInit {
   async fichar() {
     if (!this.alumnoIdReal) return;
 
-    // Obtenemos la sesión para el localStorage
     const sesion = this.authService.obtenerSesion();
 
     this.asistenciaService.fichar(this.alumnoIdReal).subscribe({

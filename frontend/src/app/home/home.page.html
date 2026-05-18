@@ -41,12 +41,7 @@
                     <span>No tienes horario para hoy. Añade uno:</span>
                   </div>
                   <div class="horario-form-fields">
-                    <div class="form-field">
-                      <label class="form-label">Día</label>
-                      <select class="form-select" [(ngModel)]="formHorario.diaSemana">
-                        <option *ngFor="let dia of diasSemana" [value]="dia">{{ dia }}</option>
-                      </select>
-                    </div>
+
                     <div class="form-field">
                       <label class="form-label">Hora inicio</label>
                       <input type="time" class="form-input-time" [(ngModel)]="formHorario.horaInicio" />

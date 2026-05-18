@@ -361,3 +361,78 @@ ion-content {
 
   ion-icon { font-size: 1rem; }
 }
+
+.horario-section {
+  margin: 20px 0 8px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f4ff 0%, #f0e8ff 100%);
+  border-radius: 16px;
+  border: 1px solid #e5d8f8;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #764ba2;
+  margin-bottom: 6px;
+
+  ion-icon { font-size: 1.2rem; }
+}
+
+.section-subtitle {
+  font-size: 0.82rem;
+  color: #9a85b0;
+  margin: 0 0 16px;
+}
+
+.horario-inputs {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.horario-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.horario-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #764ba2;
+  letter-spacing: 0.02em;
+}
+
+.horario-input {
+  border: 1.5px solid #e0d6f0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  background: white;
+  color: #2d1f3d;
+  outline: none;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.12);
+  }
+}
+
+.horario-sep {
+  font-size: 1.2rem;
+  color: #a084c0;
+  padding-bottom: 8px;
+}
+
+.horario-btn {
+  --height: 42px;
+  --border-radius: 10px;
+  margin: 0;
+  align-self: flex-end;
+}
