@@ -273,8 +273,8 @@
                           style="--background: #f4f7fe; margin-bottom: 8px; --border-radius: 8px;">
                   <ion-icon name="person-circle" slot="start" color="primary" style="font-size: 28px; margin-inline-end: 12px;"></ion-icon>
                   <ion-label>
-                    <h3 style="margin: 0; font-weight: 600; color: #2d1f3d;">{{ alumno.nombre }} {{ alumno.apellidos || '' }}</h3>
-                    <p style="margin: 2px 0 0 0; font-size: 0.85em; color: #764ba2;">{{ alumno.correo || 'Sin correo especificado' }}</p>
+                    <h3 style="margin: 0; font-weight: 600; color: #2d1f3d;">{{ alumno.nombreReal }}</h3>
+                    <p style="margin: 2px 0 0 0; font-size: 0.85em; color: #764ba2;">@{{ alumno.nombreUsuario }}</p>
                   </ion-label>
                 </ion-item>
               </ion-list>
