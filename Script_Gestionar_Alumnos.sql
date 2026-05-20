@@ -130,6 +130,30 @@ CREATE TABLE IF NOT EXISTS registro_actividad (
 );
 
 -- =========================================
+-- TABLA TAREAS DE PROYECTO
+-- =========================================
+CREATE TABLE IF NOT EXISTS tarea_proyecto (
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    proyecto_id  INT NOT NULL,
+    titulo       VARCHAR(200) NOT NULL,
+    orden        INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (proyecto_id) REFERENCES proyecto(id) ON DELETE CASCADE
+);
+
+-- =========================================
+-- TABLA PROGRESO ALUMNO POR TAREA
+-- Cada alumno tiene su propio estado por tarea
+-- =========================================
+CREATE TABLE IF NOT EXISTS tarea_completada (
+    id        INT AUTO_INCREMENT PRIMARY KEY,
+    tarea_id  INT NOT NULL,
+    alumno_id INT NOT NULL,
+    completada TINYINT(1) NOT NULL DEFAULT 0,
+    UNIQUE KEY uq_tarea_alumno (tarea_id, alumno_id),
+    FOREIGN KEY (tarea_id)  REFERENCES tarea_proyecto(id) ON DELETE CASCADE,
+    FOREIGN KEY (alumno_id) REFERENCES alumno(id)         ON DELETE CASCADE
+);
+-- =========================================
 -- INSERCIÓN DE DATOS
 -- =========================================
 
