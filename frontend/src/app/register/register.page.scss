@@ -102,3 +102,98 @@ ion-note {
     color: #667eea;
   }
 }
+
+// ==================== DARK MODE OVERRIDES ====================
+:host-context(body.ion-palette-dark) {
+
+  .login-wrapper {
+    background: linear-gradient(135deg, #0b0d17 0%, #151832 40%, #1a1040 70%, #0e1023 100%);
+  }
+
+  .interactive-card {
+    background: rgba(20, 22, 40, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+      0 24px 48px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow:
+        0 32px 64px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .form-section {
+    ion-card-title {
+      color: #eceef6;
+      letter-spacing: 2px;
+    }
+  }
+
+  .custom-input {
+    .input-label {
+      color: #818cf8;
+    }
+
+    ion-input.styled-input {
+      --background: rgba(255, 255, 255, 0.04);
+      --color: #e2e4f0;
+      --placeholder-color: #5a5e78;
+      border-color: rgba(255, 255, 255, 0.08);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+
+      &:focus-within {
+        border-color: #818cf8;
+        box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+        --background: rgba(129, 140, 248, 0.05);
+      }
+    }
+  }
+
+  .register-button {
+    --background: linear-gradient(135deg, #667eea 0%, #818cf8 50%, #a78bfa 100%);
+    --box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  }
+
+  .logo-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle at center, rgba(129, 140, 248, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: registerGlow 4s ease-in-out infinite alternate;
+    }
+  }
+
+  .img-register-large {
+    color: #818cf8;
+    filter: drop-shadow(0 0 20px rgba(129, 140, 248, 0.25));
+    position: relative;
+    z-index: 1;
+  }
+
+  ion-note {
+    color: #7b7f99;
+
+    &:hover {
+      color: #a78bfa;
+      filter: brightness(1.1);
+    }
+  }
+}
+
+@keyframes registerGlow {
+  from { opacity: 0.5; transform: scale(0.95); }
+  to   { opacity: 1;   transform: scale(1.05); }
+}

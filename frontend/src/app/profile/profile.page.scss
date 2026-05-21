@@ -436,3 +436,228 @@ ion-content {
   margin: 0;
   align-self: flex-end;
 }
+
+// ── Dark mode toggle ─────────────────────────────────────────
+.dark-mode-toggle-section {
+  margin: 16px 10px 8px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #f8f4ff 0%, #f0e8ff 100%);
+  border-radius: 16px;
+  border: 1px solid #e5d8f8;
+  transition: background 0.35s ease, border-color 0.35s ease;
+}
+
+.dark-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dark-mode-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(118, 75, 162, 0.12);
+  transition: background 0.35s ease, transform 0.35s ease;
+
+  ion-icon {
+    font-size: 1.3rem;
+    color: #764ba2;
+    transition: color 0.35s ease, transform 0.35s ease;
+  }
+
+  &.active {
+    background: rgba(102, 126, 234, 0.2);
+    transform: rotate(-15deg);
+
+    ion-icon {
+      color: #667eea;
+      transform: rotate(15deg);
+    }
+  }
+}
+
+.dark-mode-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.dark-mode-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #2d1f3d;
+  transition: color 0.35s ease;
+}
+
+.dark-mode-subtitle {
+  font-size: 0.75rem;
+  color: #9a85b0;
+  transition: color 0.35s ease;
+}
+
+// ── DARK MODE OVERRIDES ──────────────────────────────────────
+:host-context(body.ion-palette-dark) {
+
+  ion-content {
+    --background: #1a1225;
+  }
+
+  .interactive-card {
+    background: #241a33;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .profile-main-card {
+    .profile-avatar-container .avatar-big {
+      background: #2d1f3d;
+      border-color: #2d1f3d;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  ion-card-title {
+    color: #e8dff2 !important;
+  }
+
+  ion-card-subtitle {
+    color: #a084c0 !important;
+  }
+
+  .user-stats {
+    background: linear-gradient(135deg, #2d1f3d 0%, #362550 100%);
+    .stat-item .stat-label { color: #9a85b0; }
+  }
+
+  .dark-mode-toggle-section {
+    background: linear-gradient(135deg, #2d1f3d 0%, #362550 100%);
+    border-color: #4a3660;
+  }
+
+  .dark-mode-title { color: #e8dff2; }
+  .dark-mode-subtitle { color: #9a85b0; }
+
+  .dark-mode-icon-wrapper {
+    background: rgba(102, 126, 234, 0.18);
+    &.active {
+      background: rgba(102, 126, 234, 0.28);
+    }
+    ion-icon { color: #a1b4fd; }
+  }
+
+  .custom-input {
+    --background: #2d1f3d;
+    border-color: #4a3660;
+    --color: #e8dff2;
+    --placeholder-color: #7a6d8a;
+
+    ion-input {
+      --color: #e8dff2;
+      --placeholder-color: #7a6d8a;
+    }
+
+    &:focus-within {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.18);
+    }
+  }
+
+  .info-card {
+    ion-card-header ion-card-title {
+      background: linear-gradient(135deg, #a1b4fd, #c4a7e7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    ion-label, .label-stacked {
+      color: #c4a7e7 !important;
+    }
+
+    ion-list { background: transparent; }
+
+    ion-item {
+      --background: transparent;
+      --color: #e8dff2;
+    }
+  }
+
+  .card-header-flex {
+    border-image: linear-gradient(135deg, #667eea, #a084c0) 1;
+  }
+
+  .horario-section {
+    background: linear-gradient(135deg, #2d1f3d 0%, #362550 100%);
+    border-color: #4a3660;
+  }
+
+  .section-header { color: #c4a7e7; }
+  .section-subtitle { color: #7a6d8a; }
+
+  .horario-label { color: #c4a7e7; }
+
+  .horario-input {
+    border-color: #4a3660;
+    background: #2d1f3d;
+    color: #e8dff2;
+
+    &:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.18);
+    }
+  }
+
+  .horario-sep { color: #7a6d8a; }
+
+  .proyectos-card ion-card-title { color: #e8dff2; }
+
+  .proyectos-empty {
+    color: #7a6d8a;
+  }
+
+  .proyecto-mini-card {
+    background: linear-gradient(135deg, #2d1f3d, #362550);
+    border-color: #4a3660;
+
+    &:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  .proyecto-mini-icon {
+    background: rgba(102, 126, 234, 0.18);
+    ion-icon { color: #a1b4fd; }
+  }
+
+  .proyecto-mini-badge {
+    background: rgba(45, 211, 111, 0.15);
+    color: #6dd397;
+  }
+
+  .proyecto-mini-titulo { color: #e8dff2; }
+  .proyecto-mini-desc   { color: #9a85b0; }
+  .proyecto-mini-footer { color: #7a6d8a; }
+
+  .modalidad-select-wrapper {
+    background: #2d1f3d;
+  }
+
+  .modalidad-label { color: #9a85b0; }
+
+  .modalidad-select {
+    color: #e8dff2;
+    option {
+      background: #2d1f3d;
+      color: #e8dff2;
+    }
+  }
+
+  // Modal
+  .project-modal {
+    .modal-container {
+      .modal-description-text { color: #9a85b0; }
+    }
+  }
+}

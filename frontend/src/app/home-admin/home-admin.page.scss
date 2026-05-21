@@ -1519,3 +1519,112 @@ $radius-input: 12px;
 
   ion-icon { font-size: 15px; color: rgba(255,255,255,0.25); }
 }
+
+// ── DARK MODE OVERRIDES ──────────────────────────────────────
+:host-context(body.ion-palette-dark) {
+
+  .home-wrapper {
+    background-color: #1a1225;
+  }
+
+  .section-title {
+    color: #e8dff2;
+  }
+
+  .divider {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  // User list
+  .usuario-item {
+    background: #241a33;
+    border-color: #4a3660;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    &:hover { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); }
+
+    .usuario-info .usuario-nombre { color: #e8dff2; }
+    .usuario-info .usuario-id { color: #7a6d8a; }
+  }
+
+  .usuarios-header {
+    .usuarios-title-block .usuarios-count { color: #7a6d8a; }
+  }
+
+  .usuarios-vacio {
+    color: #7a6d8a;
+  }
+
+  // Filters
+  .filtro-roles .filtro-btn {
+    border-color: #4a3660;
+    background: #241a33;
+    color: #9a85b0;
+
+    &:hover { border-color: #c4a7e7; color: #c4a7e7; }
+  }
+
+  // Status section
+  .status-section {
+    background: #241a33;
+    border-color: #4a3660;
+
+    .progress-header .progress-percent { color: #e8dff2; }
+  }
+
+  // Proyectos section
+  .new-projects {
+    .section-header .section-subtitle { color: #9a85b0; }
+
+    .new-project-card {
+      background: #241a33;
+      border-color: #4a3660;
+    }
+  }
+
+  .interactive-card {
+    &:hover { box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35); }
+  }
+
+  // Skeleton shimmer
+  .usuario-item.skeleton {
+    .skeleton-box,
+    .skeleton-line {
+      background: linear-gradient(90deg, #2d1f3d 25%, #362550 50%, #2d1f3d 75%);
+      background-size: 200% 100%;
+    }
+  }
+
+  // AFK Table
+  .afk-tabla-wrapper {
+    background: #241a33;
+    border-color: #4a3660;
+  }
+
+  .afk-row {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+
+    &.afk-row-header {
+      background: rgba(99, 102, 241, 0.08);
+    }
+
+    &.afk-row-respondio:hover { background: rgba(34, 197, 94, 0.06); }
+    &.afk-row-afk:hover { background: rgba(239, 68, 68, 0.06); }
+  }
+
+  .ver-todo-btn {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #9a85b0;
+
+    &:hover {
+      background: rgba(99, 102, 241, 0.1);
+      color: #a1b4fd;
+    }
+  }
+
+  // Foto preview
+  .foto-preview-wrapper {
+    border-color: rgba(118, 75, 162, 0.3);
+    background: #2d1f3d;
+  }
+}

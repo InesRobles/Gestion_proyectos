@@ -34,6 +34,18 @@
                     <span class="stat-label">{{ userData.modalidad || 'Sin modalidad' }}</span>
                   </div>
                 </div>
+                <div class="dark-mode-toggle-section">
+                  <div class="dark-mode-row">
+                    <div class="dark-mode-icon-wrapper" [class.active]="darkMode">
+                      <ion-icon [name]="darkMode ? 'moon-outline' : 'sunny-outline'"></ion-icon>
+                    </div>
+                    <div class="dark-mode-text">
+                      <span class="dark-mode-title">Modo Oscuro</span>
+                      <span class="dark-mode-subtitle">{{ darkMode ? 'Activado' : 'Desactivado' }}</span>
+                    </div>
+                    <ion-toggle [checked]="darkMode" (ionChange)="toggleDarkMode()" mode="ios"></ion-toggle>
+                  </div>
+                </div>
                 <div class="admin-banner">
                   <ion-button *ngIf="userData.rol === 'administrador'" (click)="navegarAdmin()"
                               color="danger" expand="block" shape="round">

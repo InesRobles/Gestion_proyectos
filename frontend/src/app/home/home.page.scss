@@ -869,3 +869,137 @@ $bg-app: #f4f7fe;
   color: #ffc409 !important;
   font-weight: 500;
 }
+
+// ── DARK MODE OVERRIDES ──────────────────────────────────────
+:host-context(body.ion-palette-dark) {
+
+  .home-wrapper {
+    background-color: #1a1225;
+  }
+
+  .section-title {
+    color: #e8dff2;
+  }
+
+  .divider {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  // Project cards
+  .project-card {
+    --background: #241a33;
+    border-color: #4a3660;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+
+    .card-header-content {
+      .project-title { color: #e8dff2; }
+      .project-description { color: #9a85b0; }
+    }
+
+    .card-body {
+      .progress-row {
+        .progress-label { color: #9a85b0; }
+        .progress-value { color: #c4a7e7; }
+      }
+      .progress-track { background: #362550; }
+    }
+  }
+
+  .interactive-card {
+    &:hover { box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4); }
+  }
+
+  // New projects section
+  .new-projects {
+    .section-header .section-subtitle { color: #9a85b0; }
+
+    .new-project-card {
+      background: #241a33;
+      border-color: #4a3660;
+    }
+  }
+
+  // Modal
+  .project-modal {
+    ion-header ion-toolbar {
+      --background: #241a33;
+      --color: #e8dff2;
+      --border-color: #4a3660;
+    }
+
+    ion-content {
+      --background: #1a1225;
+      --color: #e8dff2;
+    }
+  }
+
+  .modal-header-title { color: #e8dff2; }
+
+  .modal-info-content {
+    .modal-title { color: #e8dff2; }
+    .modal-description-text { color: #9a85b0; }
+
+    .btn-video {
+      color: #a1b4fd;
+      border-color: #a1b4fd;
+      &:hover { background: #667eea; color: #fff; }
+    }
+  }
+
+  .section-label { color: #c4a7e7; }
+
+  // Status section in modal
+  .status-section {
+    background: #241a33;
+    border-color: #4a3660;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+    .progress-header .progress-percent { color: #e8dff2; }
+    .progress-remaining { color: #9a85b0; }
+    .progress-track { background: #362550; }
+  }
+
+  // Features section in modal
+  .features-section {
+    background: #241a33;
+    border-color: #4a3660;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+    .feature-item {
+      .feature-icon { color: #c4a7e7; }
+      .feature-text { color: #e8dff2; }
+    }
+  }
+
+  // Chat section
+  .chat-section {
+    background: #241a33;
+    border-color: #4a3660;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+    .comment-bubble {
+      background: #362550;
+      .comment-text { color: #e8dff2; }
+      .comment-time { color: #7a6d8a; }
+    }
+
+    .comment-author { color: #c4a7e7; }
+    .comment-avatar { background: rgba(102, 126, 234, 0.15); }
+
+    .chat-loading { color: #7a6d8a; }
+    .empty-chat {
+      color: #7a6d8a;
+      border-color: #4a3660;
+    }
+
+    .chat-input-container {
+      background: #2d1f3d;
+      border-color: #4a3660;
+
+      .chat-input {
+        --color: #e8dff2;
+        --placeholder-color: #7a6d8a;
+      }
+    }
+  }
+}

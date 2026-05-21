@@ -10,7 +10,8 @@ import {
 import { addIcons } from 'ionicons';
 import {
   personCircle, personOutline, closeOutline, schoolOutline, lockClosedOutline, exitOutline,
-  timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline, folderOpenOutline, briefcaseOutline, peopleOutline
+  timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline, folderOpenOutline, briefcaseOutline, peopleOutline,
+  moonOutline, sunnyOutline, saveOutline, settingsOutline
 } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
@@ -40,6 +41,7 @@ import { forkJoin } from 'rxjs';
 export class ProfilePage implements OnInit {
 
   isPasswordModalOpen = false;
+  darkMode = false;
   fotoUrl: string | null = null;
   numProyectos: number = 0;
   proyectosActivos: proyecto[] = [];
@@ -85,11 +87,15 @@ export class ProfilePage implements OnInit {
   ) {
     addIcons({
       personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline,
-      timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline, folderOpenOutline, briefcaseOutline, peopleOutline
+      timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline, folderOpenOutline, briefcaseOutline, peopleOutline,
+      moonOutline, sunnyOutline, saveOutline, settingsOutline
     });
   }
 
   ngOnInit(): void {
+    // Inicializar estado del dark mode desde el body
+    this.darkMode = document.body.classList.contains('ion-palette-dark');
+
     const sesion = this.authService.obtenerSesion();
     const fotoKey = `profile_foto_${sesion?.id}`;
     const savedFoto = localStorage.getItem(fotoKey);
@@ -455,6 +461,16 @@ export class ProfilePage implements OnInit {
 
   navegarAdmin() {
     this.navCtrl.navigateForward('/home-admin');
+  }
+
+  toggleDarkMode(): void {
+    this.darkMode = !this.darkMode;
+    if (this.darkMode) {
+      document.body.classList.add('ion-palette-dark');
+    } else {
+      document.body.classList.remove('ion-palette-dark');
+    }
+    localStorage.setItem('darkMode', String(this.darkMode));
   }
 
   onModalidadChange(id: number | null): void {
