@@ -37,6 +37,14 @@
                   </ion-input>
                 </div>
 
+                <div class="custom-input">
+                  <label class="input-label">Rol en la aplicación</label>
+                  <select class="styled-select" [(ngModel)]="rol">
+                    <option value="alumno">Alumno</option>
+                    <option value="admin">Administrador (Admin)</option>
+                  </select>
+                </div>
+
               </div>
 
               <p *ngIf="mensajeError" style="color:red; text-align:center; margin-top:8px;">

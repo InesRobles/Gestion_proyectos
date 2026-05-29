@@ -58,9 +58,8 @@ public class ComentarioService {
                 .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado: " + usuarioId));
 
         boolean esAutor = c.getUsuario().getId().equals(usuarioId);
-        boolean esAdmin = "administrador".equalsIgnoreCase(usuario.getRol().name());
 
-        if (!esAutor && !esAdmin) {
+        if (!esAutor) {
             throw new SecurityException("No tienes permiso para eliminar este comentario.");
         }
 

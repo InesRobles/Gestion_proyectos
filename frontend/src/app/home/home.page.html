@@ -4,115 +4,17 @@
   <div class="home-wrapper">
     <div class="content-container">
 
-      @if (mostrarTarjetaAsistencia) {
-        <section class="attendance-section" [class.exit-animation]="isExiting">
-          <ion-card class="attendance-hero-card">
-            <div class="hero-bg-shapes">
-              <div class="shape shape-1"></div>
-              <div class="shape shape-2"></div>
-              <div class="shape shape-3"></div>
-            </div>
-            <div class="attendance-content">
 
-              <div class="left-column">
-                <div class="user-greeting">
-                  <span class="greeting-label">Hola de nuevo,</span>
-                  <h1 class="user-name">{{ nombreUsuario }}</h1>
-                  <span class="greeting-sub">Que tengas un excelente día de trabajo 🚀</span>
-                </div>
 
-                <div class="time-box" *ngIf="!mostrarFormHorario">
-                  <div class="time-icon-wrap">
-                    <ion-icon name="time-outline"></ion-icon>
-                  </div>
-                  <div class="time-text">
-                    <span class="schedule-label">HORARIO DE HOY</span>
-                    <span class="hours" *ngIf="horarioHoy">{{ horarioHoy.horaInicio }} — {{ horarioHoy.horaFin }}</span>
-                    <span class="hours" *ngIf="!horarioHoy">Sin horario asignado</span>
-                  </div>
-                </div>
-
-                <div class="horario-form-box" *ngIf="mostrarFormHorario">
-                  <div class="horario-form-header">
-                    <ion-icon name="calendar-outline"></ion-icon>
-                    <span>No tienes horario para hoy. Añade uno:</span>
-                  </div>
-                  <div class="horario-form-fields">
-
-                    <div class="form-field">
-                      <label class="form-label">Hora inicio</label>
-                      <input type="time" class="form-input-time" [(ngModel)]="formHorario.horaInicio" />
-                    </div>
-                    <div class="form-field">
-                      <label class="form-label">Hora fin</label>
-                      <input type="time" class="form-input-time" [(ngModel)]="formHorario.horaFin" />
-                    </div>
-                  </div>
-                  <ion-button
-                    class="guardar-horario-btn"
-                    [disabled]="guardandoHorario"
-                    (click)="guardarHorario()">
-                    <ion-icon name="save-outline" slot="start"></ion-icon>
-                    {{ guardandoHorario ? 'Guardando...' : 'Guardar Horario' }}
-                  </ion-button>
-                </div>
-              </div>
-
-              <div class="right-column" *ngIf="!mostrarFormHorario">
-                <div class="fichar-card">
-                  <p class="instruction-text">Registra tu asistencia</p>
-
-                  <!-- Si no ha fichado entrada -->
-                  <ng-container *ngIf="!asistenciaHoy">
-                    <ion-button
-                      class="fichar-button"
-                      (click)="fichar()"
-                      [disabled]="franjaActiva === null">
-                      <ion-icon name="log-in-outline" slot="start"></ion-icon>
-                      FICHAR ENTRADA
-                    </ion-button>
-                    <span class="fichar-hint" *ngIf="franjaActiva !== null">
-                      Haz clic para registrar tu entrada de hoy
-                    </span>
-                    <span class="fichar-hint fichar-hint-warning" *ngIf="franjaActiva === null && horarioHoy">
-                      Podrás fichar entre las {{ horarioHoy.horaInicio }} y las {{ horarioHoy.horaFin }}
-                    </span>
-                  </ng-container>
-
-                  <!-- Si ya fichó entrada pero no salida -->
-                  <ng-container *ngIf="asistenciaHoy && !asistenciaHoy.horaSalida">
-                    <ion-button
-                      class="fichar-button"
-                      color="warning"
-                      (click)="desfichar()">
-                      <ion-icon name="log-out-outline" slot="start"></ion-icon>
-                      FICHAR SALIDA (DESFICHAR)
-                    </ion-button>
-                    <span class="fichar-hint">
-                      Entrada registrada a las {{ asistenciaHoy.horaEntrada ? (asistenciaHoy.horaEntrada | slice:0:5) : '--:--' }}. Haz clic para registrar tu salida de hoy.
-                    </span>
-                  </ng-container>
-
-                  <!-- Si ya fichó salida -->
-                  <ng-container *ngIf="asistenciaHoy && asistenciaHoy.horaSalida">
-                    <div class="fichado-completado" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;">
-                      <ion-icon name="checkmark-done-circle" color="success" style="font-size: 36px;"></ion-icon>
-                      <span class="fichar-hint" style="color: var(--ion-color-success); font-weight: bold;">¡Buen trabajo! Asistencia completa</span>
-                      <span class="fichar-hint">Entrada: {{ asistenciaHoy.horaEntrada ? (asistenciaHoy.horaEntrada | slice:0:5) : '--:--' }} | Salida: {{ asistenciaHoy.horaSalida ? (asistenciaHoy.horaSalida | slice:0:5) : '--:--' }}</span>
-                    </div>
-                  </ng-container>
-                </div>
-              </div>
-
-            </div>
-          </ion-card>
-        </section>
-      }
-
-      <hr class="divider">
-
+      <!-- ── VISTA ALUMNO (NORMAL) ── -->
       <section>
-        <h2 class="section-title">Tus Proyectos</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 class="section-title" style="margin: 0;">Proyectos</h2>
+          <ion-button (click)="abrirModalCrearProyecto()" color="primary" fill="solid" style="--border-radius: 12px; margin: 0; font-weight: 600;">
+            <ion-icon name="add-outline" slot="start"></ion-icon>
+            Nuevo Proyecto
+          </ion-button>
+        </div>
 
         <ion-grid *ngIf="loadingProyectos">
           <ion-row>
@@ -138,31 +40,22 @@
                   <div class="estado-chip" [ngClass]="getClaseEstado(p.estado)">
                     {{ getEtiquetaEstado(p.estado) }}
                   </div>
+                  <div class="participando-chip" *ngIf="esParticipante(p.id)">
+                    Participando
+                  </div>
                 </div>
                 <ion-card-header class="card-header-content">
-                  <ion-card-title class="project-title">{{ p.titulo }}</ion-card-title>
+                  <ion-card-title class="project-title" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ p.titulo }}</span>
+                    <ion-icon name="lock-closed-outline" *ngIf="p.privado" class="private-lock-icon"></ion-icon>
+                  </ion-card-title>
                   <p class="project-description">{{ p.descripcion }}</p>
                 </ion-card-header>
 
-                <ion-card-content class="card-body">
-                  <div class="meta-row">
-                    <span class="meta-item">
-                      <ion-icon name="people-outline"></ion-icon>
-                      {{ p.cuposDisponibles }} / {{ p.cupoMaximo }} cupos libres
-                    </span>
-                  </div>
-                  <div class="progress-track" style="margin-top: 8px;">
-                    <div class="progress-fill" [style.width.%]="getPorcentajeCupo(p)"></div>
-                  </div>
-                </ion-card-content>
                 <div class="card-footer">
-                  <ion-button fill="solid" class="action-button" (click)="verDetalles(p, true)">
+                  <ion-button fill="solid" class="action-button" (click)="verDetalles(p, true)" style="width: 100%;">
                     <ion-icon name="eye-outline" slot="start"></ion-icon>
                     Ver Detalles
-                  </ion-button>
-                  <ion-button fill="outline" color="danger" class="action-button" (click)="salirDeProyecto(p)">
-                    <ion-icon name="exit-outline" slot="start"></ion-icon>
-                    Salir
                   </ion-button>
                 </div>
               </ion-card>
@@ -170,67 +63,13 @@
 
             <div class="lista-vacia" *ngIf="misProyectosFiltrados.length === 0">
               <ion-icon name="folder-open-outline"></ion-icon>
-              <p>No tienes proyectos activos en este momento.</p>
+              <p>No hay proyectos en el sistema.</p>
             </div>
           </ion-row>
         </ion-grid>
       </section>
 
-      <hr class="divider">
 
-      <section class="project-section new-projects">
-        <div class="section-header">
-          <h2 class="section-title">Explorar Proyectos</h2>
-          <p class="section-subtitle">Inscríbete en proyectos con cupo disponible.</p>
-        </div>
-
-        <ion-grid *ngIf="!loadingProyectos">
-          <ion-row>
-            <ion-col size="12" size-sm="6" size-lg="4" *ngFor="let p of nuevosProyectosFiltrados">
-              <ion-card class="interactive-card project-card">
-                <div class="image-container">
-                  <img [src]="getImagenProyecto(p)" alt="Proyecto"/>
-                  <div class="card-overlay"></div>
-                  <div class="estado-chip" [ngClass]="getClaseEstado(p.estado)">
-                    {{ getEtiquetaEstado(p.estado) }}
-                  </div>
-                </div>
-                <ion-card-header class="card-header-content">
-                  <ion-card-title class="project-title">{{ p.titulo }}</ion-card-title>
-                  <p class="project-description">{{ p.descripcion }}</p>
-                </ion-card-header>
-
-                <ion-card-content class="card-body">
-                  <div class="meta-row">
-                    <span class="meta-item">
-                      <ion-icon name="people-outline"></ion-icon>
-                      {{ p.cuposDisponibles }} / {{ p.cupoMaximo }} cupos libres
-                    </span>
-                  </div>
-                  <div class="progress-track" style="margin-top: 8px;">
-                    <div class="progress-fill" [style.width.%]="getPorcentajeCupo(p)"></div>
-                  </div>
-                </ion-card-content>
-                <div class="card-footer">
-                  <ion-button
-                    fill="solid"
-                    class="inscribir-btn"
-                    [disabled]="!puedeInscribirse(p)"
-                    (click)="inscribirse(p)">
-                    <ion-icon name="add-circle-outline" slot="start"></ion-icon>
-                    {{ p.cuposDisponibles > 0 ? 'Inscribirse' : 'Sin cupos' }}
-                  </ion-button>
-                </div>
-              </ion-card>
-            </ion-col>
-
-            <div class="lista-vacia" *ngIf="nuevosProyectosFiltrados.length === 0">
-              <ion-icon name="search-outline"></ion-icon>
-              <p>No hay proyectos disponibles para explorar.</p>
-            </div>
-          </ion-row>
-        </ion-grid>
-      </section>
 
     </div>
   </div>
@@ -256,65 +95,299 @@
         <div class="modal-container" *ngIf="proyectoSeleccionado">
 
           <div class="modal-image-wrapper">
-            <img [src]="getImagenProyecto(proyectoSeleccionado)" class="modal-project-img" />
+            <img [src]="proyectoSeleccionado.fotoProyecto || getImagenProyecto(proyectoSeleccionado)" class="modal-project-img" />
           </div>
 
           <div class="modal-info-content">
-            <h1 class="modal-title">{{ proyectoSeleccionado.titulo }}</h1>
-            <p class="modal-description-text">{{ proyectoSeleccionado.descripcion }}</p>
-            <a *ngIf="proyectoSeleccionado.videoUrl"
-               [href]="proyectoSeleccionado.videoUrl"
-               target="_blank"
-               class="btn-video">
-              <ion-icon name="play-circle-outline"></ion-icon>
-              Ver video explicativo
-            </a>
-
-            <div class="status-section">
-              <ion-label class="section-label">
-                <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
-                Estado del proyecto
-              </ion-label>
-              <div class="progress-header">
-                <ion-badge [color]="getColorEstado(proyectoSeleccionado.estado)" mode="ios" class="progress-badge">
-                  {{ getEtiquetaEstado(proyectoSeleccionado.estado) | uppercase }}
-                </ion-badge>
-                <span class="meta-item">
-                  <ion-icon name="people-outline"></ion-icon>
-                  {{ proyectoSeleccionado.cuposDisponibles }} / {{ proyectoSeleccionado.cupoMaximo }} cupos libres
-                </span>
-              </div>
-              <div class="progress-track" style="margin-top: 12px;">
-                <div class="progress-fill" [style.width.%]="getPorcentajeCupo(proyectoSeleccionado)"></div>
-              </div>
+            <!-- ── BOTONES DE CONTROL DE EDICIÓN ── -->
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; justify-content: flex-end;" *ngIf="puedeEditarDetallesProyecto()">
+              <ion-button (click)="modoEdicion ? guardarEdicionProyecto() : activarModoEdicion()" color="primary" fill="solid" style="--border-radius: 8px; font-weight: 600; height: 36px; margin: 0;">
+                <ion-icon [name]="modoEdicion ? 'save-outline' : 'create-outline'" slot="start"></ion-icon>
+                {{ modoEdicion ? 'Guardar Cambios' : 'Editar Proyecto' }}
+              </ion-button>
+              <ion-button *ngIf="modoEdicion" (click)="cancelarEdicion()" color="medium" fill="outline" style="--border-radius: 8px; height: 36px; margin: 0;">
+                Cancelar
+              </ion-button>
+              <ion-button *ngIf="puedeEliminarProyecto()" (click)="eliminarProyectoPropio()" color="danger" fill="clear" style="height: 36px; margin: 0;">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
             </div>
 
-            <div class="team-section" style="margin-top: 24px; margin-bottom: 24px;">
+            <!-- ── MODO LECTURA ── -->
+            <ng-container *ngIf="!modoEdicion">
+              <h1 class="modal-title" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                {{ proyectoSeleccionado.titulo }}
+                <ion-badge color="warning" *ngIf="proyectoSeleccionado.privado" style="font-size: 0.55em; border-radius: 6px; padding: 4px 8px; display: inline-flex; align-items: center; gap: 4px; font-weight: 600;">
+                  <ion-icon name="lock-closed-outline" style="font-size: 14px;"></ion-icon>
+                  Privado
+                </ion-badge>
+              </h1>
+              <p class="modal-description-text">{{ proyectoSeleccionado.descripcion }}</p>
+
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                <a *ngIf="proyectoSeleccionado.videoUrl"
+                   [href]="proyectoSeleccionado.videoUrl"
+                   target="_blank"
+                   class="btn-video"
+                   style="margin: 0; display: inline-flex; align-items: center; justify-content: center;">
+                  <ion-icon name="play-circle-outline" slot="start"></ion-icon>
+                  Ver video explicativo
+                </a>
+
+                <a *ngIf="proyectoSeleccionado.enlaceGithub"
+                   [href]="proyectoSeleccionado.enlaceGithub"
+                   target="_blank"
+                   class="github-btn"
+                   style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: #24292e; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; transition: background-color 0.2s;">
+                  <ion-icon name="logo-github"></ion-icon>
+                  Ver en GitHub
+                </a>
+              </div>
+
+              <!-- Memoria de Proyecto -->
+              <div class="memoria-section project-detail-card">
+                <h3 class="detail-section-title">
+                  <ion-icon name="document-outline" color="primary"></ion-icon>
+                  Memoria de Proyecto
+                </h3>
+                <p class="memoria-text" *ngIf="proyectoSeleccionado.memoria">
+                  {{ proyectoSeleccionado.memoria }}
+                </p>
+                <p class="memoria-empty-text" *ngIf="!proyectoSeleccionado.memoria">
+                  Aún no se ha redactado la memoria de este proyecto.
+                </p>
+              </div>
+
+              <div class="status-section project-detail-card">
+                <ion-label class="section-label">
+                  <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
+                  Estado del proyecto
+                </ion-label>
+                <div class="progress-header">
+                  <ion-badge [color]="getColorEstado(proyectoSeleccionado.estado)" mode="ios" class="progress-badge">
+                    {{ getEtiquetaEstado(proyectoSeleccionado.estado) | uppercase }}
+                  </ion-badge>
+                </div>
+              </div>
+
+              <!-- Documentos -->
+              <div class="documents-section project-detail-card">
+                <h3 class="detail-section-title">
+                  <ion-icon name="document-outline" color="primary"></ion-icon>
+                  Documentos Adjuntos
+                </h3>
+                <ion-list lines="none" class="detail-doc-list">
+                  <ion-item *ngFor="let doc of proyectoSeleccionado.documentos" class="doc-item-premium">
+                    <ion-icon name="document-outline" slot="start" color="medium" class="doc-icon"></ion-icon>
+                    <ion-label>
+                      <a [href]="doc.contenido" [download]="doc.nombre" class="doc-link">
+                        {{ doc.nombre }}
+                      </a>
+                    </ion-label>
+                  </ion-item>
+                  <div *ngIf="!proyectoSeleccionado.documentos || proyectoSeleccionado.documentos.length === 0" class="empty-state-box">
+                    No hay documentos asociados a este proyecto.
+                  </div>
+                </ion-list>
+              </div>
+
+              <!-- Galería de imágenes -->
+              <div class="gallery-section project-detail-card">
+                <h3 class="detail-section-title">
+                  <ion-icon name="image-outline" color="primary"></ion-icon>
+                  Galería del Proyecto
+                </h3>
+                <div class="image-grid">
+                  <div *ngFor="let img of proyectoSeleccionado.imagenes" class="gallery-item">
+                    <a [href]="img.contenido" target="_blank">
+                      <img [src]="img.contenido" />
+                    </a>
+                  </div>
+                </div>
+                <div *ngIf="!proyectoSeleccionado.imagenes || proyectoSeleccionado.imagenes.length === 0" class="empty-state-box">
+                  No hay imágenes en la galería.
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- ── MODO EDICIÓN ── -->
+            <ng-container *ngIf="modoEdicion">
+              <h2 class="edit-modal-title">Editar Información del Proyecto</h2>
+
+              <div class="form-group">
+                <label class="form-label">Imagen de Portada</label>
+                <div class="imagen-uploader" [class.tiene-imagen]="formEdicionProyecto.fotoProyecto" (click)="triggerInputImagenEdicion()">
+                  <img *ngIf="formEdicionProyecto.fotoProyecto" [src]="formEdicionProyecto.fotoProyecto" style="max-height: 150px; margin: 0 auto; border-radius: 8px; display: block; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" />
+                  <div *ngIf="!formEdicionProyecto.fotoProyecto" style="color: #718096; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <ion-icon name="image-outline" style="font-size: 32px; color: #a0aec0;"></ion-icon>
+                    <span style="font-weight: 600; font-size: 0.9em;">Haz clic para subir imagen de portada</span>
+                    <span style="font-size: 0.8em; color: #a0aec0;">JPG, PNG o WebP · Máx. 2 MB</span>
+                  </div>
+                  <button class="imagen-quitar-btn" *ngIf="formEdicionProyecto.fotoProyecto" (click)="quitarImagenEdicion($event)" style="margin-top: 8px; background: #e53e3e; color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.8em; cursor: pointer;">
+                    Eliminar imagen
+                  </button>
+                </div>
+                <input #inputImagenEdicion type="file" accept="image/*" style="display: none;" (change)="onImagenSeleccionadaEdicion($event)" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Título *</label>
+                <input class="form-input" type="text" [(ngModel)]="formEdicionProyecto.titulo" />
+              </div>
+
+              <div class="form-group" *ngIf="puedeEliminarProyecto()">
+                <label class="form-label">Visibilidad del Proyecto</label>
+                <select class="form-select" [(ngModel)]="formEdicionProyecto.privado">
+                  <option [ngValue]="false">Público</option>
+                  <option [ngValue]="true">Privado</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Descripción</label>
+                <textarea class="form-input" [(ngModel)]="formEdicionProyecto.descripcion" rows="3"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Estado</label>
+                <select class="form-select" [(ngModel)]="formEdicionProyecto.estado">
+                  <option value="en curso">En curso</option>
+                  <option value="pausado">Pausado</option>
+                  <option value="finalizado">Finalizado</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Enlace de GitHub</label>
+                <input class="form-input" type="url" [(ngModel)]="formEdicionProyecto.enlaceGithub" placeholder="https://github.com/..." />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">URL del Video Explicativo</label>
+                <input class="form-input" type="url" [(ngModel)]="formEdicionProyecto.videoUrl" placeholder="https://youtube.com/..." />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Memoria de Proyecto (Reporte)</label>
+                <textarea class="form-input" [(ngModel)]="formEdicionProyecto.memoria" placeholder="Escribe el avance, resumen o reporte detallado..." rows="8"></textarea>
+              </div>
+
+              <!-- Edición de Documentos (Subida / Borrado) -->
+              <div class="documents-section-edit edit-section-divider">
+                <div class="edit-section-header">
+                  <h3 class="edit-section-title">Gestionar Documentos</h3>
+                  <ion-button fill="outline" size="small" (click)="triggerInputDocumento()" [disabled]="subiendoRecurso" style="--border-radius: 8px; margin: 0;">
+                    <ion-icon name="add-outline" slot="start"></ion-icon>
+                    Subir PDF/Doc
+                  </ion-button>
+                </div>
+                <input #inputDocumento type="file" accept=".pdf,.doc,.docx,.txt" style="display: none;" (change)="onDocumentoSeleccionado($event)" />
+
+                <ion-list lines="none" class="edit-doc-list">
+                  <ion-item *ngFor="let doc of proyectoSeleccionado.documentos" class="doc-item-premium select-doc-item">
+                    <ion-icon name="document-outline" slot="start" color="medium" style="font-size: 18px;"></ion-icon>
+                    <ion-label class="edit-doc-label">{{ doc.nombre }}</ion-label>
+                    <ion-button fill="clear" color="danger" slot="end" (click)="eliminarDocumento(doc.id)" style="margin: 0; height: 32px;">
+                      <ion-icon name="trash-outline" slot="icon-only" style="font-size: 18px;"></ion-icon>
+                    </ion-button>
+                  </ion-item>
+                  <div *ngIf="!proyectoSeleccionado.documentos || proyectoSeleccionado.documentos.length === 0" class="empty-state-box mini-box">
+                    No hay documentos cargados.
+                  </div>
+                </ion-list>
+              </div>
+
+              <!-- Edición de Galería (Subida / Borrado) -->
+              <div class="gallery-section-edit edit-section-divider">
+                <div class="edit-section-header">
+                  <h3 class="edit-section-title">Gestionar Galería</h3>
+                  <ion-button fill="outline" size="small" (click)="triggerInputImagenGaleria()" [disabled]="subiendoRecurso" style="--border-radius: 8px; margin: 0;">
+                    <ion-icon name="add-outline" slot="start"></ion-icon>
+                    Añadir Imagen
+                  </ion-button>
+                </div>
+                <input #inputImagenGaleria type="file" accept="image/*" style="display: none;" (change)="onImagenGaleriaSeleccionada($event)" />
+
+                <div class="image-grid-edit">
+                  <div *ngFor="let img of proyectoSeleccionado.imagenes" class="gallery-item-edit">
+                    <img [src]="img.contenido" />
+                    <button (click)="eliminarImagenGaleria(img.id)">
+                      <ion-icon name="close-outline"></ion-icon>
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="!proyectoSeleccionado.imagenes || proyectoSeleccionado.imagenes.length === 0" class="empty-state-box mini-box">
+                  No hay imágenes cargadas.
+                </div>
+              </div>
+
+              <!-- Selector de nuevos colaboradores -->
+              <div class="collaborators-edit-section edit-section-divider" style="margin-bottom: 10px;">
+                <h3 class="edit-section-title">Añadir Colaboradores</h3>
+                <div *ngIf="alumnosDisponibles.length > 0" class="collaborators-select-wrapper">
+                  <select class="collaborators-select" (change)="agregarColaborador($event)">
+                    <option value="">-- Selecciona un alumno para invitar --</option>
+                    <option *ngFor="let alumno of alumnosDisponibles" [value]="alumno.id">
+                      {{ alumno.nombreReal }} (@{{ alumno.nombreUsuario }})
+                    </option>
+                  </select>
+                </div>
+                <div *ngIf="alumnosDisponibles.length === 0" class="empty-state-box mini-box">
+                  No hay más alumnos disponibles para añadir.
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- ── INTEGRANTES DEL EQUIPO ── -->
+            <div class="team-section project-detail-card">
               <ion-label class="section-label">
                 <ion-icon name="people-outline" class="section-icon"></ion-icon>
-                Alumnos Inscritos
+                Colaboradores del Proyecto
               </ion-label>
 
-              <ion-list lines="none" style="background: transparent; padding: 0; margin-top: 12px;">
-                <ion-item *ngFor="let alumno of proyectoSeleccionado.alumnos"
-                          style="--background: #f4f7fe; margin-bottom: 8px; --border-radius: 8px;">
-                  <ion-icon name="person-circle" slot="start" color="primary" style="font-size: 28px; margin-inline-end: 12px;"></ion-icon>
-                  <ion-label>
-                    <h3 style="margin: 0; font-weight: 600; color: #2d1f3d;">{{ alumno.nombreReal }}</h3>
-                    <p style="margin: 2px 0 0 0; font-size: 0.85em; color: #764ba2;">@ {{ alumno.nombreUsuario }} </p>
+              <ion-list lines="none" class="collaborators-list">
+                <ion-item *ngFor="let alumno of proyectoSeleccionado.alumnos" class="collaborator-item-premium">
+                  <ion-icon name="person-circle" slot="start" color="primary" class="collab-avatar-icon"></ion-icon>
+                  <ion-label style="margin-right: 12px;">
+                    <h3 class="collaborator-name">{{ alumno.nombreReal }}</h3>
+                    <p class="collaborator-username">@{{ alumno.nombreUsuario }}</p>
                   </ion-label>
+                  
+                  <div slot="end" style="display: flex; align-items: center; gap: 8px;">
+                    <!-- Badge para el creador del proyecto -->
+                    <ion-badge color="tertiary" *ngIf="proyectoSeleccionado.creadorId === alumno.id" style="font-size: 0.8em; text-transform: capitalize; border-radius: 6px; padding: 4px 8px;">
+                      Creador
+                    </ion-badge>
+                    
+                    <!-- Controles para colaboradores normales (no el creador) -->
+                    <ng-container *ngIf="proyectoSeleccionado.creadorId !== alumno.id">
+                      <!-- Dropdown de cambio de rol para el creador del proyecto (admin) -->
+                      <select *ngIf="puedeEliminarProyecto()" [value]="alumno.rolProyecto || 'lector'" (change)="cambiarRolColaborador(alumno, $event)" class="role-select-styled" style="padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(124, 58, 237, 0.15); background: white; color: #5a4570; font-size: 0.85em; outline: none; margin-right: 8px;">
+                        <option value="lector">Lector</option>
+                        <option value="editor">Editor</option>
+                      </select>
+                      
+                      <!-- Badge estático para otros usuarios -->
+                      <ion-badge color="secondary" *ngIf="!puedeEliminarProyecto()" style="font-size: 0.8em; text-transform: capitalize; border-radius: 6px; padding: 4px 8px;">
+                        {{ alumno.rolProyecto || 'lector' }}
+                      </ion-badge>
+                    </ng-container>
+
+                    <!-- Botón quitar colaborador -->
+                    <ion-button fill="clear" color="danger" *ngIf="modoEdicion && proyectoSeleccionado.creadorId !== alumno.id" (click)="eliminarColaborador(alumno.id)" style="margin: 0; height: 32px;">
+                      <ion-icon name="close-circle-outline" slot="icon-only" style="font-size: 20px;"></ion-icon>
+                    </ion-button>
+                  </div>
                 </ion-item>
               </ion-list>
 
-              <div *ngIf="!proyectoSeleccionado.alumnos || proyectoSeleccionado.alumnos.length === 0"
-                   class="empty-chat" style="padding: 16px; text-align: center; background: rgba(0,0,0,0.02); border-radius: 8px;">
-                <p class="empty-chat-text" style="font-size: 0.9em; margin: 0; color: var(--ion-color-medium);">
-                  Aún no hay alumnos asignados a este proyecto.
-                </p>
+              <div *ngIf="!proyectoSeleccionado.alumnos || proyectoSeleccionado.alumnos.length === 0" class="empty-state-box">
+                Aún no hay alumnos asignados a este proyecto.
               </div>
             </div>
 
-            <div class="chat-section">
+            <!-- Chat (Solo para colaboradores) -->
+            <div class="chat-section project-detail-card" *ngIf="esColaborador()">
               <ion-label class="section-label">
                 <ion-icon name="chatbubbles-outline" class="section-icon"></ion-icon>
                 Chat del proyecto
@@ -369,7 +442,8 @@
                 </div>
               </div>
 
-              <div class="chat-input-container">
+              <!-- Input de comentarios para editores/comentadores -->
+              <div class="chat-input-container" *ngIf="puedeEscribirChat()">
                 <ion-input
                   [(ngModel)]="nuevoComentario"
                   placeholder="Escribe un mensaje..."
@@ -384,6 +458,228 @@
                   <ion-icon name="send" slot="icon-only" class="send-icon"></ion-icon>
                 </ion-button>
               </div>
+
+              <!-- Mensaje informativo para lectores -->
+              <div *ngIf="!puedeEscribirChat()" class="chat-read-only-msg" style="padding: 12px; background: rgba(124, 58, 237, 0.05); border: 1px dashed rgba(124, 58, 237, 0.2); border-radius: 12px; color: #5a4570; text-align: center; font-size: 0.9em; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+                <ion-icon name="information-circle-outline" style="font-size: 18px; color: #7c3aed;"></ion-icon>
+                <span>Tienes rol de Lector en este proyecto. No tienes permisos para escribir.</span>
+              </div>
+            </div>
+
+            <!-- Vista de bloqueo para no colaboradores -->
+            <div class="chat-section project-detail-card" *ngIf="!esColaborador()">
+              <ion-label class="section-label">
+                <ion-icon name="chatbubbles-outline" class="section-icon"></ion-icon>
+                Chat del proyecto
+              </ion-label>
+              <div class="chat-locked-content">
+                <div class="lock-icon-wrapper">
+                  <ion-icon name="lock-closed-outline"></ion-icon>
+                </div>
+                <h3>Chat Privado</h3>
+                <p>Este chat es exclusivo para los colaboradores del proyecto. Únete al equipo para poder comunicarte y planificar con ellos.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- ========================================================= -->
+  <!-- MODAL CREAR PROYECTO (ALUMNO)                             -->
+  <!-- ========================================================= -->
+  <ion-modal
+    [isOpen]="modalCrearProyectoAbierto"
+    (didDismiss)="modalCrearProyectoAbierto = false"
+    class="project-modal"
+  >
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar color="light">
+          <ion-title class="modal-header-title">Nuevo Proyecto</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modalCrearProyectoAbierto = false">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <div class="modal-container">
+          <div class="modal-info-content">
+            <h2 class="edit-modal-title">Datos del Proyecto</h2>
+
+            <div class="form-group">
+              <label class="form-label">Imagen de Portada</label>
+              <div class="imagen-uploader" [class.tiene-imagen]="formProyecto.fotoProyecto" (click)="triggerInputImagenCrear()">
+                <img *ngIf="formProyecto.fotoProyecto" [src]="formProyecto.fotoProyecto" style="max-height: 150px; margin: 0 auto; border-radius: 8px; display: block; box-shadow: 0 4px 6px rgba(0,0,0,0.05);" />
+                <div *ngIf="!formProyecto.fotoProyecto" style="color: #718096; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                  <ion-icon name="image-outline" style="font-size: 32px; color: #a0aec0;"></ion-icon>
+                  <span style="font-weight: 600; font-size: 0.9em;">Haz clic para subir imagen de portada</span>
+                  <span style="font-size: 0.8em; color: #a0aec0;">JPG, PNG o WebP · Máx. 2 MB</span>
+                </div>
+                <button class="imagen-quitar-btn" *ngIf="formProyecto.fotoProyecto" (click)="quitarImagenCrear($event)" style="margin-top: 8px; background: #e53e3e; color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 0.8em; cursor: pointer;">
+                  Eliminar imagen
+                </button>
+              </div>
+              <input #inputImagenCrear type="file" accept="image/*" style="display: none;" (change)="onImagenSeleccionadaCrear($event)" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Título *</label>
+              <input class="form-input" type="text" [(ngModel)]="formProyecto.titulo" placeholder="Ej: Red Social de Mascotas" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Visibilidad del Proyecto</label>
+              <select class="form-select" [(ngModel)]="formProyecto.privado">
+                <option [ngValue]="false">Público (Todos pueden ver el proyecto)</option>
+                <option [ngValue]="true">Privado (Solo el administrador/tú pueden verlo)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-input" [(ngModel)]="formProyecto.descripcion" placeholder="Explica brevemente qué resuelve o hace tu proyecto..." rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Estado</label>
+              <select class="form-select" [(ngModel)]="formProyecto.estado">
+                <option value="en curso">En curso</option>
+                <option value="pausado">Pausado</option>
+                <option value="finalizado">Finalizado</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Enlace de GitHub</label>
+              <input class="form-input" type="url" [(ngModel)]="formProyecto.enlaceGithub" placeholder="https://github.com/tu-usuario/tu-repo" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">URL del Video Explicativo</label>
+              <input class="form-input" type="url" [(ngModel)]="formProyecto.videoUrl" placeholder="https://youtube.com/watch?v=..." />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Memoria del Proyecto (Inicial)</label>
+              <textarea class="form-input" [(ngModel)]="formProyecto.memoria" placeholder="Escribe el alcance, objetivos o primer reporte del proyecto..." rows="6"></textarea>
+            </div>
+
+            <!-- Subida de Documentos al crear -->
+            <div class="documents-section-edit edit-section-divider">
+              <div class="edit-section-header">
+                <h3 class="edit-section-title">Documentos del Proyecto</h3>
+                <ion-button fill="outline" size="small" (click)="triggerInputDocumentoCrear(inputDocCrear)" style="--border-radius: 8px; margin: 0; font-weight: 600;">
+                  <ion-icon name="document-outline" slot="start"></ion-icon>
+                  Añadir Documentos
+                </ion-button>
+              </div>
+              <input #inputDocCrear type="file" multiple accept=".pdf,.doc,.docx,.txt,.xls,.xlsx" style="display: none;" (change)="onDocumentoSeleccionadoCrear($event)" />
+              <div *ngIf="documentosParaSubir.length > 0" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div *ngFor="let doc of documentosParaSubir; let idx = index" style="display: inline-flex; align-items: center; background: #edf2f7; padding: 6px 12px; border-radius: 20px; font-size: 0.85em; color: #4a5568;">
+                  <ion-icon name="document-outline" style="margin-right: 6px;"></ion-icon>
+                  <span style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ doc.nombre }}</span>
+                  <ion-icon name="close-circle" (click)="quitarDocumentoCrear(idx)" style="margin-left: 8px; cursor: pointer; color: #e53e3e; font-size: 16px;"></ion-icon>
+                </div>
+              </div>
+              <div *ngIf="documentosParaSubir.length === 0" class="empty-state-box">
+                No hay documentos cargados.
+              </div>
+            </div>
+
+            <!-- Subida de Galería de Fotos al crear -->
+            <div class="gallery-section-edit edit-section-divider">
+              <div class="edit-section-header">
+                <h3 class="edit-section-title">Imágenes de la Galería</h3>
+                <ion-button fill="outline" size="small" (click)="triggerInputImagenGaleriaCrear(inputImgGaleriaCrear)" style="--border-radius: 8px; margin: 0; font-weight: 600;">
+                  <ion-icon name="image-outline" slot="start"></ion-icon>
+                  Añadir Fotos
+                </ion-button>
+              </div>
+              <input #inputImgGaleriaCrear type="file" multiple accept="image/*" style="display: none;" (change)="onImagenGaleriaSeleccionadaCrear($event)" />
+              <div *ngIf="imagenesParaSubir.length > 0" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <div *ngFor="let img of imagenesParaSubir; let idx = index" style="display: inline-flex; align-items: center; background: #edf2f7; padding: 6px 12px; border-radius: 20px; font-size: 0.85em; color: #4a5568;">
+                  <ion-icon name="image-outline" style="margin-right: 6px;"></ion-icon>
+                  <span style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ img.nombre }}</span>
+                  <ion-icon name="close-circle" (click)="quitarImagenGaleriaCrear(idx)" style="margin-left: 8px; cursor: pointer; color: #e53e3e; font-size: 16px;"></ion-icon>
+                </div>
+              </div>
+              <div *ngIf="imagenesParaSubir.length === 0" class="empty-state-box">
+                No hay imágenes cargadas.
+              </div>
+            </div>
+
+            <!-- Selector de nuevos colaboradores al crear -->
+            <div class="collaborators-edit-section edit-section-divider" style="margin-bottom: 20px;">
+              <h3 class="edit-section-title">Añadir Colaboradores</h3>
+              <div *ngIf="alumnosDisponibles.length > 0" class="collaborators-select-wrapper">
+                <select class="collaborators-select" (change)="agregarColaboradorCrear($event)">
+                  <option value="">-- Selecciona un alumno para invitar --</option>
+                  <option *ngFor="let alumno of alumnosDisponibles" [value]="alumno.id">
+                    {{ alumno.nombreReal }} (@{{ alumno.nombreUsuario }})
+                  </option>
+                </select>
+              </div>
+              <div *ngIf="alumnosDisponibles.length === 0" class="empty-state-box">
+                No hay más alumnos disponibles para añadir.
+              </div>
+            </div>
+
+            <!-- Colaboradores del Proyecto list -->
+            <div class="team-section project-detail-card" style="margin-bottom: 30px;">
+              <ion-label class="section-label">
+                <ion-icon name="people-outline" class="section-icon"></ion-icon>
+                Colaboradores del Proyecto
+              </ion-label>
+
+              <ion-list lines="none" class="collaborators-list">
+                <!-- Creador (logged-in user) -->
+                <ion-item class="collaborator-item-premium">
+                  <ion-icon name="person-circle" slot="start" color="primary" class="collab-avatar-icon"></ion-icon>
+                  <ion-label style="margin-right: 12px;">
+                    <h3 class="collaborator-name">{{ nombreUsuario }} (Tú)</h3>
+                    <p class="collaborator-username">@creador</p>
+                  </ion-label>
+                  <div slot="end" style="display: flex; align-items: center; gap: 8px;">
+                    <ion-badge color="tertiary" style="font-size: 0.8em; text-transform: capitalize; border-radius: 6px; padding: 4px 8px;">
+                      Creador
+                    </ion-badge>
+                  </div>
+                </ion-item>
+
+                <!-- Colaboradores seleccionados -->
+                <ion-item *ngFor="let alumno of colaboradoresParaCrear" class="collaborator-item-premium">
+                  <ion-icon name="person-circle" slot="start" color="primary" class="collab-avatar-icon"></ion-icon>
+                  <ion-label style="margin-right: 12px;">
+                    <h3 class="collaborator-name">{{ alumno.nombreReal }}</h3>
+                    <p class="collaborator-username">@{{ alumno.nombreUsuario }}</p>
+                  </ion-label>
+                  <div slot="end" style="display: flex; align-items: center; gap: 8px;">
+                    <select [value]="alumno.rolProyecto || 'lector'" (change)="cambiarRolColaboradorCrear(alumno, $event)" class="role-select-styled">
+                      <option value="lector">Lector</option>
+                      <option value="editor">Editor</option>
+                    </select>
+                    <ion-button fill="clear" color="danger" (click)="eliminarColaboradorCrear(alumno.id)" style="margin: 0; height: 32px;">
+                      <ion-icon name="close-circle-outline" slot="icon-only" style="font-size: 20px;"></ion-icon>
+                    </ion-button>
+                  </div>
+                </ion-item>
+              </ion-list>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid rgba(124, 58, 237, 0.15); padding-top: 20px;">
+              <ion-button (click)="cerrarModalCrearProyecto()" fill="outline" color="medium" style="--border-radius: 8px; font-weight: 600;">
+                Cancelar
+              </ion-button>
+              <ion-button (click)="guardarNuevoProyecto()" [disabled]="guardandoProyecto || !formProyecto.titulo.trim()" color="primary" style="--border-radius: 8px; font-weight: 600;">
+                <ion-icon name="checkmark-outline" slot="start" *ngIf="!guardandoProyecto"></ion-icon>
+                <ion-icon name="hourglass-outline" slot="start" *ngIf="guardandoProyecto"></ion-icon>
+                {{ guardandoProyecto ? 'Guardando...' : 'Crear Proyecto' }}
+              </ion-button>
             </div>
           </div>
         </div>

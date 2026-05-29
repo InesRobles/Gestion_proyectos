@@ -8,7 +8,7 @@ export interface Usuario {
   nombreReal: string;
   nombreUsuario: string;
   contrasenaHash?: string;
-  rol: 'administrador' | 'alumno' | string;
+  rol: 'alumno' | string;
   modalidad?: string;
   modalidadId?: number;
   modalidadNombre?: string;

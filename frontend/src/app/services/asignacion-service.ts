@@ -8,6 +8,7 @@ export interface AsignacionDTO {
   proyectoId: number;
   nombreAlumno?: string;
   tituloProyecto?: string;
+  rol?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -37,5 +38,10 @@ export class AsignacionService {
     return this.http.delete<void>(this.base, {
       body: { alumnoId, proyectoId }
     });
+  }
+
+  /** Cambiar rol de un colaborador en un proyecto */
+  cambiarRolColaborador(usuarioId: number, proyectoId: number, rol: string): Observable<AsignacionDTO> {
+    return this.http.put<AsignacionDTO>(`${this.base}/rol`, { usuarioId, proyectoId, rol });
   }
 }

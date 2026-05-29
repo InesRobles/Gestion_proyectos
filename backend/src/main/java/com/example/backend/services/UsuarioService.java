@@ -121,8 +121,18 @@ public class UsuarioService {
             usuario.setNombreReal(usuarioDTO.getNombreReal());
         }
 
-        if (usuarioDTO.getRol() != null) {
+        if (usuarioDTO.getRol() != null && !usuarioDTO.getRol().equals(usuario.getRol())) {
             usuario.setRol(usuarioDTO.getRol());
+            if (Rol.alumno.equals(usuarioDTO.getRol())) {
+                if (alumnoRepository.findByUsuarioId(usuario.getId()).isEmpty()) {
+                    Alumno newAlumno = new Alumno();
+                    newAlumno.setUsuario(usuario);
+                    newAlumno.setModalidad(null);
+                    alumnoRepository.save(newAlumno);
+                }
+            } else if (Rol.admin.equals(usuarioDTO.getRol())) {
+                alumnoRepository.findByUsuarioId(usuario.getId()).ifPresent(alumnoRepository::delete);
+            }
         }
 
         if (usuarioDTO.getContrasenaHash() != null && !usuarioDTO.getContrasenaHash().isBlank()) {

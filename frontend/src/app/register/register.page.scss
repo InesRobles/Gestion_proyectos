@@ -1,168 +1,226 @@
+// Variables
+$bg-app-light: #f8fafc;
+$bg-card-light: #ffffff;
+$primary-gradient: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+$primary-color: #6366f1;
+
 .login-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
   padding: 20px;
 }
 
 .interactive-card {
   width: 100%;
-  max-width: 850px; // Un poco más ancha por tener más campos
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 15px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 850px; // Slightly wider for register fields
+  background: $bg-card-light;
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid rgba(99, 102, 241, 0.08);
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.03);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.08);
   }
 }
 
 .form-section {
   padding: 20px;
+
   ion-card-title {
-    font-weight: 800;
-    margin-bottom: 25px;
-    color: #333;
-    letter-spacing: 1px;
+    font-weight: 900;
+    margin-bottom: 24px;
+    color: #0f172a;
+    letter-spacing: -0.5px;
   }
 }
 
 .inputs-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   margin-bottom: 5px;
 }
 
 .custom-input {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 
   .input-label {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    color: #764ba2;
-    letter-spacing: 0.3px;
+    color: #6366f1;
+    letter-spacing: 0.5px;
     padding-left: 4px;
+    text-transform: uppercase;
   }
 
   ion-input.styled-input {
-    --background: #f4f0fa;
-    --color: #2d1f3d;
-    --placeholder-color: #b09cc8;
+    --background: rgba(99, 102, 241, 0.03);
+    --color: #0f172a;
+    --placeholder-color: #94a3b8;
     --padding-start: 14px;
     --padding-end: 14px;
     --border-radius: 12px;
-    border: 1.5px solid #e0d6f0;
+    border: 1.5px solid rgba(99, 102, 241, 0.1);
     border-radius: 12px;
     font-size: 0.97rem;
-    height: 46px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    height: 48px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 
     &:focus-within {
-      border-color: #764ba2;
-      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.12);
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+      --background: #ffffff;
+    }
+  }
+
+  select.styled-select {
+    background: rgba(99, 102, 241, 0.03);
+    color: #0f172a;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(99, 102, 241, 0.1);
+    font-size: 0.97rem;
+    height: 48px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+    &:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+      background: #ffffff;
     }
   }
 }
 
 .register-button {
   --border-radius: 12px;
-  margin-top: 20px;
-  margin-bottom: 15px;
-  height: 55px;
-  --background: #764ba2; // Color acorde al degradado
-  font-weight: bold;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  height: 50px;
+  font-weight: 700;
+  --background: #{$primary-gradient};
+  --box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+  letter-spacing: 0.5px;
 }
 
 .logo-section {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f8f9ff;
+  background: rgba(99, 102, 241, 0.03);
   border-radius: 20px;
-  padding: 50px;
+  padding: 40px;
+  border: 1px solid rgba(99, 102, 241, 0.06);
   height: 100%;
 }
 
 .img-register-large {
-  font-size: 160px;
-  color: #764ba2;
-  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.1));
+  font-size: 130px;
+  color: $primary-color;
+  filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.15));
+}
+
+@media (max-width: 768px) {
+  .logo-section {
+    margin-bottom: 20px;
+  }
+  .img-register-large {
+    font-size: 90px;
+  }
 }
 
 ion-note {
-  cursor: pointer;
-  &:hover {
-    color: #667eea;
+  display: block;
+  margin-top: 20px;
+  color: #64748b;
+  b {
+    color: $primary-color;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: #7c3aed;
+    }
   }
 }
 
-// ==================== DARK MODE OVERRIDES ====================
+// ===== DARK MODE OVERRIDES =====
 :host-context(body.ion-palette-dark) {
 
   .login-wrapper {
-    background: linear-gradient(135deg, #0b0d17 0%, #151832 40%, #1a1040 70%, #0e1023 100%);
+    background: #080b11;
   }
 
   .interactive-card {
-    background: rgba(20, 22, 40, 0.75);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    box-shadow:
-      0 24px 48px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    background: #0f172a;
+    border: 1px solid rgba(168, 85, 247, 0.15);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
 
     &:hover {
-      transform: translateY(-5px);
-      box-shadow:
-        0 32px 64px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07);
-      border-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 32px 64px rgba(0, 0, 0, 0.45);
+      border-color: rgba(168, 85, 247, 0.25);
     }
   }
 
   .form-section {
     ion-card-title {
-      color: #eceef6;
-      letter-spacing: 2px;
+      color: #f1f5f9;
     }
   }
 
   .custom-input {
     .input-label {
-      color: #818cf8;
+      color: #a855f7;
     }
 
     ion-input.styled-input {
-      --background: rgba(255, 255, 255, 0.04);
-      --color: #e2e4f0;
-      --placeholder-color: #5a5e78;
-      border-color: rgba(255, 255, 255, 0.08);
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      --background: rgba(168, 85, 247, 0.04);
+      --color: #f1f5f9;
+      --placeholder-color: #64748b;
+      border-color: rgba(168, 85, 247, 0.15);
 
       &:focus-within {
-        border-color: #818cf8;
-        box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
-        --background: rgba(129, 140, 248, 0.05);
+        border-color: #a855f7;
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        --background: #0f172a;
+      }
+    }
+
+    select.styled-select {
+      background: rgba(168, 85, 247, 0.04);
+      color: #f1f5f9;
+      border-color: rgba(168, 85, 247, 0.15);
+      outline: none;
+
+      &:focus {
+        border-color: #a855f7;
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        background: #0f172a;
+      }
+
+      option {
+        background: #0f172a;
+        color: #f1f5f9;
       }
     }
   }
 
   .register-button {
-    --background: linear-gradient(135deg, #667eea 0%, #818cf8 50%, #a78bfa 100%);
-    --box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    --background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%);
+    --box-shadow: 0 8px 24px rgba(168, 85, 247, 0.35);
   }
 
   .logo-section {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(168, 85, 247, 0.03);
+    border: 1px solid rgba(168, 85, 247, 0.1);
     position: relative;
     overflow: hidden;
 
@@ -170,25 +228,24 @@ ion-note {
       content: '';
       position: absolute;
       inset: -20px;
-      background: radial-gradient(circle at center, rgba(129, 140, 248, 0.08) 0%, transparent 70%);
+      background: radial-gradient(circle at center, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
       border-radius: 50%;
       animation: registerGlow 4s ease-in-out infinite alternate;
     }
   }
 
   .img-register-large {
-    color: #818cf8;
-    filter: drop-shadow(0 0 20px rgba(129, 140, 248, 0.25));
-    position: relative;
-    z-index: 1;
+    color: #a855f7;
+    filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.25));
   }
 
   ion-note {
-    color: #7b7f99;
-
-    &:hover {
-      color: #a78bfa;
-      filter: brightness(1.1);
+    color: #94a3b8;
+    b {
+      color: #a855f7;
+      &:hover {
+        color: #d946ef;
+      }
     }
   }
 }
@@ -197,3 +254,4 @@ ion-note {
   from { opacity: 0.5; transform: scale(0.95); }
   to   { opacity: 1;   transform: scale(1.05); }
 }
+

@@ -35,3 +35,692 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 @import "@ionic/angular/css/palettes/dark.class.css";
 /* @import '@ionic/angular/css/palettes/dark.system.css'; */
+
+/* --- Custom Global Overrides --- */
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom modern scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.45);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+}
+
+/* Selection style */
+::selection {
+  background: rgba(124, 58, 237, 0.15);
+  color: #7c3aed;
+}
+
+/* Standard animation utils */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- Chat Locked Styles --- */
+.chat-locked-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  background: rgba(124, 58, 237, 0.03);
+  border-radius: 16px;
+  border: 1px dashed rgba(124, 58, 237, 0.15);
+  margin-top: 15px;
+
+  .lock-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(124, 58, 237, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.05);
+
+    ion-icon {
+      font-size: 1.8rem;
+      color: #7c3aed;
+    }
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #2d1f3d;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: #5a4570;
+    max-width: 320px;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+/* Dark mode adjustments */
+body.ion-palette-dark {
+  .chat-locked-content {
+    background: rgba(168, 85, 247, 0.02);
+    border-color: rgba(168, 85, 247, 0.15);
+
+    .lock-icon-wrapper {
+      background: rgba(168, 85, 247, 0.08);
+      border-color: rgba(168, 85, 247, 0.2);
+      ion-icon {
+        color: #a855f7;
+      }
+    }
+
+    h3 {
+      color: #e8dff2;
+    }
+
+    p {
+      color: #9a85b0;
+    }
+  }
+}
+
+/* ==========================================================================
+   UNIFIED PROJECT MODAL STYLES (LIGHT AND DARK THEMES + SPACING)
+   ========================================================================== */
+
+.project-modal {
+  --width: 95%;
+  --max-width: 650px;
+  --height: 85%;
+  --max-height: 85%;
+  --border-radius: 24px;
+
+  ion-header ion-toolbar {
+    --background: #ffffff;
+    --color: #2d1f3d;
+    --border-color: #f0eaf8;
+  }
+
+  ion-content {
+    --background: #eae2f8;
+    --color: #2d1f3d;
+  }
+
+  .modal-container {
+    padding: 24px 30px;
+  }
+
+  .modal-image-wrapper {
+    margin-bottom: 24px;
+
+    .modal-project-img {
+      border-radius: 16px;
+      width: 100%;
+      object-fit: cover;
+      height: 220px;
+      box-shadow: 0 6px 18px rgba(118, 75, 162, 0.18);
+    }
+  }
+
+  .modal-info-content {
+    .modal-title {
+      margin: 0;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #2d1f3d;
+    }
+
+    .modal-description-text {
+      color: #5a4570;
+      line-height: 1.7;
+      margin: 10px 0 24px 0;
+      font-size: 1rem;
+    }
+
+    .btn-video {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #764ba2;
+      border: 1.5px solid #764ba2;
+      border-radius: 10px;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s ease, color 0.2s ease;
+
+      &:hover {
+        background: #764ba2;
+        color: #ffffff;
+      }
+    }
+  }
+
+  /* Spacing and visual design for cards */
+  .project-detail-card,
+  .status-section,
+  .chat-section,
+  .team-section,
+  .features-section,
+  .documents-section,
+  .gallery-section {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1.5px solid rgba(124, 58, 237, 0.12);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(118, 75, 162, 0.04);
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(118, 75, 162, 0.08);
+      border-color: rgba(118, 75, 162, 0.2);
+    }
+  }
+
+  .detail-section-title {
+    margin-top: 0;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2d1f3d;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.2px;
+
+    ion-icon {
+      font-size: 1.25rem;
+      color: #764ba2;
+    }
+  }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 14px;
+    font-weight: 700;
+    color: #764ba2;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+
+    .section-icon {
+      font-size: 1rem;
+    }
+  }
+
+  /* Forms & inputs */
+  .edit-modal-title {
+    margin-top: 0;
+    margin-bottom: 22px;
+    color: #2d1f3d;
+    font-weight: 800;
+    font-size: 1.3rem;
+    border-bottom: 1.5px solid rgba(118, 75, 162, 0.1);
+    padding-bottom: 10px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #5a4570;
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+
+  .form-input, .form-select, .collaborators-select, .role-select-styled {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e0;
+    background: #ffffff;
+    color: #2d1f3d;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      border-color: #764ba2;
+      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.12);
+    }
+  }
+
+  textarea.form-input {
+    resize: vertical;
+  }
+
+  /* Cover Image Uploader style */
+  .imagen-uploader {
+    border: 2px dashed #cbd5e0;
+    padding: 24px;
+    text-align: center;
+    border-radius: 12px;
+    cursor: pointer;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #764ba2;
+      background: #f1f3f9;
+    }
+
+    &.tiene-imagen {
+      border-style: solid;
+      background: #ffffff;
+    }
+  }
+
+  /* List and items styles inside card */
+  ion-list {
+    background: transparent !important;
+    padding: 0;
+    margin: 0;
+  }
+
+  ion-item {
+    --background: transparent;
+    --color: inherit;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+
+  .doc-item-premium, .collaborator-item-premium {
+    --background: rgba(255, 255, 255, 0.5);
+    padding: 8px 12px;
+    border: 1px solid rgba(124, 58, 237, 0.08);
+    margin-bottom: 8px;
+  }
+
+  .doc-link {
+    text-decoration: none;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+  }
+
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .gallery-item {
+    position: relative;
+    aspect-ratio: 4/3;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(118, 75, 162, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+
+    &:hover {
+      transform: scale(1.04);
+      box-shadow: 0 8px 18px rgba(118, 75, 162, 0.15);
+    }
+
+    a {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  /* Edit-specific dividers */
+  .edit-section-divider {
+    margin-top: 32px;
+    border-top: 1.5px solid rgba(124, 58, 237, 0.15);
+    padding-top: 24px;
+  }
+
+  .edit-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .edit-section-title {
+    margin: 0;
+    color: #2d1f3d;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .empty-state-box {
+    padding: 16px;
+    text-align: center;
+    color: #9070b0;
+    font-style: italic;
+    border: 1px dashed rgba(118, 75, 162, 0.18);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.3);
+    font-size: 0.9rem;
+  }
+
+  .collaborators-list {
+    margin-top: 10px;
+  }
+
+  .collab-avatar-icon {
+    font-size: 2.2rem;
+    color: #764ba2;
+  }
+
+  .collaborator-name {
+    margin: 0;
+    font-weight: 600;
+    color: #2d1f3d;
+    font-size: 0.95rem;
+  }
+
+  .collaborator-username {
+    margin: 2px 0 0 0;
+    font-size: 0.82rem;
+    color: #a084c0;
+  }
+
+  /* Chat elements inside modal */
+  .comments-feed {
+    max-height: 280px;
+    overflow-y: auto;
+    margin-bottom: 14px;
+    padding: 4px 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
+  }
+
+  .comment-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+
+    &.comment-row-mine {
+      flex-direction: row-reverse;
+
+      .comment-bubble {
+        background: linear-gradient(135deg, #764ba2, #a855f7);
+        border-bottom-right-radius: 4px;
+        border-bottom-left-radius: 14px;
+
+        .comment-text { color: #ffffff; }
+        .comment-time { color: rgba(255, 255, 255, 0.65); }
+      }
+
+      .comment-bubble-wrap { align-items: flex-end; }
+    }
+  }
+
+  .comment-bubble {
+    background: #f0eaf8;
+    padding: 9px 13px 6px;
+    border-radius: 14px 14px 14px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    .comment-text {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #2d1f3d;
+      line-height: 1.45;
+    }
+
+    .comment-time {
+      font-size: 0.7rem;
+      color: #a080c0;
+      align-self: flex-end;
+    }
+  }
+
+  .comment-delete-btn {
+    color: #eb445a;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .chat-input-container {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1.5px solid #d8cce8;
+    border-radius: 30px;
+    padding: 4px 8px 4px 18px;
+
+    .chat-input {
+      --padding-start: 0;
+      --background: transparent;
+      --color: #2d1f3d;
+      --placeholder-color: #a080c0;
+      font-size: 0.93rem;
+    }
+  }
+}
+
+/* ==========================================
+   DARK MODE OVERRIDES (GLOBAL PROJECT MODAL)
+   ========================================== */
+
+body.ion-palette-dark {
+  .project-modal {
+    ion-header ion-toolbar {
+      --background: #241a33;
+      --color: #e8dff2;
+      --border-color: #4a3660;
+    }
+
+    ion-content {
+      --background: #1a1225;
+      --color: #e8dff2;
+    }
+
+    .modal-info-content {
+      .modal-title { color: #e8dff2; }
+      .modal-description-text { color: #9a85b0; }
+
+      .btn-video {
+        color: #a1b4fd;
+        border-color: #a1b4fd;
+
+        &:hover {
+          background: #667eea;
+          color: #ffffff;
+        }
+      }
+    }
+
+    /* Cards */
+    .project-detail-card,
+    .status-section,
+    .chat-section,
+    .team-section,
+    .features-section,
+    .documents-section,
+    .gallery-section {
+      background: rgba(36, 26, 51, 0.65);
+      border-color: rgba(196, 167, 231, 0.12);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+
+      &:hover {
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+        border-color: rgba(196, 167, 231, 0.25);
+      }
+    }
+
+    .detail-section-title {
+      color: #e8dff2;
+      ion-icon { color: #c4a7e7; }
+    }
+
+    .section-label {
+      color: #c4a7e7;
+    }
+
+    /* Forms & inputs */
+    .edit-modal-title {
+      color: #e8dff2;
+      border-bottom-color: rgba(196, 167, 231, 0.15);
+    }
+
+    .form-label {
+      color: #9a85b0;
+    }
+
+    .form-input, .form-select, .collaborators-select, .role-select-styled {
+      border-color: #4a3660;
+      background: #2d1f3d;
+      color: #e8dff2;
+
+      &:focus {
+        border-color: #a855f7;
+        box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+      }
+    }
+
+    select option {
+      background-color: #2d1f3d;
+      color: #e8dff2;
+    }
+
+    /* Cover Image Uploader */
+    .imagen-uploader {
+      border-color: #4a3660;
+      background: #1a1225;
+
+      &:hover {
+        border-color: #a855f7;
+        background: #241a33;
+      }
+
+      &.tiene-imagen {
+        background: #2d1f3d;
+      }
+    }
+
+    /* Items */
+    .doc-item-premium, .collaborator-item-premium {
+      --background: rgba(36, 26, 51, 0.5);
+      border-color: rgba(196, 167, 231, 0.08);
+    }
+
+    .doc-link {
+      color: #a1b4fd;
+
+      &:hover {
+        color: #c4a7e7;
+      }
+    }
+
+    .gallery-item {
+      border-color: rgba(196, 167, 231, 0.12);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        box-shadow: 0 8px 22px rgba(196, 167, 231, 0.22);
+      }
+    }
+
+    .edit-section-divider {
+      border-top-color: rgba(196, 167, 231, 0.15);
+    }
+
+    .edit-section-title {
+      color: #e8dff2;
+    }
+
+    .empty-state-box {
+      color: #9a85b0;
+      border-color: rgba(196, 167, 231, 0.15);
+      background: rgba(36, 26, 51, 0.3);
+    }
+
+    .collab-avatar-icon {
+      color: #c4a7e7;
+    }
+
+    .collaborator-name {
+      color: #e8dff2;
+    }
+
+    .collaborator-username {
+      color: #9a85b0;
+    }
+
+    /* Chat overrides */
+    .comment-bubble {
+      background: #362550;
+      .comment-text { color: #e8dff2; }
+      .comment-time { color: #7a6d8a; }
+    }
+
+    .chat-input-container {
+      background: #2d1f3d;
+      border-color: #4a3660;
+
+      .chat-input {
+        --color: #e8dff2;
+        --placeholder-color: #7a6d8a;
+      }
+    }
+  }
+}
+
+

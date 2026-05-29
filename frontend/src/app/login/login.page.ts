@@ -48,7 +48,7 @@ export class LoginPage {
           this.authService.guardarSesion(usuario);
           this.cargando = false;
 
-          if (usuario.rol === 'administrador') {
+          if (usuario.rol === 'administrador' || usuario.rol === 'admin') {
             this.router.navigate(['/home-admin']);
           } else {
             this.router.navigate(['/home']);

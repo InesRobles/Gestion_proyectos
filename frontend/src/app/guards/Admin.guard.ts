@@ -22,13 +22,13 @@ export const adminGuard: CanActivateFn = () => {
         auth.guardarSesion({ ...sesion, rol: usuario.rol });
       }
 
-      if (usuario.rol === 'administrador') {
+      if (usuario.rol === 'administrador' || usuario.rol === 'admin') {
         return true;
       }
       return router.createUrlTree(['/home']);
     }),
     catchError(() => {
-      if (sesion.rol === 'administrador') return of(true);
+      if (sesion.rol === 'administrador' || sesion.rol === 'admin') return of(true);
       return of(router.createUrlTree(['/home']));
     })
   );

@@ -34,8 +34,11 @@ import { AuthService } from '../services/auth-service';
 import { proyecto, EstadoProyecto } from '../modelos/proyecto';
 import { HeaderComponent } from '../components/header/header.component';
 import { forkJoin } from 'rxjs';
+import { timeout, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { RegistroActividad, RegistroActividadService } from "../services/registro-actividad-service";
-import {TareaService} from "../services/tarea-service";
+import { TareaService } from "../services/tarea-service";
+import { ModalidadService } from '../services/modalidad-service';
 // ── AFK ────────────────────────────────────────────────────────
 
 @Component({
@@ -57,6 +60,11 @@ export class HomeAdminPage implements OnInit {
 
   mostrarTodosUsuarios: boolean = false;
   mostrarTodosProyectos: boolean = false;
+  modalidades: any[] = [];
+  usuariosExpandidos: Set<number> = new Set();
+  proyectosPorUsuario: Map<number, proyecto[]> = new Map();
+  loadingProyectosUsuario: Map<number, boolean> = new Map();
+  private modalidadService = inject(ModalidadService);
   // ── FIX: mapa usuarioId → alumnoId para cruzar usuarios con asistencia ──────
   private usuarioIdToAlumnoId: Map<number, number> = new Map();
   // ── Fichaje del administrador ──────────────────────────────────────────────
@@ -84,10 +92,10 @@ export class HomeAdminPage implements OnInit {
   proyectoEditando: proyecto | null = null;
   guardandoProyecto: boolean = false;
   formProyecto: {
-    titulo: string; descripcion: string; cupoMaximo: number; estado: EstadoProyecto;
+    titulo: string; descripcion: string; estado: EstadoProyecto;
     fotoProyecto: string | null; videoUrl: string
   } =
-    { titulo: '', descripcion: '', cupoMaximo: 5, estado: 'en curso', fotoProyecto: null, videoUrl: '' };
+    { titulo: '', descripcion: '', estado: 'en curso', fotoProyecto: null, videoUrl: '' };
   @ViewChild('inputImagen') inputImagenRef!: ElementRef<HTMLInputElement>;
 
   // Usuarios
@@ -110,7 +118,7 @@ export class HomeAdminPage implements OnInit {
   // Modal cambio masivo de rol
   modalCambioMasivoAbierto: boolean = false;
   seleccionadosMasivo: number[] = [];
-  rolMasivoDestino: string = 'administrador';
+  rolMasivoDestino: string = 'admin';
   guardandoCambioMasivo: boolean = false;
   busquedaMasivo: string = '';
   usuariosFiltradosMasivo: Usuario[] = [];
@@ -155,6 +163,7 @@ export class HomeAdminPage implements OnInit {
     this.authService.sesion$.subscribe(sesion => {
       this.nombreUsuario = sesion?.nombreReal ?? 'Administrador';
     });
+    this.cargarModalidades();
     this.cargarAlumnosYUsuarios();
     this.cargarProyectos();
     this.cargarHorarioYFichaje();
@@ -169,8 +178,8 @@ export class HomeAdminPage implements OnInit {
     this.loadingUsuarios = true;
 
     forkJoin({
-      alumnos: this.alumnoService.getAlumnos(),
-      usuarios: this.usuarioService.getUsuarios()
+      alumnos: this.alumnoService.getAlumnos().pipe(timeout(8000), catchError(() => of([]))),
+      usuarios: this.usuarioService.getUsuarios().pipe(timeout(8000), catchError(() => of([])))
     }).subscribe({
       next: ({ alumnos, usuarios }) => {
         this.alumnos = alumnos;
@@ -185,6 +194,8 @@ export class HomeAdminPage implements OnInit {
         this.loading = false;
         this.loadingUsuarios = false;
 
+        // Poblar filtroUsuarios inmediatamente para que el template no quede vacío
+        this.aplicarFiltros();
         this.cargarFichadosHoy();
       },
       error: () => {
@@ -378,7 +389,14 @@ export class HomeAdminPage implements OnInit {
   // ─────────────────────────────────────────────────────────────
   cargarProyectos() {
     this.loadingProyectos = true;
-    this.proyectoService.getProyectos().subscribe({
+    this.proyectoService.getProyectos().pipe(
+      timeout(8000),
+      catchError(() => {
+        this.mostrarToast('Error cargando proyectos', 'danger');
+        this.loadingProyectos = false;
+        return of([]);
+      })
+    ).subscribe({
       next: (res) => {
         this.proyectos = res;
         this.aplicarFiltrosProyectos();
@@ -426,7 +444,6 @@ export class HomeAdminPage implements OnInit {
     this.formProyecto = {
       titulo: p?.titulo || '',
       descripcion: p?.descripcion || '',
-      cupoMaximo: p?.cupoMaximo || 1,
       estado: p?.estado || 'en curso',
       fotoProyecto: p?.fotoProyecto || null,
       videoUrl: p?.videoUrl || ''
@@ -450,7 +467,6 @@ export class HomeAdminPage implements OnInit {
     const payload: Partial<proyecto> = {
       titulo: this.formProyecto.titulo,
       descripcion: this.formProyecto.descripcion,
-      cupoMaximo: this.formProyecto.cupoMaximo,
       estado: this.formProyecto.estado,
       fotoProyecto: this.formProyecto.fotoProyecto || null,
       videoUrl: this.formProyecto.videoUrl || '',
@@ -547,8 +563,107 @@ export class HomeAdminPage implements OnInit {
     });
   }
 
+  cargarModalidades() {
+    this.modalidadService.getModalidades().subscribe({
+      next: (modalidades) => {
+        this.modalidades = modalidades;
+      }
+    });
+  }
+
+  toggleUsuarioExpandido(u: Usuario) {
+    if (this.usuariosExpandidos.has(u.id)) {
+      this.usuariosExpandidos.delete(u.id);
+    } else {
+      this.usuariosExpandidos.add(u.id);
+      if (u.rol === 'alumno') {
+        const alumnoId = this.usuarioIdToAlumnoId.get(u.id);
+        if (alumnoId != null && !this.proyectosPorUsuario.has(u.id)) {
+          this.loadingProyectosUsuario.set(u.id, true);
+          this.proyectoService.getProyectosPorAlumno(alumnoId).subscribe({
+            next: (proyectos) => {
+              this.proyectosPorUsuario.set(u.id, proyectos);
+              this.loadingProyectosUsuario.set(u.id, false);
+            },
+            error: () => {
+              this.proyectosPorUsuario.set(u.id, []);
+              this.loadingProyectosUsuario.set(u.id, false);
+              this.mostrarToast('Error al cargar proyectos del usuario', 'danger');
+            }
+          });
+        }
+      }
+    }
+  }
+
+  isUsuarioExpandido(u: Usuario): boolean {
+    return this.usuariosExpandidos.has(u.id);
+  }
+
+  getProyectosUsuario(u: Usuario): proyecto[] {
+    return this.proyectosPorUsuario.get(u.id) || [];
+  }
+
+  isLoadingProyectosUsuario(u: Usuario): boolean {
+    return this.loadingProyectosUsuario.get(u.id) || false;
+  }
+
+  get alumnosSolo(): Usuario[] {
+    return this.filtroUsuarios.filter(u => u.rol?.toLowerCase() === 'alumno');
+  }
+
+  guardarUsuarioInline(u: Usuario) {
+    if (!u.nombreReal?.trim() || !u.nombreUsuario?.trim()) {
+      this.mostrarToast('Por favor completa todos los campos del usuario', 'warning');
+      return;
+    }
+    const payload = {
+      nombreReal: u.nombreReal,
+      nombreUsuario: u.nombreUsuario,
+      rol: u.rol
+    };
+    this.usuarioService.actualizarUsuario(u.id, payload).subscribe({
+      next: (actualizado) => {
+        // Actualizar en la lista local
+        const idx = this.usuarios.findIndex(user => user.id === u.id);
+        if (idx !== -1) {
+          this.usuarios[idx] = { ...this.usuarios[idx], ...actualizado };
+        }
+
+        // Si el rol es alumno y tiene modalidadId, actualizar modalidad
+        if (u.rol === 'alumno' && u.modalidadId) {
+          this.usuarioService.actualizarModalidad(u.id, u.modalidadId).subscribe({
+            next: () => {
+              this.mostrarToast('✅ Usuario y modalidad actualizados con éxito', 'success');
+              this.cargarAlumnosYUsuarios();
+            },
+            error: () => {
+              this.mostrarToast('⚠️ Usuario actualizado, pero falló la modalidad', 'warning');
+            }
+          });
+        } else {
+          this.mostrarToast('✅ Usuario actualizado con éxito', 'success');
+          this.cargarAlumnosYUsuarios();
+        }
+      },
+      error: (err) => {
+        const msg = err?.error?.message ?? 'Error al actualizar el usuario';
+        this.mostrarToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  getImagenProyecto(p: proyecto): string {
+    return `https://picsum.photos/seed/${p.id}/600/400`;
+  }
+
+  getClaseEstado(estado: string): string {
+    return 'estado-' + (estado ?? '').replace(/ /g, '-');
+  }
+
   getIconoPorRol(rol: string): string {
     switch (rol?.toLowerCase()) {
+      case 'admin':
       case 'administrador': return 'shield-checkmark-outline';
       case 'profesor': return 'reader-outline';
       default: return 'person-outline';
@@ -619,7 +734,7 @@ export class HomeAdminPage implements OnInit {
   // ─────────────────────────────────────────────────────────────
   abrirModalCambioMasivoRol() {
     this.seleccionadosMasivo = [];
-    this.rolMasivoDestino = 'administrador';
+    this.rolMasivoDestino = 'admin';
     this.guardandoCambioMasivo = false;
     this.busquedaMasivo = '';
     this.usuariosFiltradosMasivo = [...this.usuarios];

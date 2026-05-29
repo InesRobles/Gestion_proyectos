@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, switchMap } from 'rxjs';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
-  IonCardTitle, IonModal, IonBadge, IonCardContent, IonSearchbar,
-  IonItem, IonLabel, ToastController, IonList, IonInput, IonSelect,
-  IonSelectOption
+  IonCardTitle, IonModal, IonBadge,
+  IonItem, IonLabel, ToastController, IonList, IonInput
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -18,17 +18,20 @@ import {
   calendarOutline, saveOutline,
   checkboxOutline, checkmarkOutline, checkmarkCircleOutline,
   hourglassOutline, playCircleOutline,
-  trashOutline, personOutline
+  trashOutline, personOutline,
+  documentOutline, imageOutline, logoGithub, createOutline, addOutline,
+  lockClosedOutline
 } from 'ionicons/icons';
 import { HeaderComponent } from '../components/header/header.component';
 import { proyecto } from '../modelos/proyecto';
 import { ProyectoService } from '../services/proyecto-service';
 import { AlumnoService } from '../services/alumno-service';
 import { AuthService } from '../services/auth-service';
-import { AsistenciaService } from '../services/asistencia-service';
+import { UsuarioService, Usuario } from '../services/usuario-service';
+import { AsignacionService } from '../services/asignacion-service';
+import { ModalidadService } from '../services/modalidad-service';
 import { inject } from '@angular/core';
-import { forkJoin } from 'rxjs';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {ComentarioDTO, ComentarioService} from "../services/comentario-service";
 import {TareaDTO, TareaService} from "../services/tarea-service";
 
@@ -40,9 +43,9 @@ import {TareaDTO, TareaService} from "../services/tarea-service";
   imports: [
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
     IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader,
-    IonCardTitle, IonModal, IonBadge, IonCardContent, CommonModule,
-    FormsModule, RouterLink, IonSearchbar, HeaderComponent,
-    IonItem, IonLabel, IonInput, IonList, IonSelect, IonSelectOption
+    IonCardTitle, IonModal, IonBadge, CommonModule,
+    FormsModule, HeaderComponent,
+    IonItem, IonLabel, IonInput, IonList
   ]
 })
 export class HomePage implements OnInit {
@@ -61,34 +64,66 @@ export class HomePage implements OnInit {
   tareasProyecto: TareaDTO[] = [];
   loadingTareas = false;
 
-  mostrarTarjetaAsistencia = true;
-  isExiting = false;
   nombreUsuario = '';
-  asistenciaHoy: any = null;
-
-  // Horario del alumno para hoy
-  horarioHoy: { horaInicio: string; horaFin: string } | null = null;
-  franjaActiva: 'activa' | null = null;
-
-  mostrarFormHorario = false;
-  guardandoHorario = false;
-  alumnoIdReal: number | null = null;
-  formHorario = { horaInicio: '', horaFin: '' };
 
   // Proyectos
   misProyectos: proyecto[] = [];
-  nuevosProyectos: proyecto[] = [];
   misProyectosFiltrados: proyecto[] = [];
-  nuevosProyectosFiltrados: proyecto[] = [];
   loadingProyectos = true;
+
+  // ─── NUEVOS CAMPOS EDICIÓN/CREACIÓN ───────────────────────────────────────
+  modalCrearProyectoAbierto = false;
+  guardandoProyecto = false;
+  formProyecto = {
+    titulo: '',
+    descripcion: '',
+    estado: 'en curso' as 'en curso' | 'finalizado' | 'pausado',
+    fotoProyecto: null as string | null,
+    videoUrl: '',
+    enlaceGithub: '',
+    memoria: '',
+    privado: false
+  };
+
+  modoEdicion = false;
+  formEdicionProyecto = {
+    titulo: '',
+    descripcion: '',
+    estado: 'en curso' as 'en curso' | 'finalizado' | 'pausado',
+    fotoProyecto: null as string | null,
+    videoUrl: '',
+    enlaceGithub: '',
+    memoria: '',
+    privado: false
+  };
+
+  documentosParaSubir: { nombre: string; contenido: string }[] = [];
+  imagenesParaSubir: { nombre: string; contenido: string }[] = [];
+  colaboradoresParaCrear: any[] = [];
+
+  alumnosDisponibles: Usuario[] = [];
+  subiendoRecurso = false;
+
+  rolUsuario = '';
+  todosLosAlumnos: Usuario[] = [];
+  modalidades: { id: number; nombre: string }[] = [];
+  proyectosParticipandoIds = new Set<number>();
+
+  @ViewChild('inputImagenCrear') inputImagenCrearRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('inputImagenEdicion') inputImagenEdicionRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('inputDocumento') inputDocumentoRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('inputImagenGaleria') inputImagenGaleriaRef!: ElementRef<HTMLInputElement>;
 
   private toastController = inject(ToastController);
   private proyectoService = inject(ProyectoService);
   private authService = inject(AuthService);
   private alumnoService = inject(AlumnoService);
-  private asistenciaService = inject(AsistenciaService);
   private tareaService = inject(TareaService);
   private comentarioService = inject(ComentarioService);
+  private usuarioService = inject(UsuarioService);
+  private asignacionService = inject(AsignacionService);
+  private modalidadService = inject(ModalidadService);
+  private router = inject(Router);
 
   constructor() {
     addIcons({
@@ -100,188 +135,56 @@ export class HomePage implements OnInit {
       calendarOutline, saveOutline,
       checkboxOutline, checkmarkOutline, checkmarkCircleOutline,
       hourglassOutline, playCircleOutline,
-      trashOutline, personOutline
+      trashOutline, personOutline,
+      documentOutline, imageOutline, logoGithub, createOutline, addOutline,
+      lockClosedOutline
     });
   }
 
   ngOnInit() {
     this.authService.sesion$.subscribe(sesion => {
       this.nombreUsuario = sesion?.nombreReal ?? 'Usuario';
-      this.mostrarTarjetaAsistencia = true;
     });
-    this.cargarProyectos();
-    this.cargarHorarioYFichaje();
-  }
-
-  // ─────────────────────────────────────────────────────────────
-  // HORARIO Y FICHAJE
-  // ─────────────────────────────────────────────────────────────
-  cargarHorarioYFichaje() {
     const sesion = this.authService.obtenerSesion();
-    if (!sesion?.id) return;
-
-    const diasSemanaMap = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const diaHoy = diasSemanaMap[new Date().getDay()];
-    const ahora = new Date();
-    const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
-
-    this.alumnoService.getAlumnoByUsuarioId(sesion.id).subscribe({
-      next: (alumno: any) => {
-        console.log('[DEBUG] Respuesta getAlumnoByUsuarioId:', JSON.stringify(alumno));
-        const alumnoId: number = alumno.alumnoId ?? alumno.id;
-
-        if (!alumnoId) {
-          console.warn('[WARN] No se pudo determinar el alumnoId del usuario', sesion.id);
-          this.mostrarTarjetaAsistencia = false;
-          return;
-        }
-
-        this.alumnoIdReal = alumnoId;
-
-        this.asistenciaService.haFichadoHoy(alumnoId).subscribe({
-          next: (asistencia) => {
-            this.asistenciaHoy = asistencia;
-            this.mostrarTarjetaAsistencia = true;
-            this.cargarHorarioParaAlumno(alumnoId, diaHoy, horaActual);
-          },
-          error: () => {
-            this.asistenciaHoy = null;
-            this.mostrarTarjetaAsistencia = true;
-            this.cargarHorarioParaAlumno(alumnoId, diaHoy, horaActual);
-          }
-        });
-      },
-      error: async (err) => {
-        console.warn('[WARN] getAlumnoByUsuarioId error:', err?.status, err?.message);
-        this.mostrarTarjetaAsistencia = false;
+    if (sesion) {
+      this.rolUsuario = sesion.rol;
+      if (this.rolUsuario === 'administrador' || this.rolUsuario === 'admin') {
+        this.router.navigate(['/home-admin']);
+        return;
       }
-    });
-  }
-
-  cargarHorarioParaAlumno(alumnoId: number, diaHoy: string, horaActual: number) {
-    this.alumnoService.getHorarioAlumno(alumnoId).subscribe({
-      next: (horarios: any[]) => {
-        const horariosHoy = horarios.filter((h: any) =>
-          h.diaSemana?.toLowerCase() === diaHoy.toLowerCase()
-        );
-
-        if (horariosHoy.length === 0) {
-          if (horarios.length > 0) {
-            const ref = horarios[0];
-            this.alumnoService.crearHorario({
-              alumnoId: alumnoId,
-              diaSemana: diaHoy,
-              horaInicio: ref.horaInicio,
-              horaFin: ref.horaFin
-            }).subscribe({
-              next: () => this.cargarHorarioYFichaje(),
-              error: () => {
-                this.horarioHoy = { horaInicio: ref.horaInicio, horaFin: ref.horaFin };
-                this.franjaActiva = 'activa';
-              }
-            });
-            return;
-          }
-
-          this.horarioHoy = null;
-          this.franjaActiva = null;
-          this.mostrarFormHorario = true;
-          return;
-        }
-
-        this.mostrarFormHorario = false;
-        horariosHoy.sort((a: any, b: any) => {
-          const [aH, aM] = a.horaInicio.split(':').map(Number);
-          const [bH, bM] = b.horaInicio.split(':').map(Number);
-          return (aH * 60 + aM) - (bH * 60 + bM);
-        });
-
-        const activo = horariosHoy.find((h: any) => {
-          const [hiH, hiM] = h.horaInicio.split(':').map(Number);
-          const [hfH, hfM] = h.horaFin.split(':').map(Number);
-          return horaActual >= (hiH * 60 + hiM) && horaActual <= (hfH * 60 + hfM);
-        });
-
-        if (activo) {
-          this.horarioHoy = { horaInicio: activo.horaInicio, horaFin: activo.horaFin };
-          this.franjaActiva = 'activa';
-        } else {
-          const proximo = horariosHoy[0];
-          this.horarioHoy = { horaInicio: proximo.horaInicio, horaFin: proximo.horaFin };
-          this.franjaActiva = null;
-        }
-      },
-      error: () => {
-        this.horarioHoy = { horaInicio: '08:00', horaFin: '15:00' };
-        this.franjaActiva = 'activa';
-      }
-    });
-  }
-
-  // ─────────────────────────────────────────────────────────────
-  // GUARDAR HORARIO
-  // ─────────────────────────────────────────────────────────────
-  async guardarHorario() {
-    if (!this.alumnoIdReal || !this.formHorario.horaInicio || !this.formHorario.horaFin) {
-      const toast = await this.toastController.create({
-        message: 'Rellena la hora de entrada y salida',
-        duration: 2000, color: 'warning', position: 'top'
-      });
-      await toast.present();
-      return;
     }
-
-    this.guardandoHorario = true;
-
-    const diasLaborables = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-    const peticiones = diasLaborables.map(dia =>
-      this.alumnoService.crearHorario({
-        alumnoId: this.alumnoIdReal!,
-        diaSemana: dia,
-        horaInicio: this.formHorario.horaInicio,
-        horaFin: this.formHorario.horaFin
-      })
-    );
-
-    forkJoin(peticiones).subscribe({
-      next: async () => {
-        this.guardandoHorario = false;
-        const toast = await this.toastController.create({
-          message: '✅ Horario guardado para toda la semana',
-          duration: 2000, color: 'success', position: 'top'
-        });
-        await toast.present();
-        this.cargarHorarioYFichaje();
-      },
-      error: async () => {
-        this.guardandoHorario = false;
-        const toast = await this.toastController.create({
-          message: '❌ Error al guardar el horario',
-          duration: 2000, color: 'danger', position: 'top'
-        });
-        await toast.present();
-      }
-    });
+    this.cargarParticipando();
+    this.cargarProyectos();
   }
 
-  // ─────────────────────────────────────────────────────────────
+
   // PROYECTOS
   // ─────────────────────────────────────────────────────────────
-  cargarProyectos() {
+  cargarParticipando() {
     const sesion = this.authService.obtenerSesion();
-    if (!sesion?.id) { this.loadingProyectos = false; return; }
+    if (sesion && sesion.rol !== 'admin') {
+      this.proyectoService.getProyectosPorAlumno(sesion.id).subscribe({
+        next: (proyectos) => {
+          this.proyectosParticipandoIds = new Set(proyectos.map(p => p.id));
+        }
+      });
+    } else {
+      this.proyectosParticipandoIds.clear();
+    }
+  }
 
+  esParticipante(proyectoId: number): boolean {
+    return this.proyectosParticipandoIds.has(proyectoId);
+  }
+
+  cargarProyectos() {
     this.loadingProyectos = true;
+    const sesion = this.authService.obtenerSesion();
 
-    forkJoin({
-      misProyectos: this.proyectoService.getProyectosActivos(sesion.id),
-      nuevosProyectos: this.proyectoService.getProyectosDisponibles(sesion.id)
-    }).subscribe({
-      next: ({ misProyectos, nuevosProyectos }) => {
-        this.misProyectos = misProyectos;
-        this.nuevosProyectos = nuevosProyectos;
-        this.misProyectosFiltrados = [...misProyectos];
-        this.nuevosProyectosFiltrados = this.ordenarPorEstado(nuevosProyectos);
+    this.proyectoService.getProyectos(sesion?.id ?? undefined).subscribe({
+      next: (proyectos) => {
+        this.misProyectos = proyectos;
+        this.misProyectosFiltrados = this.ordenarPorEstado(proyectos);
         this.loadingProyectos = false;
       },
       error: async () => {
@@ -298,14 +201,10 @@ export class HomePage implements OnInit {
   buscarProyectos(textoBusqueda: string) {
     const texto = textoBusqueda ? textoBusqueda.toLowerCase().trim() : '';
     if (!texto) {
-      this.misProyectosFiltrados = [...this.misProyectos];
-      this.nuevosProyectosFiltrados = this.ordenarPorEstado(this.nuevosProyectos);
+      this.misProyectosFiltrados = this.ordenarPorEstado(this.misProyectos);
       return;
     }
-    this.misProyectosFiltrados = this.misProyectos.filter(p =>
-      p.titulo.toLowerCase().includes(texto) || p.descripcion?.toLowerCase().includes(texto)
-    );
-    this.nuevosProyectosFiltrados = this.ordenarPorEstado(this.nuevosProyectos.filter(p =>
+    this.misProyectosFiltrados = this.ordenarPorEstado(this.misProyectos.filter(p =>
       p.titulo.toLowerCase().includes(texto) || p.descripcion?.toLowerCase().includes(texto)
     ));
   }
@@ -315,9 +214,14 @@ export class HomePage implements OnInit {
   // ─────────────────────────────────────────────────────────────
   private ordenarPorEstado(proyectos: proyecto[]): proyecto[] {
     const prioridad: Record<string, number> = { 'en curso': 0, 'pausado': 1, 'finalizado': 2 };
-    return [...proyectos].sort((a, b) =>
-      (prioridad[a.estado] ?? 99) - (prioridad[b.estado] ?? 99)
-    );
+    return [...proyectos].sort((a, b) => {
+      const prioA = prioridad[a.estado] ?? 99;
+      const prioB = prioridad[b.estado] ?? 99;
+      if (prioA !== prioB) {
+        return prioA - prioB;
+      }
+      return b.id - a.id;
+    });
   }
 
   getClaseEstado(estado: string): string {
@@ -346,155 +250,39 @@ export class HomePage implements OnInit {
     }
   }
 
-  getPorcentajeCupo(p: proyecto): number {
-    if (!p.cupoMaximo || p.cupoMaximo === 0) return 0;
-    const ocupados = p.cupoMaximo - p.cuposDisponibles;
-    return Math.min((ocupados / p.cupoMaximo) * 100, 100);
-  }
 
-  puedeInscribirse(p: proyecto): boolean {
-    return p.estado === 'en curso' && p.cuposDisponibles > 0;
-  }
-
-  getTextoBotonInscripcion(p: proyecto): string {
-    if (p.estado === 'finalizado') return 'Finalizado';
-    if (p.estado === 'pausado')    return 'Pausado';
-    if (p.cuposDisponibles <= 0)   return 'Sin cupos';
-    return 'Inscribirse';
-  }
-
-  // ─────────────────────────────────────────────────────────────
-  // FICHAJE
-  // ─────────────────────────────────────────────────────────────
-  async fichar() {
-    if (!this.alumnoIdReal) return;
-
-    const sesion = this.authService.obtenerSesion();
-
-    this.asistenciaService.fichar(this.alumnoIdReal).subscribe({
-      next: async () => {
-        const hoy = new Date().toISOString().split('T')[0];
-        if (sesion?.id) {
-          localStorage.setItem(`fechaFichaje_${sesion.id}`, hoy);
-        }
-        const toast = await this.toastController.create({
-          message: '✅ Entrada registrada correctamente',
-          duration: 2000, position: 'top', color: 'success'
-        });
-        await toast.present();
-        this.cargarHorarioYFichaje();
-      },
-      error: async () => {
-        const toast = await this.toastController.create({
-          message: '❌ Error al registrar la entrada',
-          duration: 2000, position: 'top', color: 'danger'
-        });
-        await toast.present();
-      }
-    });
-  }
-
-  async desfichar() {
-    if (!this.alumnoIdReal) return;
-
-    this.asistenciaService.ficharSalida(this.alumnoIdReal).subscribe({
-      next: async () => {
-        const toast = await this.toastController.create({
-          message: '✅ Salida registrada correctamente. ¡Buen trabajo hoy! 🚀',
-          duration: 2000, position: 'top', color: 'success'
-        });
-        await toast.present();
-        this.cargarHorarioYFichaje();
-      },
-      error: async (err) => {
-        const mensaje = err?.error?.message ?? 'Error al registrar la salida';
-        const toast = await this.toastController.create({
-          message: `❌ ${mensaje}`,
-          duration: 2500, position: 'top', color: 'danger'
-        });
-        await toast.present();
-      }
-    });
-  }
-
-  // ─────────────────────────────────────────────────────────────
-  // INSCRIBIRSE / SALIR
-  // ─────────────────────────────────────────────────────────────
-  async inscribirse(p: proyecto) {
-    if (p.cuposDisponibles <= 0) {
-      const toast = await this.toastController.create({
-        message: `❌ El proyecto "${p.titulo}" no tiene cupos disponibles.`,
-        duration: 3000, color: 'danger', position: 'bottom'
-      });
-      await toast.present();
-      return;
-    }
-
-    const sesion = this.authService.obtenerSesion();
-    if (!sesion?.id) return;
-
-    this.proyectoService.inscribirse(sesion.id, p.id).subscribe({
-      next: async () => {
-        const toast = await this.toastController.create({
-          message: `✅ Te has inscrito en "${p.titulo}" correctamente.`,
-          duration: 2500, color: 'success', position: 'bottom'
-        });
-        await toast.present();
-        this.cargarProyectos();
-      },
-      error: async (err) => {
-        const mensaje = err?.error?.mensaje ?? 'Error al inscribirse. Inténtalo de nuevo.';
-        const toast = await this.toastController.create({
-          message: `❌ ${mensaje}`,
-          duration: 3500, color: 'danger', position: 'bottom'
-        });
-        await toast.present();
-      }
-    });
-  }
-
-  async salirDeProyecto(p: proyecto) {
-    const sesion = this.authService.obtenerSesion();
-    if (!sesion?.id) return;
-
-    this.proyectoService.salir(sesion.id, p.id).subscribe({
-      next: async () => {
-        const toast = await this.toastController.create({
-          message: `✅ Has salido de "${p.titulo}" correctamente.`,
-          duration: 2500, color: 'success', position: 'bottom'
-        });
-        await toast.present();
-        this.cargarProyectos();
-      },
-      error: async (err) => {
-        const mensaje = err?.error?.mensaje ?? 'Error al salir del proyecto. Inténtalo de nuevo.';
-        const toast = await this.toastController.create({
-          message: `❌ ${mensaje}`,
-          duration: 3500, color: 'danger', position: 'bottom'
-        });
-        await toast.present();
-      }
-    });
-  }
 
   // ─────────────────────────────────────────────────────────────
   // VER DETALLES / MODAL
   // ─────────────────────────────────────────────────────────────
   verDetalles(p: any, inscrito: boolean) {
-    this.proyectoSeleccionado = { ...p, alumnos: [] };
     this.esProyectoInscrito = inscrito;
     this.isModalOpen = true;
     this.tareasProyecto = [];
     this.comentarios = [];
     this.nuevoComentario = '';
+    this.modoEdicion = false;
 
-    this.proyectoService.getAlumnosPorProyecto(p.id).subscribe({
-      next: (alumnosBackend: any[]) => {
-        this.proyectoSeleccionado.alumnos = alumnosBackend;
+    const sesion = this.authService.obtenerSesion();
+    const usuarioId = sesion?.id ?? undefined;
+
+    this.proyectoService.getProyectoById(p.id, usuarioId).subscribe({
+      next: (fullProj) => {
+        this.proyectoSeleccionado = { ...fullProj, alumnos: [] };
+        // Cargar colaboradores
+        this.proyectoService.getAlumnosPorProyecto(p.id).subscribe({
+          next: (alumnosBackend: any[]) => {
+            this.proyectoSeleccionado.alumnos = alumnosBackend;
+          },
+          error: (err) => {
+            console.warn('[WARN] No se pudo cargar la lista de alumnos para este proyecto', err);
+            this.proyectoSeleccionado.alumnos = [];
+          }
+        });
       },
       error: (err) => {
-        console.warn('[WARN] No se pudo cargar la lista de alumnos para este proyecto', err);
-        this.proyectoSeleccionado.alumnos = [];
+        console.error('Error fetching project by id, using fallback', err);
+        this.proyectoSeleccionado = { ...p, alumnos: [] };
       }
     });
 
@@ -629,5 +417,685 @@ export class HomePage implements OnInit {
   tareasProgresoPct(): number {
     if (this.tareasProyecto.length === 0) return 0;
     return Math.round((this.tareasCompletadasCount() / this.tareasProyecto.length) * 100);
+  }
+
+  // ─── GESTIÓN DE PROYECTOS (PERMISOS, CREACIÓN, EDICIÓN Y RECURSOS) ───────
+
+  puedeEditarProyecto(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+
+    if (sesion.rol === 'admin') return true;
+    if (this.proyectoSeleccionado.creadorId === sesion.id) return true;
+
+    if (this.proyectoSeleccionado.alumnos) {
+      return this.proyectoSeleccionado.alumnos.some((alumno: any) => alumno.id === sesion.id);
+    }
+    return false;
+  }
+
+  puedeEditarDetallesProyecto(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+
+    // El admin global puede editar cualquier proyecto
+    if (sesion.rol === 'admin') return true;
+
+    // El creador del proyecto puede editar
+    if (this.proyectoSeleccionado.creadorId === sesion.id) return true;
+
+    // Si es colaborador y su rolProyecto es 'editor'
+    if (this.proyectoSeleccionado.alumnos) {
+      const miUsuario = this.proyectoSeleccionado.alumnos.find((alumno: any) => alumno.id === sesion.id);
+      return miUsuario && miUsuario.rolProyecto === 'editor';
+    }
+    return false;
+  }
+
+  puedeEscribirChat(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+
+    // El admin global puede comentar
+    if (sesion.rol === 'admin') return true;
+
+    // El creador del proyecto siempre puede comentar
+    if (this.proyectoSeleccionado.creadorId === sesion.id) return true;
+
+    // Si es colaborador y su rolProyecto es 'editor'
+    if (this.proyectoSeleccionado.alumnos) {
+      const miUsuario = this.proyectoSeleccionado.alumnos.find((alumno: any) => alumno.id === sesion.id);
+      return miUsuario && miUsuario.rolProyecto === 'editor';
+    }
+    return false;
+  }
+
+  esColaborador(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+
+    // El admin global tiene acceso total
+    if (sesion.rol === 'admin') return true;
+
+    if (this.proyectoSeleccionado.creadorId === sesion.id) return true;
+
+    if (this.proyectoSeleccionado.alumnos) {
+      return this.proyectoSeleccionado.alumnos.some((alumno: any) => alumno.id === sesion.id);
+    }
+    return false;
+  }
+
+  cambiarRolColaborador(colaborador: any, event: Event) {
+    if (!this.proyectoSeleccionado) return;
+    const select = event.target as HTMLSelectElement;
+    const nuevoRol = select.value;
+    this.asignacionService.cambiarRolColaborador(colaborador.id, this.proyectoSeleccionado.id, nuevoRol).subscribe({
+      next: async () => {
+        colaborador.rolProyecto = nuevoRol;
+        await this.mostrarToast(`✅ Rol de ${colaborador.nombreReal} actualizado a ${nuevoRol}`, 'success');
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al cambiar el rol';
+        await this.mostrarToast(`❌ ${msg}`, 'danger');
+        select.value = colaborador.rolProyecto;
+      }
+    });
+  }
+
+  puedeEliminarProyecto(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+
+    // El admin global o el creador del proyecto pueden borrarlo
+    return sesion.rol === 'admin' || this.proyectoSeleccionado.creadorId === sesion.id;
+  }
+
+  abrirModalCrearProyecto() {
+    this.formProyecto = {
+      titulo: '',
+      descripcion: '',
+      estado: 'en curso',
+      fotoProyecto: null,
+      videoUrl: '',
+      enlaceGithub: '',
+      memoria: '',
+      privado: false
+    };
+    this.documentosParaSubir = [];
+    this.imagenesParaSubir = [];
+    this.colaboradoresParaCrear = [];
+    this.guardandoProyecto = false;
+    this.modalCrearProyectoAbierto = true;
+    this.cargarAlumnosDisponiblesParaCrear();
+  }
+
+  cerrarModalCrearProyecto() {
+    this.modalCrearProyectoAbierto = false;
+  }
+
+  triggerInputImagenCrear() {
+    this.inputImagenCrearRef?.nativeElement.click();
+  }
+
+  onImagenSeleccionadaCrear(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.mostrarToast('La imagen no puede superar los 2 MB', 'warning');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.formProyecto.fotoProyecto = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  quitarImagenCrear(event: Event) {
+    event.stopPropagation();
+    this.formProyecto.fotoProyecto = null;
+  }
+
+  triggerInputDocumentoCrear(input: HTMLInputElement) {
+    input.click();
+  }
+
+  onDocumentoSeleccionadoCrear(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    if (!files) return;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.size > 5 * 1024 * 1024) {
+        this.mostrarToast(`El documento ${file.name} supera los 5 MB`, 'warning');
+        continue;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.documentosParaSubir.push({
+          nombre: file.name,
+          contenido: reader.result as string
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+    input.value = '';
+  }
+
+  quitarDocumentoCrear(index: number) {
+    this.documentosParaSubir.splice(index, 1);
+  }
+
+  triggerInputImagenGaleriaCrear(input: HTMLInputElement) {
+    input.click();
+  }
+
+  onImagenGaleriaSeleccionadaCrear(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    if (!files) return;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.size > 2 * 1024 * 1024) {
+        this.mostrarToast(`La imagen ${file.name} supera los 2 MB`, 'warning');
+        continue;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagenesParaSubir.push({
+          nombre: file.name,
+          contenido: reader.result as string
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+    input.value = '';
+  }
+
+  quitarImagenGaleriaCrear(index: number) {
+    this.imagenesParaSubir.splice(index, 1);
+  }
+
+  async guardarNuevoProyecto() {
+    if (!this.formProyecto.titulo.trim()) return;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) return;
+
+    this.guardandoProyecto = true;
+    const payload = {
+      ...this.formProyecto,
+      creadorId: sesion.id
+    };
+
+    this.proyectoService.crearProyecto(payload).subscribe({
+      next: async (creado) => {
+        const uploadObservables: any[] = [];
+
+        // Documentos
+        this.documentosParaSubir.forEach(doc => {
+          uploadObservables.push(this.proyectoService.subirDocumento(creado.id, doc, sesion.id));
+        });
+
+        // Galería
+        this.imagenesParaSubir.forEach(img => {
+          uploadObservables.push(this.proyectoService.subirImagen(creado.id, img, sesion.id));
+        });
+
+        // Colaboradores
+        this.colaboradoresParaCrear.forEach(colab => {
+          if (colab.rolProyecto === 'editor') {
+            uploadObservables.push(
+              this.proyectoService.inscribirse(colab.id, creado.id).pipe(
+                switchMap(() => this.asignacionService.cambiarRolColaborador(colab.id, creado.id, 'editor'))
+              )
+            );
+          } else {
+            uploadObservables.push(this.proyectoService.inscribirse(colab.id, creado.id));
+          }
+        });
+
+        if (uploadObservables.length > 0) {
+          forkJoin(uploadObservables).subscribe({
+            next: async () => {
+              this.guardandoProyecto = false;
+              await this.mostrarToast('✅ Proyecto creado y recursos asignados con éxito', 'success');
+              this.cargarParticipando();
+              this.cargarProyectos();
+              this.cerrarModalCrearProyecto();
+            },
+            error: async () => {
+              this.guardandoProyecto = false;
+              await this.mostrarToast('✅ Proyecto creado, pero hubo un error al subir algunos recursos o colaboradores', 'warning');
+              this.cargarParticipando();
+              this.cargarProyectos();
+              this.cerrarModalCrearProyecto();
+            }
+          });
+        } else {
+          this.guardandoProyecto = false;
+          await this.mostrarToast('✅ Proyecto creado con éxito', 'success');
+          this.cargarParticipando();
+          this.cargarProyectos();
+          this.cerrarModalCrearProyecto();
+        }
+      },
+      error: async (err) => {
+        this.guardandoProyecto = false;
+        const msg = err?.error?.message ?? 'Error al crear el proyecto';
+        await this.mostrarToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  activarModoEdicion() {
+    if (!this.proyectoSeleccionado) return;
+    this.formEdicionProyecto = {
+      titulo: this.proyectoSeleccionado.titulo,
+      descripcion: this.proyectoSeleccionado.descripcion || '',
+      estado: this.proyectoSeleccionado.estado,
+      fotoProyecto: this.proyectoSeleccionado.fotoProyecto || null,
+      videoUrl: this.proyectoSeleccionado.videoUrl || '',
+      enlaceGithub: this.proyectoSeleccionado.enlaceGithub || '',
+      memoria: this.proyectoSeleccionado.memoria || '',
+      privado: this.proyectoSeleccionado.privado || false
+    };
+    this.modoEdicion = true;
+    this.cargarAlumnosDisponibles();
+  }
+
+  cancelarEdicion() {
+    this.modoEdicion = false;
+  }
+
+  async guardarEdicionProyecto() {
+    if (!this.proyectoSeleccionado || !this.formEdicionProyecto.titulo.trim()) return;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) return;
+
+    this.proyectoService.actualizarProyecto(this.proyectoSeleccionado.id, this.formEdicionProyecto, sesion.id).subscribe({
+      next: async (actualizado) => {
+        this.proyectoSeleccionado = { ...this.proyectoSeleccionado, ...actualizado };
+        this.modoEdicion = false;
+        await this.mostrarToast('✅ Proyecto actualizado con éxito', 'success');
+        this.cargarProyectos();
+        this.recargarDetallesProyecto();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al actualizar el proyecto';
+        await this.mostrarToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  async eliminarProyectoPropio() {
+    if (!this.proyectoSeleccionado) return;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) return;
+
+    if (!confirm('¿Estás seguro de que deseas eliminar este proyecto de forma permanente?')) {
+      return;
+    }
+
+    this.proyectoService.eliminarProyecto(this.proyectoSeleccionado.id, sesion.id).subscribe({
+      next: async () => {
+        await this.mostrarToast('🗑️ Proyecto eliminado con éxito', 'success');
+        this.isModalOpen = false;
+        this.cargarProyectos();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al eliminar el proyecto';
+        await this.mostrarToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  // ─── RECURSOS DE PROYECTO (DOCUMENTOS E IMÁGENES) ────────────────────────
+
+  triggerInputDocumento() {
+    this.inputDocumentoRef?.nativeElement.click();
+  }
+
+  onDocumentoSeleccionado(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !this.proyectoSeleccionado) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.mostrarToast('El documento no puede superar los 5 MB', 'warning');
+      input.value = '';
+      return;
+    }
+
+    this.subiendoRecurso = true;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      const sesion = this.authService.obtenerSesion();
+      this.proyectoService.subirDocumento(this.proyectoSeleccionado.id, { nombre: file.name, contenido: base64 }, sesion?.id ?? undefined).subscribe({
+        next: async (actualizado) => {
+          this.subiendoRecurso = false;
+          await this.mostrarToast('✅ Documento subido correctamente', 'success');
+          this.recargarDetallesProyecto();
+        },
+        error: async (err) => {
+          this.subiendoRecurso = false;
+          const msg = err?.error?.message ?? 'Error al subir el documento';
+          await this.mostrarToast(`❌ ${msg}`, 'danger');
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  eliminarDocumento(docId: number) {
+    if (!this.proyectoSeleccionado) return;
+    const sesion = this.authService.obtenerSesion();
+    this.proyectoService.eliminarDocumento(this.proyectoSeleccionado.id, docId, sesion?.id ?? undefined).subscribe({
+      next: async () => {
+        await this.mostrarToast('🗑️ Documento eliminado', 'success');
+        this.recargarDetallesProyecto();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al eliminar el documento';
+        await this.mostrarToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  triggerInputImagenGaleria() {
+    this.inputImagenGaleriaRef?.nativeElement.click();
+  }
+
+  onImagenGaleriaSeleccionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !this.proyectoSeleccionado) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.mostrarToast('La imagen no puede superar los 2 MB', 'warning');
+      input.value = '';
+      return;
+    }
+
+    this.subiendoRecurso = true;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      const sesion = this.authService.obtenerSesion();
+      this.proyectoService.subirImagen(this.proyectoSeleccionado.id, { nombre: file.name, contenido: base64 }, sesion?.id ?? undefined).subscribe({
+        next: async (actualizado) => {
+          this.subiendoRecurso = false;
+          await this.mostrarToast('✅ Imagen añadida a la galería', 'success');
+          this.recargarDetallesProyecto();
+        },
+        error: async (err) => {
+          this.subiendoRecurso = false;
+          const msg = err?.error?.message ?? 'Error al subir la imagen';
+          await this.mostrarToast(`❌ ${msg}`, 'danger');
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  eliminarImagenGaleria(imgId: number) {
+    if (!this.proyectoSeleccionado) return;
+    const sesion = this.authService.obtenerSesion();
+    this.proyectoService.eliminarImagen(this.proyectoSeleccionado.id, imgId, sesion?.id ?? undefined).subscribe({
+      next: async () => {
+        await this.mostrarToast('🗑️ Imagen eliminada de la galería', 'success');
+        this.recargarDetallesProyecto();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al eliminar la imagen';
+        await this.mostrarToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  // ─── COLABORADORES ────────────────────────────────────────────────────────
+
+  cargarAlumnosDisponibles() {
+    if (!this.proyectoSeleccionado) return;
+    this.usuarioService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        const alumnos = usuarios.filter(u => u.rol === 'alumno');
+        const actualesIds = new Set(this.proyectoSeleccionado.alumnos?.map((a: any) => a.id) || []);
+        this.alumnosDisponibles = alumnos.filter(alumno => !actualesIds.has(alumno.id));
+      }
+    });
+  }
+
+  cargarAlumnosDisponiblesParaCrear() {
+    const sesion = this.authService.obtenerSesion();
+    const creadorId = sesion?.id;
+    this.usuarioService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        const alumnos = usuarios.filter(u => u.rol === 'alumno');
+        const actualesIds = new Set(this.colaboradoresParaCrear.map(a => a.id));
+        if (creadorId) {
+          actualesIds.add(creadorId);
+        }
+        this.alumnosDisponibles = alumnos.filter(alumno => !actualesIds.has(alumno.id));
+      }
+    });
+  }
+
+  agregarColaboradorCrear(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const colabUsuarioId = Number(select.value);
+    if (!colabUsuarioId) return;
+
+    this.usuarioService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        const alumno = usuarios.find(u => u.id === colabUsuarioId);
+        if (alumno) {
+          this.colaboradoresParaCrear.push({
+            ...alumno,
+            rolProyecto: 'lector'
+          });
+          this.cargarAlumnosDisponiblesParaCrear();
+        }
+      }
+    });
+    select.value = '';
+  }
+
+  cambiarRolColaboradorCrear(alumno: any, event: Event) {
+    const select = event.target as HTMLSelectElement;
+    alumno.rolProyecto = select.value;
+  }
+
+  eliminarColaboradorCrear(colabUsuarioId: number) {
+    this.colaboradoresParaCrear = this.colaboradoresParaCrear.filter(c => c.id !== colabUsuarioId);
+    this.cargarAlumnosDisponiblesParaCrear();
+  }
+
+  triggerInputImagenEdicion() {
+    this.inputImagenEdicionRef?.nativeElement.click();
+  }
+
+  onImagenSeleccionadaEdicion(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.mostrarToast('La imagen no puede superar los 2 MB', 'warning');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.formEdicionProyecto.fotoProyecto = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  quitarImagenEdicion(event: Event) {
+    event.stopPropagation();
+    this.formEdicionProyecto.fotoProyecto = null;
+  }
+
+  agregarColaborador(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const colabUsuarioId = Number(select.value);
+    if (!colabUsuarioId || !this.proyectoSeleccionado) return;
+
+    this.proyectoService.inscribirse(colabUsuarioId, this.proyectoSeleccionado.id).subscribe({
+      next: async () => {
+        await this.mostrarToast('✅ Colaborador añadido al proyecto', 'success');
+        this.recargarDetallesProyecto();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al añadir colaborador';
+        await this.mostrarToast(`❌ ${msg}`, 'danger');
+      }
+    });
+    select.value = '';
+  }
+
+  eliminarColaborador(colabUsuarioId: number) {
+    if (!this.proyectoSeleccionado) return;
+    this.proyectoService.salir(colabUsuarioId, this.proyectoSeleccionado.id).subscribe({
+      next: async () => {
+        await this.mostrarToast('🗑️ Colaborador eliminado del proyecto', 'success');
+        this.recargarDetallesProyecto();
+        const sesion = this.authService.obtenerSesion();
+        if (sesion && colabUsuarioId === sesion.id) {
+          this.cargarParticipando();
+        }
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al eliminar colaborador';
+        await this.mostrarToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  recargarDetallesProyecto() {
+    if (!this.proyectoSeleccionado) return;
+    const sesion = this.authService.obtenerSesion();
+    const usuarioId = sesion?.id ?? undefined;
+    this.proyectoService.getProyectoById(this.proyectoSeleccionado.id, usuarioId).subscribe({
+      next: (fullProj) => {
+        this.proyectoSeleccionado = { ...this.proyectoSeleccionado, ...fullProj };
+        this.proyectoService.getAlumnosPorProyecto(fullProj.id).subscribe({
+          next: (alumnosBackend: any[]) => {
+            this.proyectoSeleccionado.alumnos = alumnosBackend;
+            this.cargarAlumnosDisponibles();
+          }
+        });
+      }
+    });
+  }
+
+  // ─── TOAST AUXILIAR ────────────────────────────────────────────────────────
+
+  async mostrarToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2500,
+      color,
+      position: 'top'
+    });
+    await toast.present();
+  }
+
+  cargarModalidades() {
+    this.modalidadService.getModalidades().subscribe({
+      next: (modalidades) => {
+        this.modalidades = modalidades;
+      }
+    });
+  }
+
+  cargarTodosLosAlumnos() {
+    this.usuarioService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        this.todosLosAlumnos = usuarios.filter(u => u.rol === 'alumno');
+      },
+      error: (err) => {
+        console.error('[ERROR] No se pudieron cargar los alumnos', err);
+      }
+    });
+  }
+
+  guardarAlumnoAdmin(alumno: Usuario) {
+    if (!alumno.nombreReal || !alumno.nombreUsuario) {
+      this.mostrarToast('Por favor completa todos los campos del alumno', 'warning');
+      return;
+    }
+    this.usuarioService.actualizarUsuario(alumno.id, {
+      nombreReal: alumno.nombreReal,
+      nombreUsuario: alumno.nombreUsuario,
+      rol: alumno.rol
+    }).subscribe({
+      next: () => {
+        if (alumno.modalidadId) {
+          this.usuarioService.actualizarModalidad(alumno.id, alumno.modalidadId).subscribe({
+            next: () => {
+              this.mostrarToast('✅ Alumno y modalidad guardados con éxito', 'success');
+              this.cargarTodosLosAlumnos();
+            },
+            error: () => {
+              this.mostrarToast('⚠️ Alumno guardado, pero falló la modalidad', 'warning');
+            }
+          });
+        } else {
+          this.mostrarToast('✅ Alumno guardado con éxito', 'success');
+          this.cargarTodosLosAlumnos();
+        }
+      },
+      error: (err) => {
+        const msg = err?.error?.message ?? 'Error al actualizar alumno';
+        this.mostrarToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  eliminarAlumnoAdmin(alumnoId: number) {
+    if (confirm('¿Estás seguro de que deseas eliminar este alumno? Se eliminarán también sus proyectos asociados.')) {
+      this.usuarioService.eliminarUsuario(alumnoId).subscribe({
+        next: () => {
+          this.mostrarToast('🗑️ Alumno eliminado correctamente', 'success');
+          this.cargarTodosLosAlumnos();
+        },
+        error: (err) => {
+          const msg = err?.error?.message ?? 'Error al eliminar alumno';
+          this.mostrarToast(`❌ ${msg}`, 'danger');
+        }
+      });
+    }
+  }
+
+  eliminarProyectoDesdeFila(p: proyecto) {
+    if (confirm(`¿Estás seguro de que deseas eliminar el proyecto "${p.titulo}"?`)) {
+      const sesion = this.authService.obtenerSesion();
+      this.proyectoService.eliminarProyecto(p.id, sesion?.id ?? undefined).subscribe({
+        next: () => {
+          this.mostrarToast('🗑️ Proyecto eliminado correctamente', 'success');
+          this.cargarProyectos();
+        },
+        error: (err) => {
+          const msg = err?.error?.message ?? 'Error al eliminar el proyecto';
+          this.mostrarToast(`❌ ${msg}`, 'danger');
+        }
+      });
+    }
   }
 }

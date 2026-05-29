@@ -1,28 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonIcon, IonGrid, IonRow, IonCol, IonCard, IonCardHeader, IonCardSubtitle,
-  IonCardTitle, IonCardContent, IonList, IonItem, IonInput, IonModal, IonSearchbar,
-  IonLabel, IonToggle, IonChip, NavController, ToastController,
+  IonCardTitle, IonCardContent, IonList, IonItem, IonInput, IonModal,
+  IonLabel, IonToggle, NavController, ToastController, IonBadge
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personCircle, personOutline, closeOutline, schoolOutline, lockClosedOutline, exitOutline,
   timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline, folderOpenOutline, briefcaseOutline, peopleOutline,
-  moonOutline, sunnyOutline, saveOutline, settingsOutline
+  moonOutline, sunnyOutline, saveOutline, settingsOutline,
+  createOutline, playCircleOutline, logoGithub, documentOutline, imageOutline, statsChartOutline,
+  closeCircleOutline, chatbubblesOutline, hourglassOutline, chatbubbleEllipsesOutline, send
 } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../components/header/header.component';
 import { AuthService } from '../services/auth-service';
-import { UsuarioService } from '../services/usuario-service';
+import { UsuarioService, Usuario } from '../services/usuario-service';
 import { CambioPasswordDTO } from '../services/usuario-service';
 import { ModalidadService } from '../services/modalidad-service';
 import { ProyectoService } from '../services/proyecto-service';
-import { AlumnoService } from '../services/alumno-service';
 import { proyecto } from '../modelos/proyecto';
-import { forkJoin } from 'rxjs';
+import { ComentarioDTO, ComentarioService } from '../services/comentario-service';
+import { AsignacionService } from '../services/asignacion-service';
 
 @Component({
   selector: 'app-profile',
@@ -35,7 +37,7 @@ import { forkJoin } from 'rxjs';
     IonList, IonItem, IonInput, CommonModule, FormsModule,
     RouterLink,
     IonModal, IonHeader, IonTitle, IonToolbar, IonButtons,
-    IonLabel, IonToggle, IonSearchbar, IonChip, HeaderComponent
+    IonLabel, IonToggle, HeaderComponent, IonBadge
   ]
 })
 export class ProfilePage implements OnInit {
@@ -50,12 +52,7 @@ export class ProfilePage implements OnInit {
   modalidadIdSeleccionada: number | null = null;
   nuevaModalidadNombre = '';
 
-  // ── HORARIO ──────────────────────────────────────────────────
-  alumnoIdReal: number | null = null;
-  horariosActuales: any[] = [];           // horarios cargados de BD
-  nuevoHorario = { horaInicio: '', horaFin: '' };
-  guardandoHorario = false;
-  // ─────────────────────────────────────────────────────────────
+
 
   userData = {
     nombre_real: '',
@@ -83,12 +80,15 @@ export class ProfilePage implements OnInit {
     private usuarioService: UsuarioService,
     private modalidadService: ModalidadService,
     private proyectoService: ProyectoService,
-    private alumnoService: AlumnoService,
+    private comentarioService: ComentarioService,
+    private asignacionService: AsignacionService,
   ) {
     addIcons({
       personCircle, personOutline, closeOutline, lockClosedOutline, schoolOutline, exitOutline,
       timeOutline, shieldCheckmarkOutline, desktopOutline, addOutline, trashOutline, folderOpenOutline, briefcaseOutline, peopleOutline,
-      moonOutline, sunnyOutline, saveOutline, settingsOutline
+      moonOutline, sunnyOutline, saveOutline, settingsOutline,
+      createOutline, playCircleOutline, logoGithub, documentOutline, imageOutline, statsChartOutline,
+      closeCircleOutline, chatbubblesOutline, hourglassOutline, chatbubbleEllipsesOutline, send
     });
   }
 
@@ -132,13 +132,14 @@ export class ProfilePage implements OnInit {
         }
 
         this.proyectoService.getProyectosPorAlumno(sesion.id).subscribe({
-          next: (proyectos) => { this.numProyectos = proyectos.length; },
-          error: () => { this.numProyectos = 0; }
-        });
-
-        this.proyectoService.getProyectosActivos(sesion.id).subscribe({
-          next: (proyectos) => { this.proyectosActivos = proyectos; },
-          error: () => { this.proyectosActivos = []; }
+          next: (proyectos) => {
+            this.numProyectos = proyectos.length;
+            this.proyectosActivos = proyectos.filter(p => p.estado === 'en curso' || p.estado === 'pausado');
+          },
+          error: () => {
+            this.numProyectos = 0;
+            this.proyectosActivos = [];
+          }
         });
       },
       error: () => {
@@ -146,86 +147,9 @@ export class ProfilePage implements OnInit {
       }
     });
 
-    // Cargar alumnoId y horario actual
-    this.alumnoService.getAlumnoByUsuarioId(sesion.id).subscribe({
-      next: (alumno: any) => {
-        const alumnoId: number = alumno.alumnoId ?? alumno.id;
-        if (!alumnoId) return;
-        this.alumnoIdReal = alumnoId;
-        this.cargarHorarios(alumnoId);
-      },
-      error: () => {} // usuario sin perfil alumno → sección horario no se muestra
-    });
   }
 
-  // ──────────────────────────────────────────────
-  // HORARIO
-  // ──────────────────────────────────────────────
 
-  cargarHorarios(alumnoId: number): void {
-    this.alumnoService.getHorarioAlumno(alumnoId).subscribe({
-      next: (horarios) => {
-        this.horariosActuales = horarios;
-        // Pre-rellenar el formulario con el horario existente (si tiene)
-        if (horarios.length > 0) {
-          this.nuevoHorario.horaInicio = horarios[0].horaInicio;
-          this.nuevoHorario.horaFin = horarios[0].horaFin;
-        }
-      },
-      error: () => { this.horariosActuales = []; }
-    });
-  }
-
-  async actualizarHorario(): Promise<void> {
-    if (!this.alumnoIdReal || !this.nuevoHorario.horaInicio || !this.nuevoHorario.horaFin) {
-      await this.presentToast('Rellena la hora de entrada y de salida', 'warning');
-      return;
-    }
-
-    this.guardandoHorario = true;
-
-    // 1. Borrar todos los horarios actuales
-    const borrados = this.horariosActuales.map(h =>
-      this.alumnoService.deleteHorario(h.id)
-    );
-
-    const guardarNuevos = () => {
-      const diasLaborables = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-      const creaciones = diasLaborables.map(dia =>
-        this.alumnoService.crearHorario({
-          alumnoId: this.alumnoIdReal!,
-          diaSemana: dia,
-          horaInicio: this.nuevoHorario.horaInicio,
-          horaFin: this.nuevoHorario.horaFin
-        })
-      );
-
-      forkJoin(creaciones).subscribe({
-        next: async () => {
-          this.guardandoHorario = false;
-          this.cargarHorarios(this.alumnoIdReal!);
-          await this.presentToast('Horario actualizado correctamente', 'success');
-        },
-        error: async () => {
-          this.guardandoHorario = false;
-          await this.presentToast('Error al guardar el nuevo horario', 'danger');
-        }
-      });
-    };
-
-    if (borrados.length > 0) {
-      forkJoin(borrados).subscribe({
-        next: () => guardarNuevos(),
-        error: async () => {
-          // Si algún borrado falla, intentamos igualmente crear los nuevos
-          guardarNuevos();
-        }
-      });
-    } else {
-      // No había horarios previos → crear directamente
-      guardarNuevos();
-    }
-  }
 
   // ──────────────────────────────────────────────
   // MODALIDADES
@@ -370,7 +294,7 @@ export class ProfilePage implements OnInit {
         sesion.nombreUsuario = this.userData.nombre_usuario;
         this.authService.guardarSesion(sesion);
 
-        if ((sesion.rol === 'alumno' || sesion.rol === 'administrador') && this.modalidadIdSeleccionada) {
+        if (sesion.rol === 'alumno' && this.modalidadIdSeleccionada) {
           this.usuarioService.actualizarModalidad(sesion.id, this.modalidadIdSeleccionada).subscribe({
             next: () => {},
             error: () => this.presentToast('Error al actualizar la modalidad', 'warning')
@@ -459,9 +383,7 @@ export class ProfilePage implements OnInit {
     await toast.present();
   }
 
-  navegarAdmin() {
-    this.navCtrl.navigateForward('/home-admin');
-  }
+
 
   toggleDarkMode(): void {
     this.darkMode = !this.darkMode;
@@ -478,5 +400,525 @@ export class ProfilePage implements OnInit {
     if (encontrada) {
       this.userData.modalidad = encontrada.nombre;
     }
+  }
+
+  // ─── MODAL DETALLES DEL PROYECTO ──────────────────────────────────────────
+  isModalOpen = false;
+  proyectoSeleccionado: any = null;
+  esProyectoInscrito = true;
+  nuevoComentario: string = '';
+  enviandoComentario = false;
+
+  // Chat
+  comentarios: ComentarioDTO[] = [];
+  loadingComentarios = false;
+
+  // Edición
+  modoEdicion = false;
+  formEdicionProyecto = {
+    titulo: '',
+    descripcion: '',
+    estado: 'en curso' as 'en curso' | 'finalizado' | 'pausado',
+    fotoProyecto: null as string | null,
+    videoUrl: '',
+    enlaceGithub: '',
+    memoria: '',
+    privado: false
+  };
+
+  alumnosDisponibles: Usuario[] = [];
+  subiendoRecurso = false;
+
+  @ViewChild('inputImagenEdicion') inputImagenEdicionRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('inputDocumento') inputDocumentoRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('inputImagenGaleria') inputImagenGaleriaRef!: ElementRef<HTMLInputElement>;
+
+  verDetalles(p: any) {
+    this.esProyectoInscrito = true;
+    this.isModalOpen = true;
+    this.comentarios = [];
+    this.nuevoComentario = '';
+    this.modoEdicion = false;
+
+    const sesion = this.authService.obtenerSesion();
+    const usuarioId = sesion?.id ?? undefined;
+
+    this.proyectoService.getProyectoById(p.id, usuarioId).subscribe({
+      next: (fullProj) => {
+        this.proyectoSeleccionado = { ...fullProj, alumnos: [] };
+        this.proyectoService.getAlumnosPorProyecto(p.id).subscribe({
+          next: (alumnosBackend: any[]) => {
+            this.proyectoSeleccionado.alumnos = alumnosBackend;
+          },
+          error: (err) => {
+            console.warn('[WARN] No se pudo cargar la lista de alumnos', err);
+            this.proyectoSeleccionado.alumnos = [];
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error fetching project by id', err);
+        this.proyectoSeleccionado = { ...p, alumnos: [] };
+      }
+    });
+
+    this.cargarComentarios(p.id);
+  }
+
+  cargarComentarios(proyectoId: number) {
+    this.loadingComentarios = true;
+    this.comentarioService.getByProyecto(proyectoId).subscribe({
+      next: (lista) => {
+        this.comentarios = lista;
+        this.loadingComentarios = false;
+        this.scrollChatAbajo();
+      },
+      error: () => {
+        this.comentarios = [];
+        this.loadingComentarios = false;
+      }
+    });
+  }
+
+  agregarComentario() {
+    const texto = this.nuevoComentario.trim();
+    if (!texto || this.enviandoComentario) return;
+
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id || !this.proyectoSeleccionado?.id) return;
+
+    this.enviandoComentario = true;
+
+    const temporal: ComentarioDTO = {
+      id: -Date.now(),
+      proyectoId: this.proyectoSeleccionado.id,
+      usuarioId: sesion.id,
+      nombreUsuario: sesion.nombreReal ?? 'Tú',
+      fotoUsuario: sesion.fotoUsuario ?? undefined,
+      texto,
+      fecha: new Date().toISOString()
+    };
+    this.comentarios = [...this.comentarios, temporal];
+    this.nuevoComentario = '';
+    this.scrollChatAbajo();
+
+    this.comentarioService.crear(this.proyectoSeleccionado.id, sesion.id, texto).subscribe({
+      next: (real) => {
+        this.comentarios = this.comentarios.map(c => c.id === temporal.id ? real : c);
+        this.enviandoComentario = false;
+      },
+      error: () => {
+        this.comentarios = this.comentarios.filter(c => c.id !== temporal.id);
+        this.enviandoComentario = false;
+        this.nuevoComentario = texto;
+      }
+    });
+  }
+
+  eliminarComentario(comentario: ComentarioDTO) {
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) return;
+
+    this.comentarios = this.comentarios.filter(c => c.id !== comentario.id);
+
+    this.comentarioService.eliminar(comentario.id, sesion.id).subscribe({
+      error: () => {
+        this.comentarios = [...this.comentarios, comentario]
+          .sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+      }
+    });
+  }
+
+  esMiMensaje(comentario: ComentarioDTO): boolean {
+    return this.authService.obtenerSesion()?.id === comentario.usuarioId;
+  }
+
+  formatearFecha(iso: string): string {
+    const d = new Date(iso);
+    const hoy = new Date();
+    const esHoy = d.toDateString() === hoy.toDateString();
+    const hora = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    if (esHoy) return hora;
+    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) + ' · ' + hora;
+  }
+
+  private scrollChatAbajo() {
+    setTimeout(() => {
+      const feed = document.querySelector('.comments-feed');
+      if (feed) feed.scrollTop = feed.scrollHeight;
+    }, 60);
+  }
+
+  getClaseEstado(estado: string): string {
+    return 'estado-' + (estado ?? '').replace(/ /g, '-');
+  }
+
+  getImagenProyecto(p: proyecto): string {
+    return `https://picsum.photos/seed/${p.id}/600/400`;
+  }
+
+  getEtiquetaEstado(estado: string): string {
+    switch (estado) {
+      case 'en curso':   return 'En Curso';
+      case 'finalizado': return 'Finalizado';
+      case 'pausado':    return 'Pausado';
+      default:           return estado;
+    }
+  }
+
+  getColorEstado(estado: string): string {
+    switch (estado) {
+      case 'en curso':   return 'success';
+      case 'finalizado': return 'medium';
+      case 'pausado':    return 'warning';
+      default:           return 'primary';
+    }
+  }
+
+  puedeEditarProyecto(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+
+    if (sesion.rol === 'admin') return true;
+    if (this.proyectoSeleccionado.creadorId === sesion.id) return true;
+
+    if (this.proyectoSeleccionado.alumnos) {
+      return this.proyectoSeleccionado.alumnos.some((alumno: any) => alumno.id === sesion.id);
+    }
+    return false;
+  }
+
+  puedeEditarDetallesProyecto(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+
+    // El admin global puede editar cualquier proyecto
+    if (sesion.rol === 'admin') return true;
+
+    // El creador del proyecto puede editar
+    if (this.proyectoSeleccionado.creadorId === sesion.id) return true;
+
+    // Si es colaborador y su rolProyecto es 'editor'
+    if (this.proyectoSeleccionado.alumnos) {
+      const miUsuario = this.proyectoSeleccionado.alumnos.find((alumno: any) => alumno.id === sesion.id);
+      return miUsuario && miUsuario.rolProyecto === 'editor';
+    }
+    return false;
+  }
+
+  puedeEscribirChat(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+
+    // El admin global puede comentar
+    if (sesion.rol === 'admin') return true;
+
+    // El creador del proyecto siempre puede comentar
+    if (this.proyectoSeleccionado.creadorId === sesion.id) return true;
+
+    // Si es colaborador y su rolProyecto es 'editor'
+    if (this.proyectoSeleccionado.alumnos) {
+      const miUsuario = this.proyectoSeleccionado.alumnos.find((alumno: any) => alumno.id === sesion.id);
+      return miUsuario && miUsuario.rolProyecto === 'editor';
+    }
+    return false;
+  }
+
+  esColaborador(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+
+    // El admin global tiene acceso total
+    if (sesion.rol === 'admin') return true;
+
+    if (this.proyectoSeleccionado.creadorId === sesion.id) return true;
+
+    if (this.proyectoSeleccionado.alumnos) {
+      return this.proyectoSeleccionado.alumnos.some((alumno: any) => alumno.id === sesion.id);
+    }
+    return false;
+  }
+
+  cambiarRolColaborador(colaborador: any, event: Event) {
+    if (!this.proyectoSeleccionado) return;
+    const select = event.target as HTMLSelectElement;
+    const nuevoRol = select.value;
+    this.asignacionService.cambiarRolColaborador(colaborador.id, this.proyectoSeleccionado.id, nuevoRol).subscribe({
+      next: async () => {
+        colaborador.rolProyecto = nuevoRol;
+        this.presentToast(`✅ Rol de ${colaborador.nombreReal} actualizado a ${nuevoRol}`, 'success');
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al cambiar el rol';
+        this.presentToast(`❌ ${msg}`, 'danger');
+        select.value = colaborador.rolProyecto;
+      }
+    });
+  }
+
+  puedeEliminarProyecto(): boolean {
+    if (!this.proyectoSeleccionado) return false;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion) return false;
+    
+    // El admin global o el creador del proyecto pueden borrarlo
+    return sesion.rol === 'admin' || this.proyectoSeleccionado.creadorId === sesion.id;
+  }
+
+  activarModoEdicion() {
+    if (!this.proyectoSeleccionado) return;
+    this.formEdicionProyecto = {
+      titulo: this.proyectoSeleccionado.titulo,
+      descripcion: this.proyectoSeleccionado.descripcion || '',
+      estado: this.proyectoSeleccionado.estado,
+      fotoProyecto: this.proyectoSeleccionado.fotoProyecto || null,
+      videoUrl: this.proyectoSeleccionado.videoUrl || '',
+      enlaceGithub: this.proyectoSeleccionado.enlaceGithub || '',
+      memoria: this.proyectoSeleccionado.memoria || '',
+      privado: this.proyectoSeleccionado.privado || false
+    };
+    this.modoEdicion = true;
+    this.cargarAlumnosDisponibles();
+  }
+
+  cancelarEdicion() {
+    this.modoEdicion = false;
+  }
+
+  async guardarEdicionProyecto() {
+    if (!this.proyectoSeleccionado || !this.formEdicionProyecto.titulo.trim()) return;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) return;
+
+    this.proyectoService.actualizarProyecto(this.proyectoSeleccionado.id, this.formEdicionProyecto, sesion.id).subscribe({
+      next: async (actualizado) => {
+        this.proyectoSeleccionado = { ...this.proyectoSeleccionado, ...actualizado };
+        this.modoEdicion = false;
+        this.presentToast('✅ Proyecto actualizado con éxito', 'success');
+        this.recargarDetallesProyecto();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al actualizar el proyecto';
+        this.presentToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  async eliminarProyectoPropio() {
+    if (!this.proyectoSeleccionado) return;
+    const sesion = this.authService.obtenerSesion();
+    if (!sesion?.id) return;
+
+    if (!confirm('¿Estás seguro de que deseas eliminar este proyecto de forma permanente?')) {
+      return;
+    }
+
+    this.proyectoService.eliminarProyecto(this.proyectoSeleccionado.id, sesion.id).subscribe({
+      next: async () => {
+        this.presentToast('🗑️ Proyecto eliminado con éxito', 'success');
+        this.isModalOpen = false;
+        this.ngOnInit();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al eliminar el proyecto';
+        this.presentToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  triggerInputImagenEdicion() {
+    this.inputImagenEdicionRef?.nativeElement.click();
+  }
+
+  onImagenSeleccionadaEdicion(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.presentToast('La imagen no puede superar los 2 MB', 'warning');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.formEdicionProyecto.fotoProyecto = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  quitarImagenEdicion(event: Event) {
+    event.stopPropagation();
+    this.formEdicionProyecto.fotoProyecto = null;
+  }
+
+  triggerInputDocumento() {
+    this.inputDocumentoRef?.nativeElement.click();
+  }
+
+  onDocumentoSeleccionado(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !this.proyectoSeleccionado) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.presentToast('El documento no puede superar los 5 MB', 'warning');
+      input.value = '';
+      return;
+    }
+
+    this.subiendoRecurso = true;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      const sesion = this.authService.obtenerSesion();
+      this.proyectoService.subirDocumento(this.proyectoSeleccionado.id, { nombre: file.name, contenido: base64 }, sesion?.id ?? undefined).subscribe({
+        next: async (actualizado) => {
+          this.subiendoRecurso = false;
+          this.presentToast('✅ Documento subido correctamente', 'success');
+          this.recargarDetallesProyecto();
+        },
+        error: async (err) => {
+          this.subiendoRecurso = false;
+          const msg = err?.error?.message ?? 'Error al subir el documento';
+          this.presentToast(`❌ ${msg}`, 'danger');
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  eliminarDocumento(docId: number) {
+    if (!this.proyectoSeleccionado) return;
+    const sesion = this.authService.obtenerSesion();
+    this.proyectoService.eliminarDocumento(this.proyectoSeleccionado.id, docId, sesion?.id ?? undefined).subscribe({
+      next: async () => {
+        this.presentToast('🗑️ Documento eliminado', 'success');
+        this.recargarDetallesProyecto();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al eliminar el documento';
+        this.presentToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  triggerInputImagenGaleria() {
+    this.inputImagenGaleriaRef?.nativeElement.click();
+  }
+
+  onImagenGaleriaSeleccionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !this.proyectoSeleccionado) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.presentToast('La imagen no puede superar los 2 MB', 'warning');
+      input.value = '';
+      return;
+    }
+
+    this.subiendoRecurso = true;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      const sesion = this.authService.obtenerSesion();
+      this.proyectoService.subirImagen(this.proyectoSeleccionado.id, { nombre: file.name, contenido: base64 }, sesion?.id ?? undefined).subscribe({
+        next: async (actualizado) => {
+          this.subiendoRecurso = false;
+          this.presentToast('✅ Imagen añadida a la galería', 'success');
+          this.recargarDetallesProyecto();
+        },
+        error: async (err) => {
+          this.subiendoRecurso = false;
+          const msg = err?.error?.message ?? 'Error al subir la imagen';
+          this.presentToast(`❌ ${msg}`, 'danger');
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  eliminarImagenGaleria(imgId: number) {
+    if (!this.proyectoSeleccionado) return;
+    const sesion = this.authService.obtenerSesion();
+    this.proyectoService.eliminarImagen(this.proyectoSeleccionado.id, imgId, sesion?.id ?? undefined).subscribe({
+      next: async () => {
+        this.presentToast('🗑️ Imagen eliminada de la galería', 'success');
+        this.recargarDetallesProyecto();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al eliminar la imagen';
+        this.presentToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  cargarAlumnosDisponibles() {
+    if (!this.proyectoSeleccionado) return;
+    this.usuarioService.getUsuarios().subscribe({
+      next: (usuarios) => {
+        const alumnos = usuarios.filter(u => u.rol === 'alumno');
+        const actualesIds = new Set(this.proyectoSeleccionado.alumnos?.map((a: any) => a.id) || []);
+        this.alumnosDisponibles = alumnos.filter(alumno => !actualesIds.has(alumno.id));
+      }
+    });
+  }
+
+  agregarColaborador(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const colabUsuarioId = Number(select.value);
+    if (!colabUsuarioId || !this.proyectoSeleccionado) return;
+
+    this.proyectoService.inscribirse(colabUsuarioId, this.proyectoSeleccionado.id).subscribe({
+      next: async () => {
+        this.presentToast('✅ Colaborador añadido al proyecto', 'success');
+        this.recargarDetallesProyecto();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al añadir colaborador';
+        this.presentToast(`❌ ${msg}`, 'danger');
+      }
+    });
+    select.value = '';
+  }
+
+  eliminarColaborador(colabUsuarioId: number) {
+    if (!this.proyectoSeleccionado) return;
+    this.proyectoService.salir(colabUsuarioId, this.proyectoSeleccionado.id).subscribe({
+      next: async () => {
+        this.presentToast('🗑️ Colaborador eliminado del proyecto', 'success');
+        this.recargarDetallesProyecto();
+      },
+      error: async (err) => {
+        const msg = err?.error?.message ?? 'Error al eliminar colaborador';
+        this.presentToast(`❌ ${msg}`, 'danger');
+      }
+    });
+  }
+
+  recargarDetallesProyecto() {
+    if (!this.proyectoSeleccionado) return;
+    const sesion = this.authService.obtenerSesion();
+    const usuarioId = sesion?.id ?? undefined;
+    this.proyectoService.getProyectoById(this.proyectoSeleccionado.id, usuarioId).subscribe({
+      next: (fullProj) => {
+        this.proyectoSeleccionado = { ...this.proyectoSeleccionado, ...fullProj };
+        this.proyectoService.getAlumnosPorProyecto(fullProj.id).subscribe({
+          next: (alumnosBackend: any[]) => {
+            this.proyectoSeleccionado.alumnos = alumnosBackend;
+            this.cargarAlumnosDisponibles();
+          }
+        });
+      }
+    });
   }
 }

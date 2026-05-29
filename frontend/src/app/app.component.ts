@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { AuthService } from './services/auth-service';
-import {AfkPopupComponent} from "./components/registro-actividad/registro-actividad.component";
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet, AfkPopupComponent],
+  imports: [IonApp, IonRouterOutlet],
   standalone: true
 })
 export class AppComponent implements OnInit {

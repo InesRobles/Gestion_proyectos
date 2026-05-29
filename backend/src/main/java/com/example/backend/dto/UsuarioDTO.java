@@ -25,4 +25,6 @@ public class UsuarioDTO {
     private Long modalidadId;
 
     private String modalidadNombre;
+
+    private String rolProyecto;
 }

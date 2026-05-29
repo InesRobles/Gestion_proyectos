@@ -3,7 +3,7 @@ package com.example.backend.services;
 import com.example.backend.dto.AsignacionDTO;
 import com.example.backend.dto.ProyectoDTO;
 import com.example.backend.dto.UsuarioDTO;
-import com.example.backend.exception.CupoLlenoException;
+
 import com.example.backend.exception.ElementoNoEncontradoException;
 import com.example.backend.exception.ResourceAlreadyExistsException;
 import com.example.backend.mapper.AsignacionMapper;
@@ -61,9 +61,11 @@ public class AsignacionService {
 
     // Devuelve los proyectos en los que el usuario (por su usuarioId) está inscrito
     public List<ProyectoDTO> getProyectosPorUsuario(Long usuarioId) {
-        Alumno alumno = alumnoRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new ElementoNoEncontradoException(
-                        "No se encontró un alumno asociado al usuario con id: " + usuarioId));
+        Optional<Alumno> alumnoOpt = alumnoRepository.findByUsuarioId(usuarioId);
+        if (alumnoOpt.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        Alumno alumno = alumnoOpt.get();
 
         return asignacionRepository.findByIdAlumnoId(alumno.getId())
                 .stream()
@@ -86,11 +88,7 @@ public class AsignacionService {
                     "El alumno ya está inscrito en este proyecto.");
         }
 
-        long inscritos = asignacionRepository.countByIdProyectoId(proyectoId);
-        if (inscritos >= proyecto.getCupoMaximo()) {
-            throw new CupoLlenoException(
-                    "El proyecto \"" + proyecto.getTitulo() + "\" no tiene cupos disponibles.");
-        }
+
 
         AsignacionId id = new AsignacionId(alumno.getId(), proyectoId);
         Asignacion asignacion = new Asignacion(id, alumno, proyecto);
@@ -114,11 +112,29 @@ public class AsignacionService {
     }
 
     public List<UsuarioDTO> findUsuariosByProyecto(Long proyectoId) {
-        // Asumiendo que tu repositorio tiene un método findByProyectoId()
-        // y que tu entidad Asignacion tiene acceso al Alumno y luego al Usuario
         return asignacionRepository.findByProyectoId(proyectoId).stream()
-                .map(asignacion -> asignacion.getAlumno().getUsuario())
-                .map(usuarioMapper::toDTO)
+                .map(asignacion -> {
+                    UsuarioDTO dto = usuarioMapper.toDTO(asignacion.getAlumno().getUsuario());
+                    dto.setRolProyecto(asignacion.getRol());
+                    return dto;
+                })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public AsignacionDTO cambiarRol(Long usuarioId, Long proyectoId, String nuevoRol) {
+        Alumno alumno = alumnoRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new ElementoNoEncontradoException(
+                        "No se encontró un alumno asociado al usuario con id: " + usuarioId));
+        AsignacionId id = new AsignacionId(alumno.getId(), proyectoId);
+        Asignacion asignacion = asignacionRepository.findById(id)
+                .orElseThrow(() -> new ElementoNoEncontradoException("Asignación no encontrada para el alumno en este proyecto"));
+
+        if (!List.of("editor", "lector").contains(nuevoRol)) {
+            throw new IllegalArgumentException("Rol de proyecto no válido: " + nuevoRol);
+        }
+
+        asignacion.setRol(nuevoRol);
+        return asignacionMapper.toDTO(asignacionRepository.save(asignacion));
     }
 }

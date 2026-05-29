@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegistroActividadDTO {
-    private Integer usuarioId;
-    private String  hora;
-    private Boolean respondido;
+public class ProyectoDocumentoDTO {
+    private Long id;
+    private String nombre;
+    private String contenido; // Contenido en base64
 }

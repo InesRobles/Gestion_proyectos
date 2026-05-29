@@ -34,6 +34,7 @@ export class RegisterPage {
   nombreReal     = '';
   contrasenaHash = '';
   confirmarPass  = '';
+  rol            = 'alumno';
 
   mensajeError = '';
   mensajeExito = '';
@@ -56,7 +57,7 @@ export class RegisterPage {
       nombreUsuario:  this.nombreUsuario,
       nombreReal:     this.nombreReal,
       contrasenaHash: this.contrasenaHash,
-      rol:            'alumno'
+      rol:            this.rol
     }).subscribe({
       next: () => {
         this.mensajeExito = '¡Cuenta creada correctamente!';

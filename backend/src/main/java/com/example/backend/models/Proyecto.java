@@ -25,8 +25,7 @@ public class Proyecto {
     @Column(length = 500)
     private String descripcion;
 
-    @Column(name = "cupo_maximo", nullable = false)
-    private Integer cupoMaximo;
+
 
     @Column(name = "estado")
     private EstadoProyecto estado;
@@ -37,6 +36,25 @@ public class Proyecto {
     @Column(name = "video_url", length = 500)
     private String videoUrl;
 
-    @OneToMany(mappedBy = "proyecto")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creador_id", foreignKey = @ForeignKey(name = "fk_proyecto_creador"))
+    private Usuario creador;
+
+    @Column(name = "enlace_github", length = 255)
+    private String enlaceGithub;
+
+    @Column(name = "memoria", columnDefinition = "LONGTEXT")
+    private String memoria;
+
+    @Column(name = "privado")
+    private Boolean privado = false;
+
+    @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProyectoDocumento> documentos = new HashSet<>();
+
+    @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProyectoImagen> imagenes = new HashSet<>();
+
+    @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Asignacion> asignaciones = new HashSet<>();
 }

@@ -7,16 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class HorarioDTO {
-
+public class ProyectoImagenDTO {
     private Long id;
-
-    private Long alumnoId;
-
-    private String diaSemana;
-
-    private String horaInicio;
-
-    private String horaFin;
+    private String nombre;
+    private String contenido; // Contenido en base64
 }

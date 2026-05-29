@@ -1,1630 +1,967 @@
-$primary: #764ba2;
-$primary-light: #f0e8f8;
-$primary-dark: #5a3480;
-$accent-admin: #eb445a;
-$accent-alumno: #3880ff;
-$accent-profesor: #2dd36f;
-$bg-app: #f4f7fe;
-$surface: #ffffff;
-$border: rgba(0, 0, 0, 0.07);
-$text-main: #1a1a2e;
-$text-muted: #8892a4;
-$radius-card: 20px;
-$radius-modal: 24px;
-$radius-input: 12px;
+// ── Variables ──────────────────────────────────────────────────────────────────
+$purple:        #764ba2;
+$purple-light:  #f0e8f8;
+$purple-dark:   #5a3480;
+$red:           #eb445a;
+$blue:          #3880ff;
+$green:         #2dd36f;
+$orange:        #e6920a;
+$bg:            #f4f7fe;
+$surface:       #ffffff;
+$border:        rgba(0,0,0,0.07);
+$text:          #1a1a2e;
+$muted:         #8892a4;
+$radius:        14px;
 
-// ── BASE ──────────────────────────────────────────────────────────────────────
-.home-wrapper {
-  background-color: $bg-app;
+// ── Dark vars ─────────────────────────────────────────────────────────────────
+$dk-bg:       #120d1c;
+$dk-surface:  #1e1530;
+$dk-surface2: #271d3a;
+$dk-border:   #3d2d5a;
+$dk-text:     #e8dff2;
+$dk-muted:    #7a6d8a;
+
+// ══════════════════════════════════════════════════════════════════════════════
+// LAYOUT BASE
+// ══════════════════════════════════════════════════════════════════════════════
+.admin-wrapper {
+  background: $bg;
   min-height: 100%;
-  padding: 20px 0;
-}
-
-.content-container {
+  padding: 28px 24px 60px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 20px;
 }
 
-// LÓGICA DE ANIMACIÓN FICHAJE
-.attendance-section {
-  margin-bottom: 30px;
-  animation: fadeInDown 0.6s ease-out forwards;
-  transition: all 0.5s ease-in-out;
-
-  &.exit-animation {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-    pointer-events: none;
-  }
-
-  .attendance-hero-card {
-    border-radius: 24px;
-    background: linear-gradient(135deg, #2d1f3d 0%, #4b2c6e 50%, #764ba2 100%);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(45, 31, 61, 0.4);
-    border: none;
-
-    // Formas decorativas de fondo
-    .hero-bg-shapes {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-
-      .shape {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.06);
-      }
-      .shape-1 { width: 350px; height: 350px; top: -100px; right: -80px; }
-      .shape-2 { width: 200px; height: 200px; bottom: -60px; left: 30%; background: rgba(255,255,255,0.04); }
-      .shape-3 { width: 120px; height: 120px; top: 20px; left: 15%; background: rgba(255,255,255,0.05); }
-    }
-
-    .attendance-content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 44px 52px;
-      flex-wrap: wrap;
-      gap: 32px;
-
-      .left-column {
-        display: flex;
-        flex-direction: column;
-        gap: 22px;
-        flex: 1;
-        min-width: 260px;
-
-        .user-greeting {
-          display: flex;
-          flex-direction: column;
-          gap: 5px;
-
-          .greeting-label {
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.65);
-            font-weight: 500;
-            letter-spacing: 0.3px;
-          }
-
-          .user-name {
-            color: #ffffff;
-            font-size: 2.6rem;
-            font-weight: 900;
-            margin: 0;
-            line-height: 1.1;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-          }
-
-          .greeting-sub {
-            font-size: 0.88rem;
-            color: rgba(255,255,255,0.5);
-            margin-top: 4px;
-          }
-        }
-
-        .time-box {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          background: rgba(255,255,255,0.1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255,255,255,0.15);
-          border-radius: 14px;
-          padding: 12px 20px;
-          width: fit-content;
-
-          .time-icon-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 10px;
-
-            ion-icon {
-              font-size: 1.4rem;
-              color: #e0c8ff;
-            }
-          }
-
-          .time-text {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-
-            .schedule-label {
-              font-size: 0.65rem;
-              color: rgba(255,255,255,0.55);
-              font-weight: 700;
-              letter-spacing: 1px;
-              text-transform: uppercase;
-            }
-
-            .hours {
-              font-size: 1.15rem;
-              color: #ffffff;
-              font-weight: 800;
-              letter-spacing: 0.5px;
-            }
-          }
-        }
-      }
-
-      .right-column {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        flex-shrink: 0;
-
-        @media (min-width: 992px) {
-          flex-direction: row;
-          align-items: stretch;
-        }
-
-        .fichar-card {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 14px;
-          background: rgba(255,255,255,0.1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255,255,255,0.18);
-          border-radius: 20px;
-          padding: 32px 40px;
-          flex: 1;
-          min-width: 260px;
-          max-width: 320px;
-
-          .instruction-text {
-            margin: 0;
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.55);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 600;
-          }
-
-          .fichar-button {
-            --background: #ffffff;
-            --background-hover: #f0e8ff;
-            --color: #764ba2;
-            --border-radius: 16px;
-            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-            height: 56px;
-            font-size: 0.95rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            width: 100%;
-            min-width: 200px;
-
-            &[disabled] {
-              --background: rgba(255,255,255,0.2);
-              --color: rgba(255,255,255,0.4);
-              --box-shadow: none;
-            }
-          }
-
-          .fichar-hint {
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.4);
-            text-align: center;
-            max-width: 200px;
-            line-height: 1.5;
-          }
-        }
-      }
-    }
-  }
+.admin-section {
+  margin-bottom: 8px;
 }
 
-// ── FORMULARIO DE HORARIO ────────────────────────────────────
-.horario-form-box {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 18px;
-  padding: 20px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 420px;
-
-  .horario-form-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.82rem;
-    color: rgba(255,255,255,0.6);
-    font-weight: 500;
-
-    ion-icon { font-size: 1.1rem; color: #e0c8ff; }
-  }
-
-  .horario-form-fields {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-
-    .form-field {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      flex: 1;
-      min-width: 100px;
-
-      .form-label {
-        font-size: 0.65rem;
-        color: rgba(255,255,255,0.5);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
-
-      .form-select,
-      .form-input-time {
-        background: rgba(255,255,255,0.12);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 10px;
-        padding: 8px 12px;
-        color: #ffffff;
-        font-size: 0.88rem;
-        outline: none;
-        transition: border-color 0.2s, background 0.2s;
-
-        &:focus {
-          border-color: rgba(255,255,255,0.5);
-          background: rgba(255,255,255,0.18);
-        }
-        option { background: #4b2c6e; color: #fff; }
-      }
-    }
-  }
-
-  .guardar-horario-btn {
-    --background: #ffffff;
-    --color: #764ba2;
-    --border-radius: 12px;
-    --box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-    font-weight: 700;
-    font-size: 0.88rem;
-    height: 42px;
-    align-self: flex-start;
-  }
+.admin-divider {
+  border: none;
+  border-top: 1px solid $border;
+  margin: 28px 0;
 }
 
-// ── PROYECTOS ─────────────────────────────────────────────────────────────────
-.new-projects {
-  padding-bottom: 50px;
-
-  .section-header {
-    margin-bottom: 25px;
-    .section-subtitle { color: #666; margin-top: -15px; font-size: 1rem; }
-  }
-
-  .new-project-card {
-    border-radius: $radius-card;
-    border: 1px solid $border;
-    background: $surface;
-
-    .cat-label {
-      color: $primary;
-      font-size: 0.8rem;
-      font-weight: bold;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-  }
-}
-
-// ── GENERALES ─────────────────────────────────────────────────────────────────
-.section-title { font-size: 1.8rem; font-weight: 800; color: $text-main; margin-bottom: 20px; }
-.divider { border: 0; height: 1px; background: $border; margin: 40px 0; }
-.interactive-card {
-  transition: all 0.3s ease;
-  border-radius: 15px;
-  &:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
-}
-
-// ── STATUS ────────────────────────────────────────────────────────────────────
-.status-section {
-  background: $bg-app;
-  padding: 18px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  border: 1px solid #e0e6f0;
-
-  .progress-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-
-    .progress-percent { font-size: 1rem; font-weight: 600; color: #444; }
-  }
-}
-
-// ── USUARIOS LISTA ────────────────────────────────────────────────────────────
-.usuarios-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 24px;
-
-  .usuarios-title-block {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-
-    .usuarios-count { font-size: 0.9rem; color: $text-muted; font-weight: 500; }
-  }
-
-  .usuarios-controles {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-}
-
-.filtro-roles {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-
-  .filtro-btn {
-    padding: 6px 16px;
-    border-radius: 20px;
-    border: 1.5px solid #ddd;
-    background: $surface;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    color: #555;
-    transition: all 0.2s ease;
-
-    &:hover { border-color: $primary; color: $primary; }
-    &.active { background: $primary; border-color: $primary; color: white; }
-    &.filtro-admin.active  { background: $accent-admin;   border-color: $accent-admin; }
-    &.filtro-alumno.active { background: $accent-alumno;  border-color: $accent-alumno; }
-  }
-}
-
-.usuarios-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.usuario-item {
+// ══════════════════════════════════════════════════════════════════════════════
+// CABECERA DE SECCIÓN
+// ══════════════════════════════════════════════════════════════════════════════
+.section-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section-title-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 8px;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: $text;
+  margin: 0;
+}
+
+.section-count {
+  background: $purple-light;
+  color: $purple;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.section-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1;
+}
+
+.admin-searchbar {
+  --border-radius: 10px;
+  --background: #{$surface};
+  --box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  max-width: 260px;
+  min-width: 160px;
+  height: 38px;
+}
+
+// ── Botones filtro ─────────────────────────────────────────────────────────────
+.filtros {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filtro-btn {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #ddd;
   background: $surface;
-  border-radius: 14px;
-  padding: 14px 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  &:hover { border-color: $purple; color: $purple; }
+  &.active { background: $purple; border-color: $purple; color: #fff; }
+  &.filtro-admin.active   { background: $red;    border-color: $red; }
+  &.filtro-alumno.active  { background: $blue;   border-color: $blue; }
+  &.filtro-fichado.active { background: $green;  border-color: $green; }
+  &.filtro-nofichado.active { background: $red;  border-color: $red; }
+  &.filtro-encurso.active   { background: $blue;   border-color: $blue; }
+  &.filtro-pausado.active   { background: $orange; border-color: $orange; }
+  &.filtro-finalizado.active { background: $green; border-color: $green; }
+}
+
+.btn-masivo, .btn-nuevo {
+  --border-radius: 10px;
+  --background: #{$purple};
+  font-size: 0.82rem;
+  font-weight: 700;
+  height: 36px;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TABLA
+// ══════════════════════════════════════════════════════════════════════════════
+.tabla-wrapper {
+  background: $surface;
+  border-radius: $radius;
   border: 1px solid $border;
-  transition: box-shadow 0.2s ease;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(118,75,162,0.04);
+}
 
-  &:hover { box-shadow: 0 6px 18px rgba(118,75,162,0.1); }
+.tabla-header {
+  display: grid;
+  grid-template-columns: 44px 1fr 1fr 120px 160px 110px;
+  padding: 10px 16px;
+  background: rgba(118,75,162,0.06);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: $purple;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid $border;
+}
 
-  .usuario-avatar {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 1.3rem;
-    background: $primary-light;
-    color: $primary;
+.tabla-header-proyectos {
+  grid-template-columns: 56px 1fr 130px 120px 160px;
+}
 
-    &.avatar-administrador { background: rgba($accent-admin, 0.12); color: $accent-admin; }
-    &.avatar-alumno        { background: rgba($accent-alumno, 0.12); color: $accent-alumno; }
-  }
+.tabla-row-wrapper {
+  border-bottom: 1px solid $border;
+  &:last-child { border-bottom: none; }
+}
 
-  .usuario-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
+.tabla-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 1fr 120px 160px 110px;
+  align-items: center;
+  padding: 8px 16px;
+  gap: 8px;
+  transition: background 0.15s;
+  &:hover { background: rgba(118,75,162,0.03); }
+}
 
-    .usuario-nombre {
-      font-weight: 700;
-      font-size: 0.97rem;
-      color: $text-main;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.tabla-row-proyecto {
+  grid-template-columns: 56px 1fr 130px 120px 160px;
+  border-bottom: 1px solid $border;
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba(118,75,162,0.03); }
+}
 
-    .usuario-id { font-size: 0.78rem; color: $text-muted; }
-  }
+// ── Columnas ──────────────────────────────────────────────────────────────────
+.col-expand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.col-nombre, .col-usuario, .col-modalidad, .col-ptitulo {
+  overflow: hidden;
+}
+.col-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
 
-  .usuario-rol-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    background: $primary-light;
-    color: $primary;
-
-    &.rol-administrador { background: rgba($accent-admin, 0.12);   color: darken($accent-admin, 5%); }
-    &.rol-alumno        { background: rgba($accent-alumno, 0.12);  color: darken($accent-alumno, 5%); }
-  }
-
-  .usuario-acciones {
-    display: flex;
-    gap: 4px;
-    flex-shrink: 0;
-
-    .accion-btn { --border-radius: 8px; }
-    .edit-btn   { --color: #{$accent-alumno}; }
-    .delete-btn { --color: #{$accent-admin}; }
+// ── Inputs inline ──────────────────────────────────────────────────────────────
+.inline-input {
+  width: 100%;
+  border: 1px solid rgba(118,75,162,0.18);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.875rem;
+  color: $text;
+  background: $surface;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  &:focus {
+    border-color: $purple;
+    box-shadow: 0 0 0 3px rgba(118,75,162,0.12);
   }
 }
 
-.usuarios-vacio {
+.inline-select {
+  width: 100%;
+  border: 1px solid rgba(118,75,162,0.18);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.875rem;
+  color: $text;
+  background: $surface;
+  outline: none;
+  cursor: pointer;
+  height: 34px;
+  &:disabled { opacity: 0.45; cursor: not-allowed; background: #f5f5f5; }
+  &:focus { border-color: $purple; box-shadow: 0 0 0 3px rgba(118,75,162,0.12); }
+}
+
+// ── Botones acción ─────────────────────────────────────────────────────────────
+.expand-btn, .btn-accion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  transition: all 0.18s;
+}
+
+.expand-btn {
+  background: transparent;
+  color: $muted;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  &:hover { background: $purple-light; color: $purple; }
+}
+
+.rol-icon {
+  color: $muted;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.btn-save   { background: rgba(45,211,111,0.12);  color: #1a8a4a; &:hover { background: rgba(45,211,111,0.25); } }
+.btn-delete { background: rgba(235,68,90,0.1);    color: $red;    &:hover { background: rgba(235,68,90,0.2); } }
+.btn-view   { background: rgba(56,128,255,0.1);   color: $blue;   &:hover { background: rgba(56,128,255,0.22); } }
+
+// ── Imagen proyecto ────────────────────────────────────────────────────────────
+.proyecto-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+// ── Badges ─────────────────────────────────────────────────────────────────────
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+.estado-en-curso   { background: rgba(56,128,255,0.1);  color: $blue; }
+.estado-pausado    { background: rgba(230,146,10,0.12); color: $orange; }
+.estado-finalizado { background: rgba(45,211,111,0.1);  color: #1a8a4a; }
+.vis-privado { background: rgba(235,68,90,0.1);   color: $red; }
+.vis-publico { background: rgba(45,211,111,0.1);  color: #1a8a4a; }
+
+// ── Tabla vacía ────────────────────────────────────────────────────────────────
+.tabla-vacia {
   text-align: center;
-  padding: 50px 20px;
-  color: #bbb;
-
-  ion-icon { font-size: 48px; margin-bottom: 12px; display: block; }
-  p { font-size: 1rem; margin: 0; }
+  padding: 48px 20px;
+  color: $muted;
+  ion-icon { font-size: 40px; display: block; margin: 0 auto 10px; }
+  p { margin: 0; font-size: 0.9rem; }
 }
 
-// Skeleton
-.usuario-item.skeleton {
-  pointer-events: none;
-
-  @mixin shimmer-bg {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.2s infinite;
-  }
-
-  .skeleton-box { @include shimmer-bg; border-radius: 50%; }
-  .skeleton-line {
-    height: 12px;
-    border-radius: 6px;
-    display: block;
-    @include shimmer-bg;
-
-    &.wide   { width: 160px; }
-    &.short  { width: 70px; margin-top: 6px; }
-    &.medium { width: 80px; }
-  }
+// ── Subpanel proyectos del alumno ──────────────────────────────────────────────
+.subpanel {
+  padding: 14px 20px;
+  background: rgba(118,75,162,0.025);
+  border-top: 1px dashed rgba(118,75,162,0.15);
+  animation: slideDown 0.2s ease-out;
 }
+.subpanel-titulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: $purple;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+.subpanel-vacio { font-size: 0.85rem; color: $muted; font-style: italic; }
+.subpanel-lista { display: flex; flex-direction: column; gap: 6px; }
+.subpanel-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(118,75,162,0.08);
+  border-radius: 8px;
+}
+.subpanel-img  { width: 30px; height: 30px; border-radius: 6px; object-fit: cover; }
+.subpanel-name { font-weight: 700; font-size: 0.88rem; color: $text; flex: 1; }
+
+// ── Ver más ────────────────────────────────────────────────────────────────────
+.ver-mas-wrapper { text-align: center; padding: 12px; border-top: 1px solid $border; }
+.ver-mas-btn {
+  background: none;
+  border: 1.5px solid #ddd;
+  border-radius: 20px;
+  padding: 6px 22px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $muted;
+  cursor: pointer;
+  transition: all 0.18s;
+  &:hover { border-color: $purple; color: $purple; }
+}
+
+// ── Skeleton ───────────────────────────────────────────────────────────────────
+.tabla-skeleton { display: flex; flex-direction: column; gap: 6px; }
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: $surface;
+  border-radius: 10px;
+  border: 1px solid $border;
+}
+.sk {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  flex-shrink: 0;
+}
+.sk-icon { width: 32px; height: 32px; border-radius: 50%; }
+.sk-sm   { width: 60px; }
+.sk-md   { width: 100px; }
+.sk-lg   { flex: 1; }
+.sk-xl   { flex: 2; }
 
 @keyframes shimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
-
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-16px); }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// MODALES — sistema compartido
-// ═══════════════════════════════════════════════════════════════════════════════
-
+// ══════════════════════════════════════════════════════════════════════════════
+// MODALES (reutilizados tal cual del proyecto)
+// ══════════════════════════════════════════════════════════════════════════════
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 10, 30, 0.6);
-  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.55);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  padding: 16px;
-  animation: overlayIn 0.2s ease;
-}
-
-@keyframes overlayIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes modalIn {
-  from { opacity: 0; transform: translateY(24px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .modal-card {
-  background: #16112a;
-  border-radius: $radius-modal;
+  background: $surface;
+  border-radius: 24px;
   width: 100%;
-  max-width: 480px;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.06),
-    0 32px 80px rgba(0,0,0,0.55);
-  overflow: hidden;
-  animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  // Modal masivo más ancho
-  &.modal-masivo {
-    max-width: 560px;
-  }
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+  animation: slideUp 0.25s ease-out;
 }
 
-// ── Header ────────────────────────────────────────────────────────────────────
+.modal-masivo { max-width: 560px; }
+
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 22px 24px 18px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-
-  .modal-header-info {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .modal-avatar {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    background: rgba(255,255,255,0.07);
-    flex-shrink: 0;
-
-    &.avatar-administrador { background: rgba(139, 92, 246, 0.2); color: #b89dfa; }
-    &.avatar-alumno        { background: rgba(56, 128, 255, 0.2); color: #7fb3ff; }
-    &.avatar-profesor      { background: rgba(45, 211, 111, 0.2); color: #6ae89a; }
-  }
-
-  .modal-title {
-    margin: 0 0 2px;
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #f0ecff;
-    letter-spacing: -0.01em;
-  }
-
-  .modal-subtitle {
-    display: block;
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.38);
-    font-weight: 400;
-  }
-
-  .modal-close-btn {
-    --color: rgba(255,255,255,0.35);
-    --padding-start: 6px;
-    --padding-end: 6px;
-    transition: color 0.15s;
-
-    &:hover { --color: rgba(255,255,255,0.7); }
-  }
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid $border;
 }
-
-// ── Body ──────────────────────────────────────────────────────────────────────
-.modal-body {
-  padding: 22px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.form-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-}
-
-.form-hint {
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: 0;
-  color: rgba(255,255,255,0.28);
-  font-size: 0.75rem;
-  margin-left: 4px;
-}
-
-.form-input,
-.form-select {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: $radius-input;
-  padding: 12px 15px;
-  color: #f0ecff;
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.2s, background 0.2s;
-  width: 100%;
-  box-sizing: border-box;
-
-  &::placeholder { color: rgba(255,255,255,0.2); }
-
-  &:focus {
-    border-color: rgba(139, 92, 246, 0.6);
-    background: rgba(255,255,255,0.08);
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
-  }
-}
-
-.form-select {
-  cursor: pointer;
-  option { background: #1e1530; color: #f0ecff; }
-}
-
-// ── Footer ────────────────────────────────────────────────────────────────────
-.modal-footer {
-  display: flex;
-  gap: 10px;
-  padding: 16px 24px 22px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-
-  .btn-cancelar {
-    flex: 1;
-    padding: 12px;
-    border-radius: $radius-input;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: transparent;
-    color: rgba(255,255,255,0.45);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-
-    &:hover {
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.7);
-    }
-  }
-
-  .btn-guardar {
-    flex: 2;
-    padding: 12px;
-    border-radius: $radius-input;
-    border: none;
-    background: linear-gradient(135deg, #8b5cf6 0%, #6d3fcf 100%);
-    color: #fff;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    transition: opacity 0.2s, transform 0.15s;
-    box-shadow: 0 4px 16px rgba(109, 63, 207, 0.35);
-
-    ion-icon { font-size: 1rem; }
-
-    &:not(:disabled):hover { opacity: 0.92; transform: translateY(-1px); }
-    &:not(:disabled):active { transform: scale(0.98); }
-    &:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// MODAL MASIVO — componentes específicos
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// ── PROYECTOS ─────────────────────────────────────────────────────────────────
-
-.proyectos-section {
-  padding-bottom: 50px;
-}
-
-.btn-nuevo-proyecto {
-  --background: #{$primary};
-  --background-hover: #{$primary-dark};
-  --border-radius: 12px;
-  height: 40px;
-  font-size: 0.88rem;
-  font-weight: 700;
-}
-
-.proyecto-item {
-  .proyecto-desc {
-    max-width: 400px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .proyecto-meta {
-    display: flex;
-    align-items: center;
-
-    .proyecto-cupo {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: $text-muted;
-      white-space: nowrap;
-
-      ion-icon { font-size: 0.95rem; }
-    }
-  }
-}
-
-// Avatares de estado proyecto
-.estado-avatar-en-curso   { background: rgba($accent-alumno, 0.12); color: $accent-alumno; }
-.estado-avatar-pausado    { background: rgba(255, 165, 0, 0.12);    color: #e6920a; }
-.estado-avatar-finalizado { background: rgba(45, 211, 111, 0.12);   color: #2dd36f; }
-
-// Badges de estado
-.usuario-rol-badge {
-  &.estado-en-curso   { background: rgba($accent-alumno, 0.12); color: darken($accent-alumno, 5%); }
-  &.estado-pausado    { background: rgba(255, 165, 0, 0.12);    color: #c47a00; }
-  &.estado-finalizado { background: rgba(45, 211, 111, 0.12);   color: darken(#2dd36f, 15%); }
-}
-
-// Filtros estado
-.filtro-btn {
-  &.filtro-encurso.active   { background: $accent-alumno; border-color: $accent-alumno; }
-  &.filtro-pausado.active   { background: #e6920a;        border-color: #e6920a; }
-  &.filtro-finalizado.active{ background: #2dd36f;        border-color: #2dd36f; }
-}
-
-// Avatar modal proyecto
+.modal-header-info { display: flex; align-items: center; gap: 14px; }
 .modal-avatar {
-  &.avatar-proyecto { background: rgba(45, 211, 111, 0.2); color: #5ee88a; }
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  &.avatar-administrador, &.avatar-admin { background: rgba(235,68,90,0.12); color: $red; }
+  &.avatar-alumno        { background: rgba(56,128,255,0.12); color: $blue; }
+  &.avatar-proyecto      { background: $purple-light; color: $purple; }
+}
+.modal-title    { font-size: 1.15rem; font-weight: 800; color: $text; margin: 0; }
+.modal-subtitle { font-size: 0.82rem; color: $muted; }
+.modal-close-btn { --color: #{$muted}; }
+
+.modal-body    { padding: 20px 28px; display: flex; flex-direction: column; gap: 16px; }
+.modal-footer  {
+  padding: 16px 28px 24px;
+  display: flex; justify-content: flex-end; gap: 10px;
+  border-top: 1px solid $border;
 }
 
-// Textarea del modal
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
-  font-family: inherit;
-  line-height: 1.5;
+// Form elements dentro del modal
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label  { font-size: 0.82rem; font-weight: 700; color: $text; }
+.form-hint   { font-weight: 400; color: $muted; font-size: 0.78rem; margin-left: 4px; }
+.form-input  {
+  border: 1.5px solid rgba(118,75,162,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: $text;
+  background: $surface;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  &:focus { border-color: $purple; box-shadow: 0 0 0 3px rgba(118,75,162,0.12); }
+}
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-select {
+  border: 1.5px solid rgba(118,75,162,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: $text;
+  background: $surface;
+  outline: none;
+  cursor: pointer;
+  &:focus { border-color: $purple; box-shadow: 0 0 0 3px rgba(118,75,162,0.12); }
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.btn-cancelar {
+  border: 1.5px solid #ddd; background: $surface; border-radius: 10px;
+  padding: 10px 20px; font-size: 0.88rem; font-weight: 600; color: $muted;
+  cursor: pointer; transition: all 0.18s;
+  &:hover { border-color: $purple; color: $purple; }
+}
+.btn-guardar {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: $purple; color: #fff; border: none; border-radius: 10px;
+  padding: 10px 22px; font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; transition: background 0.18s;
+  &:hover { background: $purple-dark; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
-// Fila de dos columnas en el modal
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-// Buscador del modal masivo
-.masivo-search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-
-  .masivo-search-icon {
-    position: absolute;
-    left: 13px;
-    font-size: 1rem;
-    color: rgba(255,255,255,0.3);
-    pointer-events: none;
-  }
-
-  .masivo-search-input {
-    width: 100%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: $radius-input;
-    padding: 11px 40px 11px 38px;
-    color: #f0ecff;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s, background 0.2s;
-    box-sizing: border-box;
-
-    &::placeholder { color: rgba(255,255,255,0.22); }
-
-    &:focus {
-      border-color: rgba(139, 92, 246, 0.55);
-      background: rgba(255,255,255,0.07);
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-    }
-  }
-
-  .masivo-search-clear {
-    position: absolute;
-    right: 10px;
-    background: rgba(255,255,255,0.08);
-    border: none;
-    border-radius: 6px;
-    width: 22px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: rgba(255,255,255,0.4);
-    font-size: 0.85rem;
-    transition: background 0.15s, color 0.15s;
-
-    &:hover { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.75); }
-  }
-}
-
-.masivo-vacio {
+// Imagen uploader
+.imagen-uploader {
+  border: 2px dashed rgba(118,75,162,0.3);
+  border-radius: 12px;
+  padding: 20px;
   text-align: center;
-  padding: 24px 16px;
-  color: rgba(255,255,255,0.25);
+  cursor: pointer;
+  position: relative;
+  min-height: 100px;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.18s;
+  &:hover { border-color: $purple; }
+  &.tiene-imagen { padding: 8px; border-style: solid; }
+}
+.imagen-placeholder {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: $muted;
+  ion-icon { font-size: 2rem; }
+  span { font-size: 0.85rem; }
+  .imagen-hint { font-size: 0.75rem; opacity: 0.7; }
+}
+.imagen-preview {
+  width: 100%; max-height: 160px; object-fit: cover; border-radius: 8px;
+}
+.imagen-quitar-btn {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%;
+  width: 26px; height: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
 
-  ion-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+// Tareas
+.tareas-admin-section { gap: 10px; }
+.tareas-label {
+  display: flex; align-items: center; gap: 6px;
+  ion-icon { color: $purple; }
+}
+.tareas-count-badge {
+  background: $purple-light; color: $purple; font-size: 0.72rem;
+  font-weight: 700; padding: 2px 8px; border-radius: 10px;
+}
+.tareas-lista { display: flex; flex-direction: column; gap: 6px; }
+.tarea-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; background: rgba(118,75,162,0.03);
+  border: 1px solid rgba(118,75,162,0.1); border-radius: 8px;
+}
+.tarea-drag-handle { cursor: grab; color: $muted; display: flex; align-items: center; }
+.tarea-num { font-size: 0.75rem; color: $muted; font-weight: 700; min-width: 18px; }
+.tarea-input { flex: 1; }
+.tarea-quitar-btn { background: none; border: none; color: $red; cursor: pointer; display: flex; align-items: center; }
+.tareas-vacio {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px; color: $muted; font-size: 0.85rem; font-style: italic;
+  ion-icon { font-size: 1.2rem; }
+}
+.btn-añadir-tarea {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: $purple-light; color: $purple; border: none;
+  border-radius: 8px; padding: 8px 14px; font-size: 0.83rem;
+  font-weight: 600; cursor: pointer; transition: background 0.18s;
+  &:hover { background: rgba(118,75,162,0.2); }
+}
+.tareas-admin-aviso {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(118,75,162,0.06); border-radius: 8px;
+  padding: 10px 14px; font-size: 0.83rem; color: $muted;
+  ion-icon { color: $purple; font-size: 1.1rem; }
+}
+
+// Modal masivo
+.masivo-search-wrapper {
+  display: flex; align-items: center; gap: 8px;
+  border: 1.5px solid rgba(118,75,162,0.2); border-radius: 10px;
+  padding: 6px 12px; background: $surface;
+  .masivo-search-icon { color: $muted; font-size: 1rem; }
+  .masivo-search-input {
+    flex: 1; border: none; outline: none;
+    font-size: 0.9rem; color: $text; background: transparent;
+  }
+  .masivo-search-clear { background: none; border: none; color: $muted; cursor: pointer; display: flex; align-items: center; }
+}
+.masivo-acciones-rapidas { display: flex; flex-wrap: wrap; gap: 6px; }
+.masivo-lista {
+  display: flex; flex-direction: column; gap: 4px;
+  max-height: 280px; overflow-y: auto; border: 1px solid $border;
+  border-radius: 10px; padding: 6px;
+}
+.masivo-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 8px; cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: $purple-light; }
+  &.masivo-item-selected { background: rgba(118,75,162,0.1); border: 1px solid rgba(118,75,162,0.25); }
+}
+.masivo-check { font-size: 1.2rem; color: $purple; }
+.usuario-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  &.avatar-alumno        { background: rgba(56,128,255,0.12); color: $blue; }
+  &.avatar-administrador, &.avatar-admin { background: rgba(235,68,90,0.12); color: $red; }
+}
+.usuario-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.usuario-nombre { font-weight: 600; font-size: 0.88rem; color: $text; }
+.usuario-id     { font-size: 0.75rem; color: $muted; }
+.usuario-rol-badge {
+  font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+  text-transform: uppercase;
+  &.rol-alumno        { background: rgba(56,128,255,0.12); color: $blue; }
+  &.rol-administrador, &.rol-admin { background: rgba(235,68,90,0.12); color: $red; }
+}
+.masivo-vacio {
+  text-align: center; padding: 24px; color: $muted;
+  ion-icon { font-size: 28px; display: block; margin: 0 auto 6px; }
   p { font-size: 0.85rem; margin: 0; }
 }
 
-.masivo-acciones-rapidas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  .filtro-btn {
-    padding: 5px 14px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.05);
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
-    color: rgba(255,255,255,0.5);
-    transition: all 0.2s ease;
-
-    &:hover {
-      border-color: rgba(139, 92, 246, 0.5);
-      color: #b89dfa;
-      background: rgba(139, 92, 246, 0.1);
-    }
-
-    &.filtro-admin:hover  { border-color: rgba($accent-admin, 0.5); color: lighten($accent-admin, 20%); background: rgba($accent-admin, 0.1); }
-    &.filtro-alumno:hover { border-color: rgba($accent-alumno, 0.5); color: lighten($accent-alumno, 20%); background: rgba($accent-alumno, 0.1); }
-  }
-}
-
-.masivo-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 320px;
-  overflow-y: auto;
-  padding-right: 4px;
-
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
-  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-}
-
-.masivo-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: background 0.15s, border-color 0.15s;
-  background: rgba(255,255,255,0.03);
-
-  &:hover {
-    background: rgba(139, 92, 246, 0.07);
-    border-color: rgba(139, 92, 246, 0.2);
-  }
-
-  &.masivo-item-selected {
-    background: rgba(139, 92, 246, 0.13);
-    border-color: rgba(139, 92, 246, 0.35);
-
-    .masivo-check ion-icon { color: #b89dfa; }
-    .usuario-nombre { color: #f0ecff; }
-  }
-
-  .masivo-check {
-    flex-shrink: 0;
-    width: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    ion-icon {
-      font-size: 1.2rem;
-      color: rgba(255,255,255,0.2);
-      transition: color 0.15s;
-    }
-  }
-
-  .usuario-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 1.1rem;
-
-    &.avatar-administrador { background: rgba($accent-admin, 0.18); color: lighten($accent-admin, 15%); }
-    &.avatar-alumno        { background: rgba($accent-alumno, 0.18); color: lighten($accent-alumno, 15%); }
-  }
-
-  .usuario-info {
-    flex: 1;
-    min-width: 0;
-
-    .usuario-nombre {
-      display: block;
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.75);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      transition: color 0.15s;
-    }
-
-    .usuario-id {
-      display: block;
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.3);
-    }
-  }
-
-  .usuario-rol-badge {
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    flex-shrink: 0;
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.3);
-
-    &.rol-administrador { background: rgba($accent-admin, 0.18); color: lighten($accent-admin, 20%); }
-    &.rol-alumno        { background: rgba($accent-alumno, 0.18); color: lighten($accent-alumno, 20%); }
-  }
-}
-
-// Vista previa de imagen en el modal
-.foto-preview-wrapper {
-  margin-top: 10px;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 2px solid rgba(118, 75, 162, 0.2);
-  max-height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8f4fd;
-
-  .foto-preview {
-    width: 100%;
-    max-height: 180px;
-    object-fit: cover;
-    display: block;
-  }
-}
-
-// Foto miniatura en la lista de proyectos
-.proyecto-avatar {
-  overflow: hidden;
-
-  .proyecto-foto-mini {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: inherit;
-  }
-}
-
-
-// ─── Imagen uploader en modal proyecto ───────────────────────────────────────
-.imagen-uploader {
-  position: relative;
-  width: 100%;
-  min-height: 130px;
-  border: 2px dashed rgba(var(--ion-color-primary-rgb), 0.35);
-  border-radius: 14px;
-  cursor: pointer;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(var(--ion-color-primary-rgb), 0.03);
-  transition: border-color 0.2s, background 0.2s;
-
-  &:hover {
-    border-color: rgba(var(--ion-color-primary-rgb), 0.65);
-    background: rgba(var(--ion-color-primary-rgb), 0.07);
-  }
-
-  &.tiene-imagen {
-    border-style: solid;
-    min-height: 160px;
-    border-color: rgba(var(--ion-color-primary-rgb), 0.4);
-  }
-}
-
-.imagen-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 24px 16px;
-  color: var(--ion-color-medium);
-  pointer-events: none;
-
-  ion-icon {
-    font-size: 2.2rem;
-    color: rgba(var(--ion-color-primary-rgb), 0.55);
-  }
-
-  span {
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
-}
-
-.imagen-hint {
-  font-size: 0.75rem !important;
-  font-weight: 400 !important;
-  color: var(--ion-color-medium-shade);
-}
-
-.imagen-preview {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  display: block;
-  border-radius: 12px;
-}
-
-.imagen-quitar-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  transition: background 0.15s;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.8);
-  }
-
-  ion-icon {
-    font-size: 1rem;
-  }
-}
-
-// ── BADGE FICHAJE ─────────────────────────────────────────────────────────────
-.fichado-badge {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 20px;
-  padding: 4px 10px;
-  white-space: nowrap;
-  min-width: 90px;
-  justify-content: center;
-
-  ion-icon { font-size: 13px; }
-
-  &.fichado-si {
-    background: rgba(45, 211, 111, 0.13);
-    color: darken(#2dd36f, 10%);
-  }
-
-  &.fichado-no {
-    background: rgba(235, 68, 90, 0.12);
-    color: darken(#eb445a, 5%);
-  }
-
-  &.fichado-na {
-    color: #c0c8d8;
-    background: transparent;
-    font-size: 16px;
-    font-weight: 300;
-  }
-}
-
-// ── FILTROS FICHADO ───────────────────────────────────────────────────────────
-.filtro-fichado {
-  &.active {
-    background: rgba(45, 211, 111, 0.18) !important;
-    color: darken(#2dd36f, 12%) !important;
-    border-color: #2dd36f !important;
-  }
-}
-
-.filtro-no-fichado {
-  &.active {
-    background: rgba(235, 68, 90, 0.15) !important;
-    color: darken(#eb445a, 5%) !important;
-    border-color: #eb445a !important;
-  }
-}
-
-.afk-section {
-  margin-top: 8px;
-}
-
-// Leyenda
-.afk-legend {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-// Badges reutilizables
-.afk-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 600;
-
-  &.afk-si {
-    background: rgba(34, 197, 94, 0.12);
-    color: #16a34a;
-  }
-
-  &.afk-no {
-    background: rgba(239, 68, 68, 0.12);
-    color: #dc2626;
-  }
-}
-
-// Loading
-.afk-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 32px;
-  color: var(--ion-color-medium);
-  font-size: 0.9rem;
-
-  .afk-loading-icon {
-    font-size: 1.4rem;
-    animation: spin 1s linear infinite;
-  }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-// Tabla
-.afk-tabla-wrapper {
-  margin-top: 12px;
-  background: var(--ion-color-light, #f8fafc);
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.06);
-}
-
-.afk-tabla {
-  width: 100%;
-}
-
-.afk-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 16px;
-  padding: 13px 18px;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  transition: background 0.15s;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &.afk-row-header {
-    background: rgba(99, 102, 241, 0.06);
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--ion-color-medium);
-  }
-
-  &.afk-row-respondio:hover {
-    background: rgba(34, 197, 94, 0.04);
-  }
-
-  &.afk-row-afk:hover {
-    background: rgba(239, 68, 68, 0.04);
-  }
-}
-
-// Avatar + nombre
-.afk-usuario {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.afk-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: rgba(99, 102, 241, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  ion-icon {
-    font-size: 16px;
-    color: #6366f1;
-  }
-}
-
-.afk-usuario-info {
-  display: flex;
-  flex-direction: column;
-
-  .afk-nombre {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--ion-color-dark, #1e293b);
-    line-height: 1.2;
-  }
-
-  .afk-id {
-    font-size: 0.72rem;
-    color: var(--ion-color-medium);
-  }
-}
-
-// Hora
-.afk-hora {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.85rem;
-  color: var(--ion-color-medium-shade);
-  white-space: nowrap;
-
-  ion-icon {
-    font-size: 14px;
-  }
-}
-
-// Resultado badge dentro de la fila
-.afk-resultado {
-  display: flex;
-  justify-content: flex-end;
-  white-space: nowrap;
-}
-
-// Ver más
-.ver-todo-container {
-  display: flex;
-  justify-content: center;
-  padding: 14px;
-}
-
-.ver-todo-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 20px;
-  border: 1px solid rgba(0,0,0,0.1);
-  border-radius: 20px;
-  background: transparent;
-  font-size: 0.83rem;
-  font-weight: 500;
-  color: var(--ion-color-medium-shade);
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-
-  &:hover {
-    background: rgba(99, 102, 241, 0.06);
-    color: #6366f1;
-  }
-
-  ion-icon {
-    font-size: 14px;
-  }
-}
-
-
-// ─── TAREAS DE PROYECTO (admin modal) ────────────────────────────────────────
-
-.tareas-admin-section {
-  margin-top: 4px;
-}
-
-.tareas-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  ion-icon { font-size: 16px; color: #a78bfa; }
-
-  .tareas-count-badge {
-    margin-left: auto;
-    background: rgba(118, 75, 162, 0.15);
-    color: #a78bfa;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 1px 8px;
-    border-radius: 99px;
-  }
-}
-
-.tareas-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.tarea-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 10px;
-  padding: 6px 8px;
-  transition: border-color 0.15s;
-
-  &:focus-within {
-    border-color: rgba(118, 75, 162, 0.5);
-  }
-
-  // CDK drag
-  &.cdk-drag-preview {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-    border-color: #764ba2;
-    opacity: 0.95;
-  }
-  &.cdk-drag-placeholder { opacity: 0.25; }
-  &.cdk-drag-animating   { transition: transform 200ms ease; }
-}
-
-.tarea-drag-handle {
-  cursor: grab;
-  color: rgba(255, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  font-size: 18px;
-  flex-shrink: 0;
-  &:hover { color: rgba(255, 255, 255, 0.6); }
-  &:active { cursor: grabbing; }
-}
-
-.tarea-num {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.3);
-  min-width: 18px;
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.tarea-input {
-  flex: 1;
-  margin: 0 !important;
-  padding: 4px 8px !important;
-  min-height: unset !important;
-  height: 34px !important;
-  font-size: 0.875rem !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: #ffffff !important;
-
-  &::placeholder { color: rgba(255,255,255,0.3) !important; }
-  &:focus { outline: none; }
-}
-
-.tarea-quitar-btn {
-  flex-shrink: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  color: rgba(255, 255, 255, 0.25);
-  transition: color 0.15s;
-
-  ion-icon { font-size: 18px; }
-
-  &:hover { color: #eb445a; }
-}
-
-.tareas-vacio {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 10px;
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 0.85rem;
-  font-style: italic;
-
-  ion-icon { font-size: 18px; }
-}
-
-.btn-añadir-tarea {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(118, 75, 162, 0.12);
-  border: 1px dashed rgba(118, 75, 162, 0.4);
-  border-radius: 10px;
-  color: #a78bfa;
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 8px 14px;
-  cursor: pointer;
-  width: 100%;
-  justify-content: center;
-  transition: background 0.15s, border-color 0.15s;
-
-  ion-icon { font-size: 16px; }
-
-  &:hover {
-    background: rgba(118, 75, 162, 0.2);
-    border-color: rgba(118, 75, 162, 0.7);
-  }
-}
-
-.tareas-admin-aviso {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.35);
-  padding: 10px 2px 4px;
-  font-style: italic;
-
-  ion-icon { font-size: 15px; color: rgba(255,255,255,0.25); }
-}
-
-// ── DARK MODE OVERRIDES ──────────────────────────────────────
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// DARK MODE
+// ══════════════════════════════════════════════════════════════════════════════
 :host-context(body.ion-palette-dark) {
 
-  .home-wrapper {
-    background-color: #1a1225;
+  .admin-wrapper    { background: $dk-bg; }
+  .admin-divider    { border-color: $dk-border; }
+
+  .section-title    { color: $dk-text; }
+  .section-count    { background: rgba(168,85,247,0.12); color: #c4a7e7; }
+
+  .admin-searchbar  { --background: #{$dk-surface}; --color: #{$dk-text}; }
+
+  .filtro-btn {
+    border-color: $dk-border; background: $dk-surface; color: $dk-muted;
+    &:hover  { border-color: #c4a7e7; color: #c4a7e7; }
+    &.active { background: $purple; border-color: $purple; color: #fff; }
+    &.filtro-admin.active    { background: $red;    border-color: $red; }
+    &.filtro-alumno.active   { background: $blue;   border-color: $blue; }
+    &.filtro-fichado.active  { background: $green;  border-color: $green; }
+    &.filtro-nofichado.active{ background: $red;    border-color: $red; }
+    &.filtro-encurso.active  { background: $blue;   border-color: $blue; }
+    &.filtro-pausado.active  { background: $orange; border-color: $orange; }
+    &.filtro-finalizado.active { background: $green; border-color: $green; }
   }
 
-  .section-title {
-    color: #e8dff2;
+  .tabla-wrapper {
+    background: $dk-surface;
+    border-color: $dk-border;
   }
 
-  .divider {
-    background: rgba(255, 255, 255, 0.08);
+  .tabla-header {
+    background: rgba(168,85,247,0.08);
+    border-bottom-color: $dk-border;
+    color: #c4a7e7;
   }
 
-  // User list
-  .usuario-item {
-    background: #241a33;
-    border-color: #4a3660;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-
-    &:hover { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); }
-
-    .usuario-info .usuario-nombre { color: #e8dff2; }
-    .usuario-info .usuario-id { color: #7a6d8a; }
+  .tabla-row-wrapper { border-bottom-color: $dk-border; }
+  .tabla-row         { &:hover { background: rgba(168,85,247,0.05); } }
+  .tabla-row-proyecto {
+    border-bottom-color: $dk-border;
+    &:hover { background: rgba(168,85,247,0.05); }
   }
 
-  .usuarios-header {
-    .usuarios-title-block .usuarios-count { color: #7a6d8a; }
+  .inline-input {
+    border-color: $dk-border; color: $dk-text; background: $dk-surface2;
+    &:focus { border-color: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,0.2); }
   }
 
-  .usuarios-vacio {
-    color: #7a6d8a;
+  .inline-select {
+    border-color: $dk-border; color: $dk-text; background: $dk-surface2;
+    option { background: $dk-surface2; color: $dk-text; }
+    &:disabled { background: $dk-bg; }
+    &:focus { border-color: #a855f7; }
   }
 
-  // Filters
-  .filtro-roles .filtro-btn {
-    border-color: #4a3660;
-    background: #241a33;
-    color: #9a85b0;
+  .expand-btn {
+    color: $dk-muted;
+    &:hover { background: rgba(168,85,247,0.12); color: #c4a7e7; }
+  }
+  .rol-icon { color: $dk-muted; }
 
+  .tabla-vacia { color: $dk-muted; }
+
+  .subpanel {
+    background: rgba(168,85,247,0.03);
+    border-top-color: $dk-border;
+  }
+  .subpanel-titulo { color: #c4a7e7; }
+  .subpanel-vacio  { color: $dk-muted; }
+  .subpanel-item {
+    background: rgba(36,26,51,0.6);
+    border-color: $dk-border;
+  }
+  .subpanel-name { color: $dk-text; }
+
+  .ver-mas-btn {
+    border-color: $dk-border; color: $dk-muted;
+    &:hover { border-color: #c4a7e7; color: #c4a7e7; }
+  }
+  .ver-mas-wrapper { border-top-color: $dk-border; }
+
+  .sk {
+    background: linear-gradient(90deg, #2d1f3d 25%, #362550 50%, #2d1f3d 75%);
+    background-size: 200% 100%;
+  }
+  .skeleton-row { background: $dk-surface; border-color: $dk-border; }
+
+  // Modal
+  .modal-card    { background: $dk-surface; }
+  .modal-header  { border-bottom-color: $dk-border; }
+  .modal-footer  { border-top-color: $dk-border; }
+  .modal-title   { color: $dk-text; }
+  .modal-subtitle { color: $dk-muted; }
+
+  .form-label { color: $dk-text; }
+  .form-hint  { color: $dk-muted; }
+  .form-input, .form-select {
+    border-color: $dk-border; color: $dk-text; background: $dk-surface2;
+    &:focus { border-color: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,0.2); }
+  }
+
+  .btn-cancelar {
+    border-color: $dk-border; background: $dk-surface; color: $dk-muted;
     &:hover { border-color: #c4a7e7; color: #c4a7e7; }
   }
 
-  // Status section
-  .status-section {
-    background: #241a33;
-    border-color: #4a3660;
+  .imagen-uploader { border-color: $dk-border; &:hover { border-color: #a855f7; } }
+  .imagen-placeholder { color: $dk-muted; }
 
-    .progress-header .progress-percent { color: #e8dff2; }
+  .tarea-row { background: rgba(168,85,247,0.04); border-color: $dk-border; }
+  .tarea-num { color: $dk-muted; }
+  .tareas-vacio { color: $dk-muted; }
+  .tareas-count-badge { background: rgba(168,85,247,0.12); color: #c4a7e7; }
+  .btn-añadir-tarea {
+    background: rgba(168,85,247,0.1); color: #c4a7e7;
+    &:hover { background: rgba(168,85,247,0.2); }
   }
+  .tareas-admin-aviso { background: rgba(168,85,247,0.06); color: $dk-muted; ion-icon { color: #c4a7e7; } }
 
-  // Proyectos section
-  .new-projects {
-    .section-header .section-subtitle { color: #9a85b0; }
-
-    .new-project-card {
-      background: #241a33;
-      border-color: #4a3660;
-    }
+  .masivo-search-wrapper { border-color: $dk-border; background: $dk-surface2; }
+  .masivo-search-input   { color: $dk-text; }
+  .masivo-lista { border-color: $dk-border; }
+  .masivo-item {
+    &:hover { background: rgba(168,85,247,0.1); }
+    &.masivo-item-selected { background: rgba(168,85,247,0.15); border-color: rgba(168,85,247,0.35); }
   }
+  .masivo-check   { color: #c4a7e7; }
+  .usuario-nombre { color: $dk-text; }
+  .usuario-id     { color: $dk-muted; }
+  .masivo-vacio   { color: $dk-muted; }
+}
 
-  .interactive-card {
-    &:hover { box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35); }
+// ==============================================================================
+// ESTILOS CUSTOM PARA EL REDISEÑO (INSPIRADO EN LA CAPTURA)
+// ==============================================================================
+.admin-wrapper {
+  background: #120d1c !important;
+  min-height: 100vh;
+  padding: 40px 30px;
+}
+
+.section-header-custom {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.section-title-custom {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.proyectos-header-custom {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 16px;
+}
+
+.btn-nuevo-proyecto-custom {
+  background: #3880ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(56, 128, 255, 0.3);
+  transition: all 0.2s ease;
+  &:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(56, 128, 255, 0.4);
   }
-
-  // Skeleton shimmer
-  .usuario-item.skeleton {
-    .skeleton-box,
-    .skeleton-line {
-      background: linear-gradient(90deg, #2d1f3d 25%, #362550 50%, #2d1f3d 75%);
-      background-size: 200% 100%;
-    }
-  }
-
-  // AFK Table
-  .afk-tabla-wrapper {
-    background: #241a33;
-    border-color: #4a3660;
-  }
-
-  .afk-row {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
-
-    &.afk-row-header {
-      background: rgba(99, 102, 241, 0.08);
-    }
-
-    &.afk-row-respondio:hover { background: rgba(34, 197, 94, 0.06); }
-    &.afk-row-afk:hover { background: rgba(239, 68, 68, 0.06); }
-  }
-
-  .ver-todo-btn {
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #9a85b0;
-
-    &:hover {
-      background: rgba(99, 102, 241, 0.1);
-      color: #a1b4fd;
-    }
-  }
-
-  // Foto preview
-  .foto-preview-wrapper {
-    border-color: rgba(118, 75, 162, 0.3);
-    background: #2d1f3d;
+  &:active {
+    transform: translateY(0);
   }
 }
+
+.tabla-wrapper-alumnos, .tabla-wrapper-proyectos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.tabla-header-custom-alumnos {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 140px 180px 90px;
+  gap: 16px;
+  padding: 0 16px;
+  margin-bottom: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #8c7fa6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tabla-header-custom-proyectos {
+  display: grid;
+  grid-template-columns: 60px 1fr 140px 140px 150px;
+  gap: 16px;
+  padding: 0 24px;
+  margin-bottom: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #8c7fa6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.alumno-row-custom {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 140px 180px 90px;
+  gap: 16px;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.proyecto-card-row-custom {
+  display: grid;
+  grid-template-columns: 60px 1fr 140px 140px 150px;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 24px;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.proyecto-thumb-custom {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.col-ptitulo {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1a1a2e;
+}
+
+.col-estado {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #4a5568;
+}
+
+.col-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.custom-input-white, .custom-select-white {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #000000;
+  background: #ffffff;
+  outline: none;
+  height: 48px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  &:focus {
+    border-color: #3880ff;
+    box-shadow: 0 0 0 3px rgba(56, 128, 255, 0.25);
+  }
+}
+
+.custom-select-white {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 36px;
+}
+
+.btn-save-green {
+  background: #2dd36f;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(45, 211, 111, 0.3);
+  transition: all 0.2s ease;
+  &:hover {
+    background: #24b25b;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(45, 211, 111, 0.4);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-detalles-blue {
+  background: #3880ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 22px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(56, 128, 255, 0.25);
+  transition: all 0.2s ease;
+  &:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(56, 128, 255, 0.35);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.badge-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  ion-icon {
+    font-size: 0.9rem;
+  }
+}
+
+.badge-private {
+  background: #fbbf24;
+  color: #1e1b15;
+}
+
+.badge-publico {
+  background: #2dd36f;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(45, 211, 111, 0.25);
+}
+

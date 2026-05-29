@@ -51,7 +51,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['/home']);
+    const sesion = this.authService.obtenerSesion();
+    if (sesion?.rol === 'administrador' || sesion?.rol === 'admin') {
+      this.router.navigate(['/home-admin']);
+    } else {
+      this.router.navigate(['/home']);
+    }
   }
 
   onSearch(event: any) {

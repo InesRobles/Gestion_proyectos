@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -57,5 +58,14 @@ public class AsignacionController {
     public ResponseEntity<List<UsuarioDTO>> getAlumnosPorProyecto(@PathVariable Long proyectoId) {
         List<UsuarioDTO> alumnos = asignacionService.findUsuariosByProyecto(proyectoId);
         return ResponseEntity.ok(alumnos);
+    }
+
+    @PutMapping("/rol")
+    public ResponseEntity<AsignacionDTO> cambiarRol(@RequestBody Map<String, Object> body) {
+        Long usuarioId = ((Number) body.get("usuarioId")).longValue();
+        Long proyectoId = ((Number) body.get("proyectoId")).longValue();
+        String nuevoRol = (String) body.get("rol");
+        AsignacionDTO resultado = asignacionService.cambiarRol(usuarioId, proyectoId, nuevoRol);
+        return ResponseEntity.ok(resultado);
     }
 }
